@@ -17,9 +17,9 @@ import android.util.Printer;
 import com.ds.io.DsLog;
 import com.ds.theard.WorkThread;
 
-public class BitmapGetter {
+public class BitmapNetGetter {
 	private static final boolean DEBUG_PERFORMANCE = false;
-	private static BitmapGetter sInstance;
+	private static BitmapNetGetter sInstance;
 	protected static String sCacheDirPath;
 	
 	private WorkHandler mWorkHandler;
@@ -27,15 +27,15 @@ public class BitmapGetter {
 	
 	private HashMap<Object, Bitmap> mBitmapCache;
 	private HashMap<Object, BitmapGotCallBack> mFetchTask;
-	private static synchronized BitmapGetter getInstance() {
+	private static synchronized BitmapNetGetter getInstance() {
 		if (sInstance == null) {
-			sInstance = new BitmapGetter();
+			sInstance = new BitmapNetGetter();
 		}
 		return sInstance;
 	}
 	
 	private Printer mTheradprint;
-	private BitmapGetter() {
+	private BitmapNetGetter() {
 		mWorkHandler = new WorkHandler();
 		mUIHandler = new UIHandler();
 		mBitmapCache = new HashMap<Object, Bitmap>();
@@ -57,7 +57,7 @@ public class BitmapGetter {
 	 * @param aTask
 	 */
 	public static void releaseBitmap(BitmapTask aTask) {
-		BitmapGetter instance = getInstance();
+		BitmapNetGetter instance = getInstance();
 		Bitmap release = instance.mBitmapCache.get(aTask.getTaskKey());
 		if (release != null) {
 			release.recycle();
