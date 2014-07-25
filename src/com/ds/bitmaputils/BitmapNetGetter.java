@@ -1,6 +1,7 @@
 package com.ds.bitmaputils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -161,7 +162,16 @@ public class BitmapNetGetter {
 			Bitmap retval = null;
 			try {
 				if (aTask.getFileSystemPath() != null) {
-					retval = BitmapFactory.decodeFile(aTask.getFileSystemPath());
+					if (aTask.getBitmapMaxWidth() != -1 && 
+							aTask.getBitmapMaxHeight() != -1)
+					{
+						retval = decodeFileWithMaxSize(
+								aTask.getFileSystemPath(),
+								aTask.getBitmapMaxWidth(),
+								aTask.getBitmapMaxHeight());
+					} else { // origin
+						retval = BitmapFactory.decodeFile(aTask.getFileSystemPath());
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -182,7 +192,26 @@ public class BitmapNetGetter {
 			}
 			return retval;
 		}
-		
+	}
+	
+	private static Bitmap decodeFileWithMaxSize(String filepath, int max_width, int max_height) {
+		BitmapFactory.Options op = new BitmapFactory.Options();
+		op.inScaled = false;
+		op.inJustDecodeBounds = true;
+		Bitmap retval = null;
+		try {
+			InputStream is = new FileInputStream(filepath);
+			BitmapFactory.decodeStream(is, null, op);
+			is.close();
+
+			int sample = Math.max(1, (op.outWidth + op.outHeight ) / (max_width + max_height));
+			op.inSampleSize = sample;
+			op.inJustDecodeBounds = false;
+			retval = BitmapFactory.decodeStream(new FileInputStream(filepath), null, op);
+		} catch (Exception e) {
+			// ZHUJJ: handle exception, should call task error occur
+		}
+		return retval;
 	}
 
 	private static class UIHandler extends Handler {
@@ -209,52 +238,6 @@ public class BitmapNetGetter {
 		}
 	}
 
-	public interface BitmapGotCallBack {
-		/** Call after we got the Bitmap
-		 * @param aBitmap
-		 */
-		public void onBitmapGot(Bitmap aBitmap);
-	}
-	
-	public interface BitmapTask {
-		/**
-		 * The uniq key, which should always same the different sessions. An
-		 * immutable string recommended, or you should serilize the memory
-		 * object
-		 * 
-		 * @return
-		 */
-		public Object getTaskKey();
-
-		/**
-		 * get URI as string
-		 * 
-		 * @return
-		 */
-		public String getNetUrl();
-
-		/**
-		 * the abs path, tell by last call of @saveFileSystemPath, or null
-		 * 
-		 * @return
-		 */
-		public String getFileSystemPath();
-
-		/**
-		 * maybe 403, but now is meanless
-		 * 
-		 * @param aUrl
-		 */
-		public void saveNetUrl(String aUrl);
-
-		/**
-		 * call then cached in local fs, the fs path given
-		 * 
-		 * @param aPath
-		 */
-		public void saveFileSystemPath(String aPath);
-	}
-	
 	private static String saveBitmap2Sdcard(String aDirPath, Bitmap bitmap) {
 		String filePath = null;
 		if (aDirPath == null) {

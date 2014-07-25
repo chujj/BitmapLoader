@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 		
 		mKeys = new String[files.length];
 		
-		for (int i = 0; i < files.length; i++) {
+		for (int i = 0; i < 10; i++) {
 			mKeys[i] = files[i].getAbsolutePath();
 		}
 	}
@@ -74,8 +74,9 @@ public class MainActivity extends Activity {
 			canvas.drawText(Integer.toString(mIdx), 0, 50, mPaint);
 			
 			mIdx ++;
-			mIdx = mIdx > mKeys.length ? 0 : mIdx;
-			this.postInvalidateDelayed(1000);
+			mIdx = mIdx > 9 /*mKeys.length*/ ? 0 : mIdx;
+//			this.postInvalidateDelayed(1000);
+			this.postInvalidate();
 		}
 		
 		
