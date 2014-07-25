@@ -9,6 +9,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
 
@@ -86,9 +87,11 @@ public class MainActivity extends Activity {
 			mPaint = new Paint();
 			mPaint.setColor(0xffffffff);
 			mPaint.setTextSize(50);
+			mRect = new Rect();
 		}
 
 		private LEVEL mCurrLevel = LEVEL.THUMBNAIL;
+		private Rect mRect;
 		@Override
 		protected void onDraw(Canvas canvas) {
 			canvas.drawColor(0xff000000);
@@ -96,7 +99,7 @@ public class MainActivity extends Activity {
 			AtomBitmap abp = BitmapHelper.getInstance(getContext()).getBitmap(mKeys[mIdx], mCurrLevel);
 			mBp = abp.getBitmap();
 			if (mBp != null) {
-				canvas.drawBitmap(mBp, 0, 0, null);
+				canvas.drawBitmap(mBp, null, mRect, null);
 			}
 			canvas.drawText(Integer.toString(mIdx), 0, 50, mPaint);
 			
@@ -116,8 +119,12 @@ public class MainActivity extends Activity {
 				this.postInvalidate();
 			}
 		}
-		
-		
+		@Override
+		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+			mRect.set(0, 0, this.getMeasuredWidth(), this.getMeasuredHeight());
+		}
+
 	}
 	
 	private void testHashOfString() {

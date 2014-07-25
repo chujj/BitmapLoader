@@ -73,7 +73,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 		return isRecycled;
 	}
 	
-	private static Object UniqueKey(String str) {
+	private static Object UniqueKey(String str) { // ZHUJJ: use same key, if size are same
 		return Integer.valueOf(str.hashCode());
 	}
 
@@ -85,7 +85,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 
 	@Override
 	public String getNetUrl() {
-		// ZHUJJ Auto-generated method stub
+		int a = 1 / 0;
 		return null;
 	}
 
@@ -96,13 +96,12 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 
 	@Override
 	public void saveNetUrl(String aUrl) {
-		// ZHUJJ Auto-generated method stub
-		
+		int a = 1 / 0;
 	}
 
 	@Override
 	public void saveFileSystemPath(String aPath) {
-		// ZHUJJ Auto-generated method stub
+		int a = 1 / 0;
 	}
 
 	@Override
