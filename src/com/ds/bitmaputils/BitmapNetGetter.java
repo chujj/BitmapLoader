@@ -20,8 +20,10 @@ import com.ds.theard.WorkThread;
 
 public class BitmapNetGetter {
 	private static final boolean DEBUG_PERFORMANCE = false;
+	public static int DECODE_ORIGIN_SIZE = -1;
 	private static BitmapNetGetter sInstance;
 	protected static String sCacheDirPath;
+	
 	
 	private WorkHandler mWorkHandler;
 	private UIHandler mUIHandler;
@@ -162,8 +164,8 @@ public class BitmapNetGetter {
 			Bitmap retval = null;
 			try {
 				if (aTask.getFileSystemPath() != null) {
-					if (aTask.getBitmapMaxWidth() != -1 && 
-							aTask.getBitmapMaxHeight() != -1)
+					if (aTask.getBitmapMaxWidth() != DECODE_ORIGIN_SIZE && 
+							aTask.getBitmapMaxHeight() != DECODE_ORIGIN_SIZE)
 					{
 						retval = decodeFileWithMaxSize(
 								aTask.getFileSystemPath(),

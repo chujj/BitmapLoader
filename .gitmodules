@@ -1,0 +1,5 @@
+[submodule "nanohttpd"]
+	   path = subprjs/nanohttpd
+	   url = https://github.com/NanoHttpd/nanohttpd.git
+
+

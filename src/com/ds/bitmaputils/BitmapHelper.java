@@ -1,5 +1,7 @@
 package com.ds.bitmaputils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import com.ds.theard.WorkThread;
@@ -13,6 +15,12 @@ public class BitmapHelper {
 	
 	public static int FIT_SCREEN_WIDTH = 768;
 	public static int FIT_SCREEN_HEIGHT = 1280;
+	
+	public static enum LEVEL {
+		THUMBNAIL,
+		FITSCREEN,
+		ORIGIN,
+	}
 	
 	private static BitmapHelper sInstance;
 	public static synchronized BitmapHelper getInstance(Context context) {
@@ -29,22 +37,32 @@ public class BitmapHelper {
 			BitmapNetGetter.setCacheFileDir(context.getFilesDir().getAbsolutePath());
 		}
 		mCbitmapMap = new HashMap<String, Cbitmap>();
+		mAtomBitmaps = new ArrayList<AtomBitmap>();
 	}
 	
 	private HashMap<String , Cbitmap> mCbitmapMap;
+	private ArrayList<AtomBitmap> mAtomBitmaps;
 
+	protected void registeAtomBitmap(AtomBitmap abp) {
+		mAtomBitmaps.add(abp);
+	}
 	
 	/** String as key, ui thread only
 	 * @param path
 	 */
 	public AtomBitmap getBitmap(String path) {
+		return getBitmap(path, LEVEL.THUMBNAIL);
+	}
+	
+	public AtomBitmap getBitmap(String path, LEVEL level) {
 		Cbitmap c = mCbitmapMap.get(path);
 		if (c == null) {
-			c = new Cbitmap(path);
+			c = new Cbitmap(this, path);
 			mCbitmapMap.put(path, c);
 		}
-
-		return c.accessBitmap();
+		
+		return c.accessBitmap(level);
+		
 	}
 	
 	
@@ -57,7 +75,13 @@ public class BitmapHelper {
 		
 	}
 	
-	public void dumpAllAtomBitmaps() {
-		
+	public String dumpAllAtomBitmaps() {
+		StringBuilder sb = new StringBuilder();
+		Collections.sort(mAtomBitmaps);
+		for (int i = 0; i < mAtomBitmaps.size(); i++) {
+			sb.append(mAtomBitmaps.get(i).dump());
+			sb.append("\n");
+		}
+		return sb.toString();
 	}
 }

@@ -1,16 +1,15 @@
 package com.ds.bitmaputils;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import com.ds.bitmaputils.BitmapHelper.LEVEL;
 
-public class AtomBitmap implements BitmapTask {
+import android.graphics.Bitmap;
+
+public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	private int max_width, max_height;
 	private int width, height;
-	private int size;
+	private long size;
 	private Bitmap mBitmap;
 	private boolean isRecycled;
 	private long lastAccessTime;
@@ -18,17 +17,24 @@ public class AtomBitmap implements BitmapTask {
 	private String mFilePath;
 	private boolean isDecodeError;
 	private ArrayList<BitmapGotCallBack> mRegistedCallback;
+	private LEVEL mLevel;
+	private Object unique_key;
 
-	public AtomBitmap(String abspath2File, int m_width, int m_height) {
+	public AtomBitmap(BitmapHelper aHalper, LEVEL level, String abspath2File, int m_width, int m_height) {
 		mFilePath = abspath2File;
 		max_width = m_width;
 		max_height = m_height;
 		isRecycled = false;
 		isDecodeError = false;
 		mRegistedCallback = new ArrayList<BitmapGotCallBack>();
+		aHalper.registeAtomBitmap(this);
+		size = -1;
+		mLevel = level;
+		
+		unique_key = UniqueKey(mFilePath + level.name());
 	}
 	
-	public int getSize() {
+	public long getSize() {
 		return size;
 	}
 	
@@ -39,6 +45,7 @@ public class AtomBitmap implements BitmapTask {
 		if (mBitmap == null) {
 			mBitmap = BitmapNetGetter.tryGetBitmapFromUrlOrCallback(this, mInsideCallback);
 		}
+		markRead();
 		return mBitmap;
 	}
 	
@@ -46,11 +53,19 @@ public class AtomBitmap implements BitmapTask {
 		return null;
 	}
 
+	final private void markRead() {
+		lastAccessTime = System.currentTimeMillis();
+		accessCount ++ ;
+	}
+	
 	private BitmapGotCallBack mInsideCallback = new BitmapGotCallBack() {
 		
 		@Override
 		public void onBitmapGot(Bitmap aBitmap) {
 			mBitmap = aBitmap;
+			width = mBitmap.getWidth();
+			height = mBitmap.getHeight();
+			size = width * height;
 		}
 	};
 
@@ -65,7 +80,7 @@ public class AtomBitmap implements BitmapTask {
 	//////////////////////////////// Task implemention ////////////////////////////////
 	@Override
 	public Object getTaskKey() {
-		return UniqueKey(mFilePath);
+		return unique_key;
 	}
 
 	@Override
@@ -88,7 +103,6 @@ public class AtomBitmap implements BitmapTask {
 	@Override
 	public void saveFileSystemPath(String aPath) {
 		// ZHUJJ Auto-generated method stub
-		
 	}
 
 	@Override
@@ -99,5 +113,14 @@ public class AtomBitmap implements BitmapTask {
 	@Override
 	public int getBitmapMaxHeight() {
 		return max_height;
+	}
+
+	@Override
+	public int compareTo(AtomBitmap arg0) {
+		return (int) (size - arg0.size);
+	}
+
+	public String dump() {
+		return mLevel.name() + " : " + Long.toString(size) + " : " + Long.toString(lastAccessTime) + " : " + Long.toString(accessCount) + " : "+  mFilePath;
 	}
 }
