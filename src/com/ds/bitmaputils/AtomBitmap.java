@@ -46,7 +46,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	}
 	
 	public Bitmap getBitmap(BitmapGotCallBack callback) {
-		if (mBitmap == null) {
+		if (mBitmap == null || isRecycled) {
 			mBitmap = BitmapNetGetter.tryGetBitmapFromUrlOrCallback(this, mInsideCallback);
 		}
 		markRead();
@@ -67,6 +67,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 			width = mBitmap.getWidth();
 			height = mBitmap.getHeight();
 			size = width * height;
+			isRecycled = false;
 		}
 	};
 
@@ -133,9 +134,18 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	public String dump() {
 		return 
 				"<td>" + mLevel.name() + "</td>\n"+ 
+				"<td>" + isRecycled + "</td>\n" +
 				"<td>" + Long.toString(size) + "</td>\n" + 
 				"<td>" +Long.toString(lastAccessTime) + "</td>\n" + 
 				"<td>" +Long.toString(accessCount) + "</td>\n"+  
 				"<td>" +mFilePath + "</td>\n";
+	}
+
+	public void recycle() {
+		isRecycled = true;
+		BitmapNetGetter.releaseBitmap(this);
+		mBitmap = null;
+		lastAccessTime = 0;
+		accessCount = 0;
 	}
 }

@@ -76,6 +76,20 @@ public class BitmapHelper {
 		
 	}
 	
+	private static final long SIZE_LIMIT = 2000 * 2000;
+	public void recycleBitmaps() {
+		Collections.sort(mAtomBitmaps);
+		int total_size = 0;
+		long this_size = 0;
+		for (int i = 0; i < mAtomBitmaps.size(); i++) {
+			if (total_size > SIZE_LIMIT) {
+				mAtomBitmaps.get(i).recycle();
+				continue;
+			}
+			total_size += mAtomBitmaps.get(i).getSize();
+		}
+	}
+	
 	public String dumpAllAtomBitmaps() {
 		StringBuilder sb = new StringBuilder();
 		Collections.sort(mAtomBitmaps);

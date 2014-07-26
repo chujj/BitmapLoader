@@ -26,19 +26,31 @@ public class MainActivity extends Activity {
 
 	private String[] mKeys;
 	private MyServer mServer;
+	private View mView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		loadBitmaps();
-		this.setContentView(new ImageView(this));
+		this.setContentView(mView = new ImageView(this));
 		try {
 			mServer = new MyServer(res);
 			mServer.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		mView.postDelayed(recycleCall, 5000);
+		
 	}
+	
+	private Runnable recycleCall = new Runnable() {
+		
+		@Override
+		public void run() {
+			BitmapHelper.getInstance(MainActivity.this).recycleBitmaps();
+			mView.postDelayed(recycleCall, 5000);
+		}
+	};
 	
 	private Responce res = new Responce() {
 		
@@ -133,11 +145,12 @@ public class MainActivity extends Activity {
 				i ++;
 			}
 			mIdx = i;
+		
 
 			AtomBitmap abp = BitmapHelper.getInstance(getContext()).getBitmap(mKeys[mIdx], mCurrLevel);
 			mBp = abp.getBitmap();
 			if (mBp != null) {
-//				canvas.drawBitmap(mBp, null, mRect, null);
+				canvas.drawBitmap(mBp, null, mRect, null);
 			}
 			canvas.drawText(Integer.toString(mIdx), 0, 50, mPaint);
 
