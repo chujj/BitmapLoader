@@ -1,5 +1,7 @@
 package com.learnopengles.android.common;
 
+import com.ds.io.DsLog;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,12 +42,13 @@ public class TextureHelper
 		{
 			throw new RuntimeException("Error loading texture.");
 		}
-		
+
 		return textureHandle[0];
 	}
 	
 	public static int loadTexture(final Context context, Bitmap bitmap)
 	{
+
 		final int[] textureHandle = new int[1];
 
 		GLES20.glGenTextures(1, textureHandle, 0);
@@ -68,7 +71,15 @@ public class TextureHelper
 		{
 			throw new RuntimeException("Error loading texture.");
 		}
-
+		
+		DsLog.e("use text: " + textureHandle[0]);
 		return textureHandle[0];
+	}
+
+	public static void deleteTexture(Context mActivityContext,
+			int mTextureHandle) {
+		int[] id = new int[1];
+		id[0] = mTextureHandle;
+		GLES20.glDeleteTextures(1, id, 0);
 	}
 }

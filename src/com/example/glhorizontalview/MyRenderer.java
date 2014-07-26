@@ -127,7 +127,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				"a_TexCoordinate");
 
 		for (int i = 0; i < items.length; i++) {
-			if ( !(items[i].validate)) continue;
+			if ( !(items[i].validate)) {
+				items[i].deprecateToDraw();
+				continue;
+			}
+			items[i].prepareToDraw();
 
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, items[i].mTextureHandle);
@@ -245,23 +249,48 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		public Item(Bitmap bitmap, float  ax) {
 			mBitmap = bitmap;
-			mTextureHandle = TextureHelper.loadTexture(mActivityContext, bitmap);
+			mTextureHandle = -1;
+//			mTextureHandle = TextureHelper.loadTexture(mActivityContext, bitmap);
+//			DsLog.e("try load text with result: " + mTextureHandle);
 			validate = false;
 			x = ax;
 			offsetX = -1;
 		}
-		
+
 		public void calcOffset(float offset_x) {
 			if (offset_x == offsetX) return;
 			
 			offsetX = offset_x + x; // x changed
 			offsetZ = (float) (-K * Math.pow(offsetX, 2)); // z changed;
-			validate = (-offsetZ > Max_Depth) ? false : true; 
+			boolean old_stat = validate;
+			validate = (-offsetZ > Max_Depth) ? false : true;
+//			if (old_stat != validate) {
+//				if (validate) {
+//					mTextureHandle = TextureHelper.loadTexture(mActivityContext, mBitmap);
+//				} else  {
+//					TextureHelper.deleteTexture(mActivityContext, mTextureHandle);
+//					mTextureHandle = -1;
+//				}
+//			}
+		}
+				
+		public void deprecateToDraw() {
+//			if (mTextureHandle != -1) {
+//				TextureHelper.deleteTexture(mActivityContext, mTextureHandle);
+//				mTextureHandle = -1;
+//			}
+		}
+		
+		public boolean prepareToDraw() {
+			if (validate && mTextureHandle == -1) {
+				mTextureHandle = TextureHelper.loadTexture(mActivityContext, mBitmap);
+			}
+			return true;
 		}
 
 		@Override
 		public String toString() {
-			return "ox: " + x + " ostx: " + offsetX + " ostz: " + offsetZ;
+			return "ox: " + x + " ostx: " + offsetX + " ostz: " + offsetZ + " th: " + mTextureHandle;
 		}
 
 	}

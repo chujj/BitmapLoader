@@ -17,6 +17,7 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		super(context);
 		mGestureDetector = new GestureDetector(context, this);
 	}
+	
 
 	@Override
 	public void setRenderer(Renderer renderer) {
