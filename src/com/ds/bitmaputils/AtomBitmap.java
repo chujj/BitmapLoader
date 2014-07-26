@@ -131,10 +131,11 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	}
 
 	public String dump() {
-		return mLevel.name() + " : "+ 
-				Long.toString(size) + " : " + 
-				Long.toString(lastAccessTime) + " : " + 
-				Long.toString(accessCount) + " : "+  
-				mFilePath;
+		return 
+				"<td>" + mLevel.name() + "</td>\n"+ 
+				"<td>" + Long.toString(size) + "</td>\n" + 
+				"<td>" +Long.toString(lastAccessTime) + "</td>\n" + 
+				"<td>" +Long.toString(accessCount) + "</td>\n"+  
+				"<td>" +mFilePath + "</td>\n";
 	}
 }

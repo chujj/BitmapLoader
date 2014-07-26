@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>FooTable - jQuery plugin for responsive HTML tables</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width = device-width, initial-scale = 1.0, minimum-scale = 1.0, maximum-scale = 1.0, user-scalable = no"/>
+	<link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
+	<link href="FooTable/css/footable.core.css?v=2-0-1" rel="stylesheet" type="text/css"/>
+    <link href="css/footable-demos.css" rel="stylesheet" type="text/css"/>
+    <script src="js/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="FooTable/js/footable.js?v=2-0-1" type="text/javascript"></script>
+	<script src="FooTable/js/footable.sort.js?v=2-0-1" type="text/javascript"></script>
+	<script src="FooTable/js/footable.filter.js?v=2-0-1" type="text/javascript"></script>
+	<script src="FooTable/js/footable.paginate.js?v=2-0-1" type="text/javascript"></script>
+	<script src="js/bootstrap-tab.js" type="text/javascript"></script>
+    <script src="js/data-generator.js" type="text/javascript"></script>
+    <script src="js/jquery.mockjax.js" type="text/javascript"></script>
+    <script src="js/demos.js" type="text/javascript"></script>
+</head>
+<body>
+  <div class="demo-container">
+    <div class="tab-content">
+      <div class="tab-pane active" id="demo">
+        <p><a href="#" class="get_data"></a></p>
+	<table class="table demo" data-filter="#filter" data-page-size="50">
+	  <thead>
+	    <tr>
+	      <th >
+		LEVEL
+	      </th>
+	      <th >
+		Size
+	      </th>
+	      <th>
+		Last Access Time
+	      </th>
+	      <th data-type="numeric">
+		Access Count
+	      </th>
+	      <th >
+		Path
+	      </th>
+	    </tr>
+	  </thead>
+	  <tbody>
+            <!-- load data, which will append here -->
+	  </tbody>
+	  <tfoot class="hide-if-no-paging">
+	    <tr>
+	      <td colspan="5">
+		<div class="pagination pagination-centered"></div>
+	      </td>
+	    </tr>
+	  </tfoot>
+	</table>
+      </div>
+    </div>
+  </div>
+
+  <script src="querylist.js"></script>
+
+</body>
+</html>

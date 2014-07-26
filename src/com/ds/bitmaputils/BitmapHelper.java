@@ -88,9 +88,12 @@ public class BitmapHelper {
 //				return 0;
 //			}
 //		});
+		
 		for (int i = 0; i < mAtomBitmaps.size(); i++) {
+			sb.append("<tr>\n");
 			sb.append(mAtomBitmaps.get(i).dump());
-			sb.append("\n");
+			sb.append("</tr>\n");
+			
 		}
 		return sb.toString();
 	}

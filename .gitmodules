@@ -2,4 +2,7 @@
 	   path = subprjs/nanohttpd
 	   url = https://github.com/NanoHttpd/nanohttpd.git
 
+[submodule "FooTable"]
+	   path = subprjs/server/FooTable
+	   url = https://github.com/bradvin/FooTable.git
 
