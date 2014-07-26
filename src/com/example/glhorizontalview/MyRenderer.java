@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.widget.Scroller;
 
 import com.ds.io.DsLog;
 import com.example.bitmaploader.R;
@@ -47,12 +48,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		// X, Y, Z
 		final float[] cubePositionData = {
 				// Front face
-				-PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, -3.0f, 
-				-PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, -3.0f, 
-				PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, -3.0f,
-				-PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, -3.0f, 
-				PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, -3.0f, 
-				PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, -3.0f, };
+				-PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, 0f, 
+				-PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, 0f, 
+				PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, 0f,
+				-PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, 0f, 
+				PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, 0f, 
+				PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, 0f, };
 
 		final float[] cubeTextureCoordinateData = {
 				// Front face
@@ -138,8 +139,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			GLES20.glUniform1i(mTextureUniformHandle, 0);
 			
 			Matrix.setIdentityM(mModelMatrix, 0);
-			Matrix.translateM(mModelMatrix, 0, items[i].offsetX, 0.0f, items[i].offsetZ);
-			// Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 1.0f, 1.0f, 0.0f);
+			Matrix.translateM(mModelMatrix, 0, items[i].offsetX, 0.0f, PLAN_TRASLATE_Z + items[i].offsetZ);
+			Matrix.rotateM(mModelMatrix, 0, items[i].degree, 0.0f, 1.0f, 0.0f);
 			
 			mCubePositions.position(0);
 			GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize,
@@ -159,33 +160,57 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			
 			GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
 		}
+		
+		if (inAutoAnimation) {
+			inAutoAnimation = continueAnimation();
+		}
 	}
 
-	
-////////////////////////////////animation part ////////////////////////////////
-	private final static int animation_part = 1;
-	
+	////////////////////////////////animation part ////////////////////////////////
+	private final static int View_part = 1;
+
 	private final static float PLAN_HEIGHT_MAXIMIN = 1.0f;
 	private final static float PLAN_HALF_WIDTH_FIXED = 1.0f; // y = k*x^2
 	private final static float PLAN_NEARLEST_GAP = 0.4f;
 	private final static float PLAN_NEARLEST_GAP_DEPTH = 0.3f; // -z toward
+	private final static float PLAN_TRASLATE_Z = -3f;
 	private final static float Distance = (float) (PLAN_HALF_WIDTH_FIXED * 2 + PLAN_NEARLEST_GAP );
 	private final static float K = (float) ( PLAN_NEARLEST_GAP_DEPTH / (
 			Distance * Distance / 4));
 	private final static float Max_Depth = (float) (K * Math.pow((Distance * 2), 2));
+	private final static float Over_Max_Rotate_Degree = 45f;
 	
 	private final static float NEAR = 1.5f;
 	private final static float FAR = Max_Depth + 5;
 	
-	private float screen_height, screen_width;
-	private final static float OVERSCROLL_WIDTH = 100;
-	private int mItemCount = 1;
-	private float mCurrOffset;
+	private float calced_min_offset, calced_max_offset;
+	
+	private final static int animation_part = 1;
+	private Scroller mScroller; // ZHUJJ rewrite use float update precise 
+	private final static long AUTO_ANIMATION_TIME_PER_PIXEL = 500;
+	private boolean inAutoAnimation;
+	private long mThisAnimationTime;
+	private float mThisAnimationDestOffset;
+	private long mLastFrameTimeStamp;
 
+	private float mCurrOffset;
+	
+	/** 
+	 * @return true if animation should draw nextframe yet
+	 */
+	private boolean continueAnimation() {
+		boolean finish = mScroller.computeScrollOffset();
+		mCurrOffset = mScroller.getCurrX();
+		DsLog.e("curr: " + mCurrOffset + " dst: " + mScroller.getFinalX());
+		this.updateItems(0, 0);
+		return finish;
+	}
+	
 	protected IEvent eventHandler = new IEvent() {
 
 		@Override
 		public void onScroll(float offset_x, float offset_y) {
+			if (inAutoAnimation) return;
 			updateItems(offset_x, offset_y);
 		}
 
@@ -201,12 +226,25 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onFinish(float x, float y) { // roll back
+			inAutoAnimation = true;
+			mLastFrameTimeStamp = System.currentTimeMillis();
+			if (mCurrOffset > calced_max_offset) {
+				int dx = (int )(mCurrOffset - calced_max_offset);
+				mScroller.startScroll((int)mCurrOffset, -1, dx, 0, (int) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+			} else if (mCurrOffset < calced_min_offset) {
+				int dx = (int) (calced_min_offset - mCurrOffset);
+				mScroller.startScroll((int) mCurrOffset, -1, dx, 0, (int) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+			} else {
+				mThisAnimationDestOffset = mCurrOffset;
+				mScroller.startScroll(0, 0, 0, 0, 0);
+			}
 			
 		}
 
 	};
 
 	private void initDimensionLimit() {
+		mScroller = new Scroller(mActivityContext);
 		mCurrOffset = 0;
 		
 		int[] resourceIds = new int[] {
@@ -227,25 +265,42 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			items[i] = new Item(bitmap, i * Distance);
 		}
 		
+		calced_max_offset = 0;
+		calced_min_offset =  -( items.length - 1 ) * Distance;
 	}
 	
 	
 	private void updateItems(float offset_x, float offset_y) {
 		mCurrOffset += offset_x;
-		mCurrOffset = Math.min(0, mCurrOffset);
-		mCurrOffset = Math.max( -( items.length - 1 ) * Distance, mCurrOffset);
+		float progress = 0;
+		final float max = calced_max_offset;
+		final float min = calced_min_offset;
+		// calc over progress
+		if (mCurrOffset > max) {
+			progress = Math.min((mCurrOffset - 0) / Distance , 1);
+		} else if (mCurrOffset < min) {
+			progress = Math.max((mCurrOffset  - min) / Distance, -1);
+		}
+		
+		// limit under over
+		mCurrOffset =  Math.max(min - Distance, 
+				Math.min(mCurrOffset, max + Distance));
+
 		for (int i = 0; i < items.length; i++) {
-			items[i].calcOffset(mCurrOffset);
+			items[i].calcOffset(
+					Math.max( min, Math.min(max, mCurrOffset))
+					, Over_Max_Rotate_Degree * progress);
 //			DsLog.e("item " + i + ":" + items[i].toString());
 		}
 	}
 
 	
 	private class Item {
-		private float x, offsetX, offsetZ;
+		private float x, offsetX, offsetZ, degree;
 		private boolean validate;
 		private Bitmap mBitmap;
 		private int mTextureHandle;
+		
 		
 		public Item(Bitmap bitmap, float  ax) {
 			mBitmap = bitmap;
@@ -257,9 +312,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			offsetX = -1;
 		}
 
-		public void calcOffset(float offset_x) {
-			if (offset_x == offsetX) return;
+		public void calcOffset(float offset_x, float f) {
+//			if (offset_x == offsetX) return;
 			
+			degree = f;
 			offsetX = offset_x + x; // x changed
 			offsetZ = (float) (-K * Math.pow(offsetX, 2)); // z changed;
 			boolean old_stat = validate;
