@@ -3,6 +3,7 @@ package com.example.bitmaploader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Random;
 
 import android.app.Activity;
 import android.content.Context;
@@ -81,6 +82,7 @@ public class MainActivity extends Activity {
 		private Bitmap mBp;
 		private int mIdx;
 		private Paint mPaint;
+		private Random mRandom;
 		public ImageView(Context context) {
 			super(context);
 			mIdx = 0;
@@ -88,6 +90,7 @@ public class MainActivity extends Activity {
 			mPaint.setColor(0xffffffff);
 			mPaint.setTextSize(50);
 			mRect = new Rect();
+			mRandom = new Random();
 		}
 
 		private LEVEL mCurrLevel = LEVEL.THUMBNAIL;
@@ -96,28 +99,49 @@ public class MainActivity extends Activity {
 		protected void onDraw(Canvas canvas) {
 			canvas.drawColor(0xff000000);
 			
+			int i = 			mRandom.nextInt(3);
+			if (i == 0) {
+				mCurrLevel = LEVEL.THUMBNAIL;
+			} else if (i == 1) {
+				mCurrLevel = LEVEL.FITSCREEN;
+			} else if (i == 2) {
+				mCurrLevel = LEVEL.ORIGIN;
+			}
+			
+			mIdx = mRandom.nextInt(55);
+			int[] random = new int[] {
+					1, 
+					3, 
+					6,
+					10,
+					15,
+					21,
+					28,
+					36,
+					45,
+					55,
+			};
+			i = 0;
+			while (i < random.length) {
+				if (i == 0) {
+					if (mIdx <= random[i]) {
+						break;
+					}
+				} else if (mIdx > random[i - 1] && mIdx <= random[i]) {
+					break;
+				}
+				i ++;
+			}
+			mIdx = i;
+
 			AtomBitmap abp = BitmapHelper.getInstance(getContext()).getBitmap(mKeys[mIdx], mCurrLevel);
 			mBp = abp.getBitmap();
 			if (mBp != null) {
-				canvas.drawBitmap(mBp, null, mRect, null);
+//				canvas.drawBitmap(mBp, null, mRect, null);
 			}
 			canvas.drawText(Integer.toString(mIdx), 0, 50, mPaint);
-			
-			mIdx ++;
-			if (mIdx > 9) {
-				mIdx = 0;
-				this.postInvalidate();
-				if (mCurrLevel == LEVEL.THUMBNAIL) {
-					mCurrLevel = LEVEL.FITSCREEN;
-				} else if (mCurrLevel == LEVEL.FITSCREEN) {
-					mCurrLevel = LEVEL.ORIGIN;
-				} else {
-					mCurrLevel = LEVEL.THUMBNAIL;
-				}
-			} else {
-				mIdx = mIdx > 9 /*mKeys.length*/ ? 0 : mIdx;
-				this.postInvalidate();
-			}
+
+			this.postInvalidate();
 		}
 		@Override
 		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

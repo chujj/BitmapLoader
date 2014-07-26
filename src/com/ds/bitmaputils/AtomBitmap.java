@@ -9,11 +9,11 @@ import android.graphics.Bitmap;
 public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	private int max_width, max_height;
 	private int width, height;
-	private long size;
+	protected long size;
 	private Bitmap mBitmap;
 	private boolean isRecycled;
-	private long lastAccessTime;
-	private long accessCount;
+	protected long lastAccessTime;
+	protected long accessCount;
 	private String mFilePath;
 	private boolean isDecodeError;
 	private ArrayList<BitmapGotCallBack> mRegistedCallback;
@@ -42,15 +42,16 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	 * @return
 	 */
 	public Bitmap getBitmap() { // ZHUJJ distingursh between file read fail and not load yet 
+		return getBitmap(null);
+	}
+	
+	public Bitmap getBitmap(BitmapGotCallBack callback) {
 		if (mBitmap == null) {
 			mBitmap = BitmapNetGetter.tryGetBitmapFromUrlOrCallback(this, mInsideCallback);
 		}
 		markRead();
 		return mBitmap;
-	}
-	
-	public Bitmap getBitmap(BitmapGotCallBack callback) {
-		return null;
+
 	}
 
 	final private void markRead() {
@@ -116,10 +117,24 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 
 	@Override
 	public int compareTo(AtomBitmap arg0) {
-		return (int) (size - arg0.size);
+		int retval 
+		= 
+//		0;
+				(int) (arg0.lastAccessTime - lastAccessTime );
+		if (retval == 0) {
+			retval = (int) (arg0.accessCount - accessCount );
+		}
+		if (retval == 0) {
+			retval = (int) (size - arg0.size);
+		}
+		return retval;
 	}
 
 	public String dump() {
-		return mLevel.name() + " : " + Long.toString(size) + " : " + Long.toString(lastAccessTime) + " : " + Long.toString(accessCount) + " : "+  mFilePath;
+		return mLevel.name() + " : "+ 
+				Long.toString(size) + " : " + 
+				Long.toString(lastAccessTime) + " : " + 
+				Long.toString(accessCount) + " : "+  
+				mFilePath;
 	}
 }

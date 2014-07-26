@@ -10,7 +10,7 @@ public class Cbitmap {
 	private AtomBitmap mThumbNailAtomBitmap, mFitScreenAtomBitmap, mOriginAtomBitmap;
 	private BitmapHelper mHelper;
 	public Cbitmap(BitmapHelper aHalper, String path) {
-		key = path; 
+		key = path;
 		mHelper = aHalper;
 	}
 

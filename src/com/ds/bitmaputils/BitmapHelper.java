@@ -2,6 +2,7 @@ package com.ds.bitmaputils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import com.ds.theard.WorkThread;
@@ -78,6 +79,15 @@ public class BitmapHelper {
 	public String dumpAllAtomBitmaps() {
 		StringBuilder sb = new StringBuilder();
 		Collections.sort(mAtomBitmaps);
+//		Collections.sort(mAtomBitmaps, new Comparator<AtomBitmap>() {
+//
+//			@Override
+//			public int compare(AtomBitmap arg0, AtomBitmap arg1) {
+//				int c = 0;
+//				c = arg0.lastAccessTime
+//				return 0;
+//			}
+//		});
 		for (int i = 0; i < mAtomBitmaps.size(); i++) {
 			sb.append(mAtomBitmaps.get(i).dump());
 			sb.append("\n");
