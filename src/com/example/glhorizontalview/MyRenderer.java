@@ -51,9 +51,27 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private final int mTextureCoordinateDataSize = 2;
 
 	private GLSurfaceView mGLSurfaceView;
-	public MyRenderer(Context activityContext, GLSurfaceView sv) {
+	public MyRenderer(Context activityContext, GLSurfaceView sv, GLResourceModel aModel) {
 		mActivityContext = activityContext;
 		mGLSurfaceView = sv;
+		mModel = aModel;
+		if (aModel == null) {
+			mModel = new GLResourceModel() {
+				
+				private static final int size = 20;
+				@Override
+				public int getCount() {
+					return size;
+				}
+				
+				@Override
+				public void updateToCanvas(int aIdx, Canvas mC,
+						int require_width, int require_height) {
+					// we draw nothing here
+					
+				}
+			};
+		}
 
 		// X, Y, Z
 		final float[] cubePositionData = {
@@ -289,6 +307,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	private float mCurrOffset;
 	
+	private GLResourceModel mModel;
+	
 	/** 
 	 * @return true if animation should draw nextframe yet
 	 */
@@ -350,15 +370,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		p.setTextSize(50);
 		p.setColor(0xff00ff00);
 		
-		int size = 20; //resourceIds.length;
+		int size = mModel.getCount();
 		items = new Item[size];
 		Bitmap.Config cf = Bitmap.Config.RGB_565;
 		Bitmap bitmap = Bitmap.createBitmap(100, 100, cf);
 		Canvas c = new Canvas(bitmap);
 		for (int i = 0; i < size ;i++) {
-//			final BitmapFactory.Options options = new BitmapFactory.Options();
-//			options.inScaled = false;	
-//			Bitmap bitmap = BitmapFactory.decodeResource(mActivityContext.getResources(), resourceIds[i], options);
 			items[i] = new Item(bitmap, c, p, i * Distance, i);
 		}
 		
@@ -459,15 +476,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 //				mTextureHandle = -1;
 //			}
 		}
-		
-		public boolean prepareToDraw() {
-			if (validate && mTextureHandle == -1) {
-				mTextureHandle = TextureHelper.loadTexture(mActivityContext, mBitmap);
-				validate = true;
-			}
-			return true;
-		}
-		
+
 		public void prepareToDraw2() {
 			if (mTileIdx == -1) {
 				throw new RuntimeException("invalidate tile idx, should calc already");
@@ -478,6 +487,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					mC.drawColor(0xffffffff);
 					
 					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
+					mModel.updateToCanvas(mIdx, mC, 100, 100);
 					// we do not need to bind, which already bind before this called
 					GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
 							100 * mTileIdx, 
