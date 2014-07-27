@@ -10,11 +10,12 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.widget.Scroller;
 
 import com.ds.io.DsLog;
 import com.ds.views.MyScroller;
@@ -59,7 +60,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		final float[] cubeTextureCoordinateData = {
 				// Front face
-				0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+				0.0f, 0.0f, 
+				0.0f, 1.0f, 
+				1.0f, 0.0f, 
+				0.0f, 1.0f, 
+				1.0f, 1.0f,
 				1.0f, 0.0f, };
 
 		mCubePositions = ByteBuffer
@@ -129,17 +134,18 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mTextureCoordinateHandle = GLES20.glGetAttribLocation(mProgramHandle,
 				"a_TexCoordinate");
 
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTileTextureHandle);
+		GLES20.glUniform1i(mTextureUniformHandle, 0);
+		
 		for (int i = 0; i < items.length; i++) {
 			if ( !(items[i].validate)) {
 				items[i].deprecateToDraw();
 				continue;
 			}
-			items[i].prepareToDraw();
+//			items[i].prepareToDraw();
+			items[i].prepareToDraw2();
 
-			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, items[i].mTextureHandle);
-			GLES20.glUniform1i(mTextureUniformHandle, 0);
-			
 			Matrix.setIdentityM(mModelMatrix, 0);
 			Matrix.translateM(mModelMatrix, 0, items[i].offsetX, 0.0f, PLAN_TRASLATE_Z + items[i].offsetZ);
 			Matrix.rotateM(mModelMatrix, 0, items[i].degree, 0.0f, 1.0f, 0.0f);
@@ -149,10 +155,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					GLES20.GL_FLOAT, false, 0, mCubePositions);
 			GLES20.glEnableVertexAttribArray(mPositionHandle);
 			
-			mCubeTextureCoordinates.position(0);
+			FloatBuffer fb = mTilePoll[items[i].mTileIdx].mCoordinates;
+			fb.position(0);
 			GLES20.glVertexAttribPointer(mTextureCoordinateHandle,
 					mTextureCoordinateDataSize, GLES20.GL_FLOAT, false, 0,
-					mCubeTextureCoordinates);
+					fb);
 			GLES20.glEnableVertexAttribArray(mTextureCoordinateHandle);
 			
 			Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
@@ -166,7 +173,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		if (inAutoAnimation) {
 			inAutoAnimation = continueAnimation();
 		}
-		testSubTex();
+//		testSubTex();
 //		int error = glUnused.glGetError();
 //		DsLog.e("GL Error: " + error);
 	}
@@ -184,16 +191,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			offset ++;
 			for (int i = 0; i < items.length; i++) {
 				int j = (offset + i )% items.length ;
-//				DsLog.e("i : " + i + " j: " + j);
 				GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, items[i].mTextureHandle);
-
-//				// Set filtering
-//				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-//				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-//
-//				// Load the bitmap into the bound texture.
-//				GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+				DsLog.e("bind texture error: " + GLES20.glGetError());
 				GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, items[j].mBitmap);
+				DsLog.e("subimage error: " + GLES20.glGetError());
 			}
 		}
 	}
@@ -209,7 +210,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private final static float Distance = (float) (PLAN_HALF_WIDTH_FIXED * 2 + PLAN_NEARLEST_GAP );
 	private final static float K = (float) ( PLAN_NEARLEST_GAP_DEPTH / (
 			Distance * Distance / 4));
-	private final static float Max_Depth = (float) (K * Math.pow((Distance * 2), 2));
+	private final static int ONE_SIZE_COUNT = 2;
+	private final static float Max_Depth = (float) (K * Math.pow((Distance * ONE_SIZE_COUNT), 2));
 	private final static float Over_Max_Rotate_Degree = 45f;
 	
 	private final static float NEAR = 1.5f;
@@ -274,6 +276,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					}
 					inAutoAnimation = true;
 					mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
+					testSubTex();
 				}
 			}
 			
@@ -293,18 +296,33 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				R.drawable.p2,
 				R.drawable.p3,
 		};
+		Paint p = new Paint();
+		p.setTextSize(50);
+		p.setColor(0xff00ff00);
 		
-		items = new Item[resourceIds.length];
-		int x = 0;
-		for (int i = 0; i < resourceIds.length; i++) {
-			final BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inScaled = false;	
-			Bitmap bitmap = BitmapFactory.decodeResource(mActivityContext.getResources(), resourceIds[i], options);
-			items[i] = new Item(bitmap, i * Distance);
+		int size = 20; //resourceIds.length;
+		items = new Item[size];
+		Bitmap.Config cf = Bitmap.Config.RGB_565;
+		Bitmap bitmap = Bitmap.createBitmap(100, 100, cf);
+		Canvas c = new Canvas(bitmap);
+		for (int i = 0; i < size ;i++) {
+//			final BitmapFactory.Options options = new BitmapFactory.Options();
+//			options.inScaled = false;	
+//			Bitmap bitmap = BitmapFactory.decodeResource(mActivityContext.getResources(), resourceIds[i], options);
+			items[i] = new Item(bitmap, c, p, i * Distance, i);
 		}
 		
 		calced_max_offset = 0;
 		calced_min_offset =  -( items.length - 1 ) * Distance;
+		
+		int count = (ONE_SIZE_COUNT * 2) + 1 + 1;
+		mTilePoll = new Tile[count];
+		for (int i = 0; i < mTilePoll.length; i++) {
+			mTilePoll[i] = new Tile(i, count);
+		}
+		
+		mTileBitmap = Bitmap.createBitmap(100 * count, 100, cf);
+		mTileTextureHandle = TextureHelper.loadTexture(mActivityContext, mTileBitmap);
 	}
 	
 	
@@ -338,9 +356,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		private boolean validate;
 		private Bitmap mBitmap;
 		private int mTextureHandle;
+		private int mTileIdx;
+		private Canvas mC;
+		private Paint mP;
+		private int mIdx;
 		
 		
-		public Item(Bitmap bitmap, float  ax) {
+		public Item(Bitmap bitmap, Canvas c, Paint p, float  ax, int idx) {
 			mBitmap = bitmap;
 			mTextureHandle = -1;
 //			mTextureHandle = TextureHelper.loadTexture(mActivityContext, bitmap);
@@ -348,6 +370,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			validate = false;
 			x = ax;
 			offsetX = -1;
+			mTileIdx = 0;
+			mC = c;
+			mP = p;
+			mIdx = idx;
 		}
 
 		public void calcOffset(float offset_x, float f) {
@@ -358,14 +384,23 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			offsetZ = (float) (-K * Math.pow(offsetX, 2)); // z changed;
 			boolean old_stat = validate;
 			validate = (-offsetZ > Max_Depth) ? false : true;
-//			if (old_stat != validate) {
-//				if (validate) {
-//					mTextureHandle = TextureHelper.loadTexture(mActivityContext, mBitmap);
-//				} else  {
-//					TextureHelper.deleteTexture(mActivityContext, mTextureHandle);
-//					mTextureHandle = -1;
-//				}
-//			}
+			if (old_stat != validate) {
+				if (validate) {
+					int tile = findUnusedTile();
+					if (tile == -1) {
+						throw new RuntimeException("Find tile fail, unacceptable");
+					} else {
+						mTilePoll[tile].markInUse();
+						mTileIdx = tile;
+					}
+				} else  {
+					if (mTileIdx == -1) {
+						throw new RuntimeException("here tile should in used before release, unacceptable");
+					}
+					mTilePoll[mTileIdx].unmark();
+					mTileIdx = -1;
+				}
+			}
 		}
 				
 		public void deprecateToDraw() {
@@ -382,6 +417,25 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			}
 			return true;
 		}
+		
+		public void prepareToDraw2() {
+			if (mTileIdx == -1) {
+				throw new RuntimeException("invalidate tile idx, should calc already");
+			} else {
+				if (mTilePoll[mTileIdx].dataLoaded) {
+					; // nothing to do
+				} else {
+					mC.drawColor(0xffffffff);
+					
+					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
+					// we do not need to bind, which already bind before this called
+					GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
+							100 * mTileIdx, 
+							0, 
+							mBitmap);
+				}
+			}
+		}
 
 		@Override
 		public String toString() {
@@ -391,5 +445,54 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	private Item[] items;
+	
+	private Tile[] mTilePoll;
+	private Bitmap mTileBitmap;
+	private int mTileTextureHandle;
+
+	private class Tile {
+		private FloatBuffer mCoordinates;
+		private boolean inUse , dataLoaded;
+
+		public Tile(int i, int length) {
+			float step = 1.0f / length;
+			float start =  i * step;
+			float end =  start + step;
+			float[] cubeTextureCoordinateData = {
+					// Front face
+					start, 0.0f, 
+					start, 1.0f, 
+					end, 0.0f, 
+					start, 1.0f, 
+					end, 1.0f,
+					end, 0.0f, };
+			mCoordinates = ByteBuffer
+				.allocateDirect(
+						cubeTextureCoordinateData.length * mBytesPerFloat)
+				.order(ByteOrder.nativeOrder()).asFloatBuffer();
+			mCoordinates.put(cubeTextureCoordinateData).position(0);
+			inUse = false;
+			dataLoaded = false;
+		}
+
+		public void unmark() {
+			inUse = false;
+			dataLoaded = false;
+		}
+
+		public void markInUse() {
+			inUse = true;
+			dataLoaded = false;
+		}
+		
+	}
+	private int findUnusedTile() {
+		for (int i = 0; i < mTilePoll.length; i++) {
+			if (!mTilePoll[i].inUse) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
 }
