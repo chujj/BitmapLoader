@@ -107,8 +107,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		@Override
 		public void run() {
 			synchronized (mMessagesList) {
-				if (mMessagesList.size() > 0)
-					handleMessage(mMessagesList.remove(0));	
+				if (mMessagesList.size() > 0) {
+					handleMessage(mMessagesList.remove(0));
+					mGLSurfaceView.requestRender();
+				}
 			}
 		}
 
@@ -253,6 +255,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		if (inAutoAnimation) {
 			inAutoAnimation = continueAnimation();
+			mGLSurfaceView.requestRender();
 		}
 //		testSubTex();
 //		int error = glUnused.glGetError();

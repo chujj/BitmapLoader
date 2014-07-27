@@ -24,6 +24,7 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		super.setRenderer(renderer);
 		mRender = (MyRenderer) renderer;
 		mEvent = mRender.eventHandler;
+		this.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
