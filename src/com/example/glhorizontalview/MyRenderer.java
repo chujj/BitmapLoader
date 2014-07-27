@@ -16,6 +16,7 @@ import android.opengl.Matrix;
 import android.widget.Scroller;
 
 import com.ds.io.DsLog;
+import com.ds.views.MyScroller;
 import com.example.bitmaploader.R;
 import com.learnopengles.android.common.RawResourceReader;
 import com.learnopengles.android.common.ShaderHelper;
@@ -186,12 +187,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private float calced_min_offset, calced_max_offset;
 	
 	private final static int animation_part = 1;
-	private Scroller mScroller; // ZHUJJ rewrite use float update precise 
-	private final static long AUTO_ANIMATION_TIME_PER_PIXEL = 500;
+	private MyScroller mScroller; // ZHUJJ rewrite use float update precise 
+	private final static long AUTO_ANIMATION_TIME_PER_PIXEL = 200;
 	private boolean inAutoAnimation;
-	private long mThisAnimationTime;
-	private float mThisAnimationDestOffset;
-	private long mLastFrameTimeStamp;
 
 	private float mCurrOffset;
 	
@@ -226,17 +224,16 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onFinish(float x, float y) { // roll back
-			inAutoAnimation = true;
-			mLastFrameTimeStamp = System.currentTimeMillis();
 			if (mCurrOffset > calced_max_offset) {
-				int dx = (int )(mCurrOffset - calced_max_offset);
-				mScroller.startScroll((int)mCurrOffset, -1, dx, 0, (int) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+				float dx =  (mCurrOffset - calced_max_offset);
+				mScroller.startScroll(mCurrOffset, -1, -dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+				inAutoAnimation = true;
 			} else if (mCurrOffset < calced_min_offset) {
-				int dx = (int) (calced_min_offset - mCurrOffset);
-				mScroller.startScroll((int) mCurrOffset, -1, dx, 0, (int) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+				float dx =  (calced_min_offset - mCurrOffset);
+				mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+				inAutoAnimation = true;
 			} else {
-				mThisAnimationDestOffset = mCurrOffset;
-				mScroller.startScroll(0, 0, 0, 0, 0);
+//				mScroller.startScroll(mCurrOffset, 0, 0, 0, 0);
 			}
 			
 		}
@@ -244,7 +241,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	};
 
 	private void initDimensionLimit() {
-		mScroller = new Scroller(mActivityContext);
+		mScroller = new MyScroller(mActivityContext);
 		mCurrOffset = 0;
 		
 		int[] resourceIds = new int[] {

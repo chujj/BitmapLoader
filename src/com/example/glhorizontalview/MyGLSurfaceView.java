@@ -27,10 +27,17 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		boolean retval = false;
 		if (mGestureDetector.onTouchEvent(event)) {
-			return true;
-		} else 
-			return super.onTouchEvent(event);
+			retval = true;
+		} else {
+			retval = super.onTouchEvent(event);
+		}
+		if (event.getAction() == MotionEvent.ACTION_CANCEL || 
+				event.getAction() == MotionEvent.ACTION_UP) {
+			mEvent.onFinish(event.getX(), event.getY());
+		}
+		return retval;
 	}
 
 	@Override
@@ -47,7 +54,6 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		mEvent.onFinish(e.getX(), e.getY());
 		return true;
 	}
 
