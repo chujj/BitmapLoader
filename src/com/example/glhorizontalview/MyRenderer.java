@@ -283,7 +283,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private float calced_min_offset, calced_max_offset;
 	
 	private final static int animation_part = 1;
-	private MyScroller mScroller; // ZHUJJ rewrite use float update precise 
+	private MyScroller mScroller;
 	private final static long AUTO_ANIMATION_TIME_PER_PIXEL = 200;
 	private boolean inAutoAnimation;
 

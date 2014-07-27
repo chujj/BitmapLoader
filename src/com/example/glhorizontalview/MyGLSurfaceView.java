@@ -43,14 +43,11 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// ZHUJJ Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public void onShowPress(MotionEvent e) {
-		// ZHUJJ Auto-generated method stub
-		
 	}
 
 	@Override
@@ -67,14 +64,11 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		// ZHUJJ Auto-generated method stub
-		
 	}
 
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		// ZHUJJ Auto-generated method stub
 		return false;
 	}
 
