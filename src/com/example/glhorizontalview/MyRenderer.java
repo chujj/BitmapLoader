@@ -3,6 +3,7 @@ package com.example.glhorizontalview;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -16,6 +17,10 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
 import com.ds.io.DsLog;
 import com.ds.views.MyScroller;
@@ -45,8 +50,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private final int mPositionDataSize = 3;
 	private final int mTextureCoordinateDataSize = 2;
 
-	public MyRenderer(final Context activityContext) {
+	private GLSurfaceView mGLSurfaceView;
+	public MyRenderer(Context activityContext, GLSurfaceView sv) {
 		mActivityContext = activityContext;
+		mGLSurfaceView = sv;
 
 		// X, Y, Z
 		final float[] cubePositionData = {
@@ -78,9 +85,83 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
 		mCubeTextureCoordinates.put(cubeTextureCoordinateData).position(0);
 	}
+	
+	private static final int MSG_ONSCRELL = 0x0000;
+	private static final int MSG_FLING = 0x0001;
+	private static final int MSG_FINISH = 0x0002;
+	
+	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
+	
+	public void sendMesg(Message msg) {
+		if (mGLHandler == null) return;
+		
+		synchronized (mMessagesList) {
+			mMessagesList.add(msg);
+			// call surface view's check
+			mGLSurfaceView.queueEvent(mGLHandler);
+		}
+	}
+	
+	private class MyGLHandler implements Runnable {
+
+		@Override
+		public void run() {
+			synchronized (mMessagesList) {
+				if (mMessagesList.size() > 0)
+					handleMessage(mMessagesList.remove(0));	
+			}
+		}
+
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case MSG_ONSCRELL:
+				float offset_x = msg.getData().getFloat("x");
+				float offset_y = msg.getData().getFloat("y");
+				if (inAutoAnimation) return;
+				updateItems(offset_x, offset_y);
+				break;
+			case MSG_FLING:
+				
+				break;
+			case MSG_FINISH:
+				float x = msg.getData().getFloat("x");
+				float y = msg.getData().getFloat("y");
+				if (mCurrOffset > calced_max_offset) {
+					float dx =  (mCurrOffset - calced_max_offset);
+					mScroller.startScroll(mCurrOffset, -1, -dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+					inAutoAnimation = true;
+				} else if (mCurrOffset < calced_min_offset) {
+					float dx =  (calced_min_offset - mCurrOffset);
+					mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+					inAutoAnimation = true;
+				} else {
+					if (!inAutoAnimation && Math.abs(mCurrOffset % Distance) > 0.001) {
+						float left = Math.abs(mCurrOffset % Distance);
+						float dx = 0; 
+						if (left < Distance /2) {
+							dx = -left;
+						} else {
+							dx = Distance - left;
+						}
+						inAutoAnimation = true;
+						mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
+					}
+				}
+				
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+	private MyGLHandler mGLHandler;
 
 	@Override
 	public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
+		mGLHandler = new MyGLHandler();
+		if (Looper.myLooper() == Looper.getMainLooper())
+			;
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		GLES20.glEnable(GLES20.GL_CULL_FACE);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -178,27 +259,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 //		DsLog.e("GL Error: " + error);
 	}
 
-	private long mLastUpdate;
-	private int offset = 0;
-	private void testSubTex() {
-		
-		for (int i = 0; i < items.length; i++) {
-			if (items[i].mTextureHandle == -1) return;
-		}
-
-		if ((System.currentTimeMillis() - mLastUpdate) > 3000) {
-			mLastUpdate = System.currentTimeMillis();
-			offset ++;
-			for (int i = 0; i < items.length; i++) {
-				int j = (offset + i )% items.length ;
-				GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, items[i].mTextureHandle);
-				DsLog.e("bind texture error: " + GLES20.glGetError());
-				GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, items[j].mBitmap);
-				DsLog.e("subimage error: " + GLES20.glGetError());
-			}
-		}
-	}
-
 	////////////////////////////////animation part ////////////////////////////////
 	private final static int View_part = 1;
 
@@ -241,8 +301,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onScroll(float offset_x, float offset_y) {
-			if (inAutoAnimation) return;
-			updateItems(offset_x, offset_y);
+			Message m = Message.obtain(null, MSG_ONSCRELL);
+			Bundle b = new Bundle();
+			b.putFloat("x", offset_x);
+			b.putFloat("y", offset_y);
+			m.setData(b);
+			sendMesg(m);
 		}
 
 		@Override
@@ -257,29 +321,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onFinish(float x, float y) { // roll back
-			if (mCurrOffset > calced_max_offset) {
-				float dx =  (mCurrOffset - calced_max_offset);
-				mScroller.startScroll(mCurrOffset, -1, -dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
-				inAutoAnimation = true;
-			} else if (mCurrOffset < calced_min_offset) {
-				float dx =  (calced_min_offset - mCurrOffset);
-				mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
-				inAutoAnimation = true;
-			} else {
-				if (!inAutoAnimation && Math.abs(mCurrOffset % Distance) > 0.001) {
-					float left = Math.abs(mCurrOffset % Distance);
-					float dx = 0; 
-					if (left < Distance /2) {
-						dx = -left;
-					} else {
-						dx = Distance - left;
-					}
-					inAutoAnimation = true;
-					mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
-					testSubTex();
-				}
-			}
-			
+			Message m = Message.obtain(null, MSG_FINISH);
+			Bundle b = new Bundle();
+			b.putFloat("x", x);
+			b.putFloat("y", y);
+			m.setData(b);
+			sendMesg(m);
 		}
 
 	};
