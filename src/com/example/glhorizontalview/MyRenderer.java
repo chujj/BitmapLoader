@@ -199,7 +199,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private boolean continueAnimation() {
 		boolean finish = mScroller.computeScrollOffset();
 		mCurrOffset = mScroller.getCurrX();
-		DsLog.e("curr: " + mCurrOffset + " dst: " + mScroller.getFinalX());
+//		DsLog.e("curr: " + mCurrOffset + " dst: " + mScroller.getFinalX());
 		this.updateItems(0, 0);
 		return finish;
 	}
@@ -233,7 +233,17 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
 				inAutoAnimation = true;
 			} else {
-//				mScroller.startScroll(mCurrOffset, 0, 0, 0, 0);
+				if (!inAutoAnimation && Math.abs(mCurrOffset % Distance) > 0.001) {
+					float left = Math.abs(mCurrOffset % Distance);
+					float dx = 0; 
+					if (left < Distance /2) {
+						dx = -left;
+					} else {
+						dx = Distance - left;
+					}
+					inAutoAnimation = true;
+					mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
+				}
 			}
 			
 		}
