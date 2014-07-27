@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.widget.Scroller;
 
@@ -164,6 +165,36 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		if (inAutoAnimation) {
 			inAutoAnimation = continueAnimation();
+		}
+		testSubTex();
+//		int error = glUnused.glGetError();
+//		DsLog.e("GL Error: " + error);
+	}
+
+	private long mLastUpdate;
+	private int offset = 0;
+	private void testSubTex() {
+		
+		for (int i = 0; i < items.length; i++) {
+			if (items[i].mTextureHandle == -1) return;
+		}
+
+		if ((System.currentTimeMillis() - mLastUpdate) > 3000) {
+			mLastUpdate = System.currentTimeMillis();
+			offset ++;
+			for (int i = 0; i < items.length; i++) {
+				int j = (offset + i )% items.length ;
+//				DsLog.e("i : " + i + " j: " + j);
+				GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, items[i].mTextureHandle);
+
+//				// Set filtering
+//				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+//				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+//
+//				// Load the bitmap into the bound texture.
+//				GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+				GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, items[j].mBitmap);
+			}
 		}
 	}
 
@@ -347,6 +378,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		public boolean prepareToDraw() {
 			if (validate && mTextureHandle == -1) {
 				mTextureHandle = TextureHelper.loadTexture(mActivityContext, mBitmap);
+				validate = true;
 			}
 			return true;
 		}
