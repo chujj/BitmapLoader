@@ -31,8 +31,8 @@ public class MainActivity extends Activity {
 
 			// Set the renderer to our demo renderer, defined below.
 			mGLSurfaceView.setRenderer(new MyRenderer(this, mGLSurfaceView, 
-//					null
-					new DCIMCameraModel(this)
+					null
+//					new DCIMCameraModel(this)
 					));
 		} 
 		else 

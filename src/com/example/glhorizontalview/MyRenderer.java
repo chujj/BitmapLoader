@@ -107,6 +107,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private static final int MSG_ONSCRELL = 0x0000;
 	private static final int MSG_FLING = 0x0001;
 	private static final int MSG_FINISH = 0x0002;
+	private static final int MSG_HIT_TEST = 0x0003;
 	
 	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
 	
@@ -166,6 +167,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 						inAutoAnimation = true;
 						mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
 					}
+				}
+				
+			case MSG_HIT_TEST:
+				msg.getData().putInt("hit", 100);
+				synchronized (msg) {
+					msg.notify();
 				}
 				
 				break;
@@ -339,7 +346,21 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onClick(float x, float y) {
-
+			Message m = Message.obtain(null, MSG_HIT_TEST);
+			Bundle b = new Bundle();
+			b.putFloat("x", x);
+			b.putFloat("y", y);
+			m.setData(b);
+			sendMesg(m);
+			synchronized (m) {
+				try {
+					m.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			;
+			DsLog.e(" onClick x y: " + x + " " + y + " hit: " + m.getData().getInt("hit", -1));
 		}
 
 		@Override

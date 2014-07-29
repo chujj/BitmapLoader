@@ -52,6 +52,7 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
+		mEvent.onClick(e.getX(), e.getY());
 		return true;
 	}
 
