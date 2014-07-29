@@ -31,7 +31,7 @@ public class DCIMCameraModel implements GLResourceModel {
 	@Override
 	public int getCount() {
 		
-		return 20;
+		return mKeys.length;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class DCIMCameraModel implements GLResourceModel {
 
 		mKeys = new String[files.length];
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < files.length; i++) {
 			mKeys[i] = files[i].getAbsolutePath();
 		}
 		

@@ -211,6 +211,7 @@ public class BitmapNetGetter {
 			op.inJustDecodeBounds = false;
 			retval = BitmapFactory.decodeStream(new FileInputStream(filepath), null, op);
 		} catch (Exception e) {
+			e.printStackTrace();
 			// ZHUJJ: handle exception, should call task error occur
 		}
 		return retval;
