@@ -170,7 +170,20 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				}
 				
 			case MSG_HIT_TEST:
-				msg.getData().putInt("hit", 100);
+				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
+				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
+				float hit_x = viewport_offset_x_percent * viewport_width + mCurrOffset;
+//				float hit_y = viewport_offset_y_percent * viewport_height;
+				int hit = -1;
+				for (int i = 0; i < items.length; i++) {
+					if (!items[i].validate) continue;
+					if (items[i].rect.contain(hit_x, hit_y)) {
+						hit = i;
+						break;
+					}
+				}
+				
+				msg.getData().putInt("hit", hit);
 				synchronized (msg) {
 					msg.notify();
 				}
@@ -348,8 +361,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		public void onClick(float x, float y) {
 			Message m = Message.obtain(null, MSG_HIT_TEST);
 			Bundle b = new Bundle();
-			b.putFloat("x", x);
-			b.putFloat("y", y);
+			b.putFloat("viewport_offset_x_percent", x);
+			b.putFloat("viewport_offset_y_percent", y);
 			m.setData(b);
 			sendMesg(m);
 			synchronized (m) {
@@ -359,8 +372,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					e.printStackTrace();
 				}
 			}
-			;
-			DsLog.e(" onClick x y: " + x + " " + y + " hit: " + m.getData().getInt("hit", -1));
+			int hit = m.getData().getInt("hit", -1);
+			if (hit != -1) {
+				DsLog.e(" onClick x y: " + x + " " + y + " hit: " + m.getData().getInt("hit", -1));
+			} else {
+				; // ZHUJJ, auto scroll accord with the down location ? 
+			}
 		}
 
 		@Override
