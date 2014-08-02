@@ -36,7 +36,7 @@ public class PathContainerView extends ViewGroup implements PathListener {
 
 			mGLSurfaceView.setRenderer(mRender = new MyRenderer(context, mGLSurfaceView,
 //					null
-					mModel = new DCIMCameraModel(context)
+					mModel = new DCIMCameraModel(context, this)
 					));
 		} else {
 			Toast.makeText(context,
@@ -87,6 +87,12 @@ public class PathContainerView extends ViewGroup implements PathListener {
 	@Override
 	public void onPathChange(String abspath) {
 		mModel.loadPathContent(abspath, true);
+	}
+
+	public void insideClickAtPath(String absPath) {
+		mPathSelector.setCurrPath(absPath);
+		mModel.loadPathContent(absPath, true);
+		
 	}
 
 }

@@ -23,8 +23,9 @@ public class DCIMCameraModel implements GLResourceModel {
 	private Context mContext;
 	private Paint mPaint;
 	private String initPath;
+	private PathContainerView mPathClickListener;
 
-	public DCIMCameraModel(Context context) {
+	public DCIMCameraModel(Context context, PathContainerView pathContainerView) {
 		mRect = new Rect();
 		mContext = context;
 		mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(),
@@ -34,6 +35,7 @@ public class DCIMCameraModel implements GLResourceModel {
 		loadPathContent(initPath = getInitPath(), false);
 		mPaint = new Paint();
 		mPaint.setTextSize(30);
+		mPathClickListener = pathContainerView;
 	}
 
 	@Override
@@ -118,7 +120,7 @@ public class DCIMCameraModel implements GLResourceModel {
 	@Override
 	public void clickAt(int hit) {
 		if (mKeys[hit].isFolder) {
-			loadPathContent(mKeys[hit].absPath, true);
+			mPathClickListener.insideClickAtPath(mKeys[hit].absPath);
 		}
 		
 	}
