@@ -108,6 +108,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private static final int MSG_FLING = 0x0001;
 	private static final int MSG_FINISH = 0x0002;
 	private static final int MSG_HIT_TEST = 0x0003;
+	private static final int MSG_MODEL_RELOAD = 0x0004;
 	
 	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
 	
@@ -183,6 +184,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					msg.notify();
 				}
 				
+				break;
+			case MSG_MODEL_RELOAD:
+				mMessagesList.clear();
+				initDimensionLimit();
+				updateItems(0, 0);
 				break;
 			default:
 				break;
@@ -397,15 +403,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private void initDimensionLimit() {
 		mScroller = new MyScroller(mActivityContext);
 		mCurrOffset = 0;
-		
-		int[] resourceIds = new int[] {
-				R.drawable.p6,
-				R.drawable.p5,
-				R.drawable.p4,
-				R.drawable.p1,
-				R.drawable.p2,
-				R.drawable.p3,
-		};
+
 		Paint p = new Paint();
 		p.setTextSize(50);
 		p.setColor(0xff00ff00);
@@ -593,6 +591,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			}
 		}
 		return -1;
+	}
+
+	public void modelChanged() {
+		
+		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD));
+		
 	}
 
 }

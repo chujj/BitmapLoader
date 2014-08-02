@@ -73,6 +73,4 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		return false;
 	}
 
-
-
 }
