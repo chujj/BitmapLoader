@@ -15,7 +15,7 @@ public class PathContainerView extends ViewGroup implements PathListener {
 	private MyGLSurfaceView mGLSurfaceView;
 	private PathSelector mPathSelector;
 	private HorizontalScrollView mHorizontalView;
-	private DCIMCameraModel mModel;
+	private FolderPicturesModel mModel;
 	private MyRenderer mRender;
 
 	public PathContainerView(Context context) {
@@ -36,7 +36,7 @@ public class PathContainerView extends ViewGroup implements PathListener {
 
 			mGLSurfaceView.setRenderer(mRender = new MyRenderer(context, mGLSurfaceView,
 //					null
-					mModel = new DCIMCameraModel(context, this)
+					mModel = new FolderPicturesModel(context, this)
 					));
 		} else {
 			Toast.makeText(context,

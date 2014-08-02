@@ -15,7 +15,7 @@ import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.bitmaploader.R;
 
-public class DCIMCameraModel implements GLResourceModel {
+public class FolderPicturesModel implements GLResourceModel {
 
 	private Bitmap mDefaultBitmap, mFolderBitmap;
 	private Rect mRect;
@@ -25,7 +25,7 @@ public class DCIMCameraModel implements GLResourceModel {
 	private String initPath;
 	private PathContainerView mPathClickListener;
 
-	public DCIMCameraModel(Context context, PathContainerView pathContainerView) {
+	public FolderPicturesModel(Context context, PathContainerView pathContainerView) {
 		mRect = new Rect();
 		mContext = context;
 		mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(),
@@ -75,8 +75,10 @@ public class DCIMCameraModel implements GLResourceModel {
 				@Override
 				public boolean accept(File arg0) {
 					boolean retval;
-					retval = arg0.getName().endsWith("jpg") ? true : 
-						arg0.getName().endsWith("png") ? true : 
+					String name = arg0.getName();
+					name = name.substring(name.length() - 3);
+					retval = name.equalsIgnoreCase("jpg") ? true : 
+						name.equalsIgnoreCase("png") ? true : 
 							arg0.isDirectory() ? arg0.getName().startsWith(".") ? false : true
 									: false;
 					return retval;
