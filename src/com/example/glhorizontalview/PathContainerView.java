@@ -46,6 +46,7 @@ public class PathContainerView extends ViewGroup implements PathListener {
 		}
 		
 		mPathSelector = new PathSelector(context);
+		mPathSelector.setCurrPath(mModel.InitPath());
 		mPathSelector.setListener(this);
 		mHorizontalView = new HorizontalScrollView(context);
 		
@@ -85,9 +86,7 @@ public class PathContainerView extends ViewGroup implements PathListener {
 
 	@Override
 	public void onPathChange(String abspath) {
-		mModel.loadPathContent(abspath);
-		mRender.modelChanged();
-
+		mModel.loadPathContent(abspath, true);
 	}
 
 }

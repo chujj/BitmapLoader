@@ -7,7 +7,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Environment;
 
 import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapHelper;
@@ -15,22 +17,27 @@ import com.example.bitmaploader.R;
 
 public class DCIMCameraModel implements GLResourceModel {
 
-	private Bitmap mDefaultBitmap;
+	private Bitmap mDefaultBitmap, mFolderBitmap;
 	private Rect mRect;
-	private String[] mKeys;
+	private Item[] mKeys;
 	private Context mContext;
-	
+	private Paint mPaint;
+	private String initPath;
+
 	public DCIMCameraModel(Context context) {
 		mRect = new Rect();
 		mContext = context;
-		mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+		mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(),
+				R.drawable.ic_launcher);
+		mFolderBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.folder);
 		BitmapHelper.getInstance(mContext);
-		loadPathContent("/sdcard/wallpapers");
+		loadPathContent(initPath = getInitPath(), false);
+		mPaint = new Paint();
+		mPaint.setTextSize(30);
 	}
-	
+
 	@Override
 	public int getCount() {
-		
 		return mKeys.length;
 	}
 
@@ -38,31 +45,88 @@ public class DCIMCameraModel implements GLResourceModel {
 	public void updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
 		mRect.set(0, 0, require_width, require_height);
-		AtomBitmap abp = BitmapHelper.getInstance(mContext).getBitmap(mKeys[aIdx]);
-		Bitmap bp = abp.getBitmap();
-		if (bp == null)
-			bp = mDefaultBitmap;
-		mC.drawBitmap(bp, null, mRect, null);
+		if (mKeys[aIdx].isFolder) {
+			mC.drawBitmap(mFolderBitmap, null, mRect, null);
+			mC.drawText(mKeys[aIdx].fName, 0, 40, mPaint);
+		} else {
+			AtomBitmap abp = BitmapHelper.getInstance(mContext).getBitmap(
+					mKeys[aIdx].absPath);
+			Bitmap bp = abp.getBitmap();
+			if (bp == null)
+				bp = mDefaultBitmap;
+			mC.drawBitmap(bp, null, mRect, null);
+		}
 	}
-	
-	public void loadPathContent(String path) {
+
+	public void loadPathContent(String path, boolean reload) {
+		if (reload)
+			mRender.modelChangedStart();
+		
 		File dir = new File(path);
 		File[] files = dir.listFiles(new FileFilter() {
 
 			@Override
 			public boolean accept(File arg0) {
 				boolean retval;
-				retval = arg0.getName().endsWith("jpg") ? true : false;
+				retval = arg0.getName().endsWith("jpg") ? true : 
+					arg0.getName().endsWith("png") ? true : 
+						arg0.isDirectory() ? arg0.getName().startsWith(".") ? false : true
+						: false;
 				return retval;
 			}
 		});
 
-		mKeys = new String[files.length];
+		mKeys = new Item[files.length];
 
 		for (int i = 0; i < files.length; i++) {
-			mKeys[i] = files[i].getAbsolutePath();
+			mKeys[i] = new Item(files[i].isDirectory(), files[i].getName(),
+					files[i].getAbsolutePath());
+		}
+
+		if (reload)
+			mRender.modelChangedEnd();
+	}
+
+	private class Item {
+		boolean isFolder;
+		String absPath;
+		String fName;
+
+		public Item(boolean folder, String foldername, String path) {
+			isFolder = folder;
+			if (isFolder) {
+				fName = foldername;
+			}
+			absPath = path;
+		}
+	}
+	
+	private String getInitPath() {
+		File rootsd = Environment.getExternalStorageDirectory();
+		File dcim = new File(rootsd.getAbsolutePath() + "/DCIM");
+		if (dcim.exists()) {
+			return dcim.getAbsolutePath();
+		} else {
+			return "/";
+		}
+	}
+
+	public String InitPath() {
+		return initPath;
+	}
+
+	@Override
+	public void clickAt(int hit) {
+		if (mKeys[hit].isFolder) {
+			loadPathContent(mKeys[hit].absPath, true);
 		}
 		
+	}
+
+	private MyRenderer mRender;
+	@Override
+	public void currRenderView(MyRenderer render) {
+		mRender = render;
 	}
 
 }

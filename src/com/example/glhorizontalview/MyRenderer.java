@@ -70,8 +70,21 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					// we draw nothing here
 					
 				}
+
+				@Override
+				public void clickAt(int hit) {
+					// ZHUJJ Auto-generated method stub
+					
+				}
+
+				@Override
+				public void currRenderView(MyRenderer render) {
+					// ZHUJJ Auto-generated method stub
+					
+				}
 			};
 		}
+		mModel.currRenderView(this);
 
 		// X, Y, Z
 		final float[] cubePositionData = {
@@ -383,6 +396,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			int hit = m.getData().getInt("hit", -1);
 			if (hit != -1) {
 				DsLog.e(" onClick x y: " + x + " " + y + " hit: " + m.getData().getInt("hit", -1));
+				mModel.clickAt(hit);
 			} else {
 				; // ZHUJJ, auto scroll accord with the down location ? 
 			}
@@ -593,10 +607,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		return -1;
 	}
 
-	public void modelChanged() {
+	public void modelChangedStart() {
+		synchronized (mMessagesList) {
+			mMessagesList.clear();
+		}
 		
+	}
+	
+	public void modelChangedEnd() {
 		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD));
-		
 	}
 
 }
