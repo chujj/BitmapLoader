@@ -25,7 +25,7 @@ public class DCIMCameraModel implements GLResourceModel {
 		mContext = context;
 		mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 		BitmapHelper.getInstance(mContext);
-		loadBitmaps();
+		loadPathContent("/sdcard/wallpapers");
 	}
 	
 	@Override
@@ -45,10 +45,8 @@ public class DCIMCameraModel implements GLResourceModel {
 		mC.drawBitmap(bp, null, mRect, null);
 	}
 	
-	
-	private void loadBitmaps() {
-		String testDir = "/sdcard/wallpapers";
-		File dir = new File(testDir);
+	public void loadPathContent(String path) {
+		File dir = new File(path);
 		File[] files = dir.listFiles(new FileFilter() {
 
 			@Override

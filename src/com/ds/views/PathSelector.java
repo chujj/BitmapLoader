@@ -34,6 +34,15 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 		}
 		refreshView();
 	}
+	private PathListener mListener;
+	
+	public void setListener(PathListener listener) {
+		mListener = listener;
+	}
+	
+	public static interface PathListener {
+		public void onPathChange(String abspath);
+	}
 	
 	private ArrayList<MyTextView> mLists = new ArrayList<PathSelector.MyTextView>();
 	
@@ -105,6 +114,9 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 	public void onClick(View v) {
 		MyTextView tv = (MyTextView) v;
 		this.setCurrPath(tv.mAbsPath);
+		if (mListener != null) {
+			mListener.onPathChange(pathString);
+		}
 	}
 	
 	

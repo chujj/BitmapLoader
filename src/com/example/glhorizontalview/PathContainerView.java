@@ -1,6 +1,7 @@
 package com.example.glhorizontalview;
 
 import com.ds.views.PathSelector;
+import com.ds.views.PathSelector.PathListener;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -10,10 +11,11 @@ import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.Toast;
 
-public class PathContainerView extends ViewGroup {
+public class PathContainerView extends ViewGroup implements PathListener {
 	private GLSurfaceView mGLSurfaceView;
 	private PathSelector mPathSelector;
 	private HorizontalScrollView mHorizontalView;
+	private DCIMCameraModel mModel;
 
 	public PathContainerView(Context context) {
 		super(context);
@@ -32,8 +34,8 @@ public class PathContainerView extends ViewGroup {
 			mGLSurfaceView.setEGLContextClientVersion(2);
 
 			mGLSurfaceView.setRenderer(new MyRenderer(context, mGLSurfaceView,
-					null
-			// new DCIMCameraModel(this)
+//					null
+					mModel = new DCIMCameraModel(context)
 					));
 		} else {
 			Toast.makeText(context,
@@ -43,6 +45,7 @@ public class PathContainerView extends ViewGroup {
 		}
 		
 		mPathSelector = new PathSelector(context);
+		mPathSelector.setListener(this);
 		mHorizontalView = new HorizontalScrollView(context);
 		
 		this.addView(mGLSurfaceView);
@@ -77,6 +80,11 @@ public class PathContainerView extends ViewGroup {
 
 	public void onPause() {
 		mGLSurfaceView.onPause();
+	}
+
+	@Override
+	public void onPathChange(String abspath) {
+		mModel.loadPathContent(abspath);
 	}
 
 }
