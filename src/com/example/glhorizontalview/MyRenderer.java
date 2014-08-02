@@ -73,14 +73,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 				@Override
 				public void clickAt(int hit) {
-					// ZHUJJ Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void currRenderView(MyRenderer render) {
-					// ZHUJJ Auto-generated method stub
-					
+
 				}
 			};
 		}
@@ -125,7 +123,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	
 	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
 	
-	public void sendMesg(Message msg) {
+	private void sendMesg(Message msg) {
 		if (mGLHandler == null) return;
 		
 		synchronized (mMessagesList) {
@@ -612,6 +610,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	public void modelChanged(Runnable run) {
 		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD, run));
+	}
+	
+	public void refreshIdx() {
+		// ZHUJJ implement method body
 	}
 
 }
