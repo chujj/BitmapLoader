@@ -399,7 +399,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				DsLog.e(" onClick x y: " + x + " " + y + " hit: " + m.getData().getInt("hit", -1));
 				mModel.clickAt(hit);
 			} else {
-				; // ZHUJJ, auto scroll accord with the down location ? 
+				; // ZHUJJ-FIXME, auto scroll accord with the down location ? 
 			}
 		}
 
@@ -613,7 +613,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	public void refreshIdx() {
-		// ZHUJJ implement method body
+		// ZHUJJ-FIXME implement method body
 	}
 
 }
