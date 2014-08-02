@@ -172,17 +172,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			case MSG_HIT_TEST:
 				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
-				float hit_x = viewport_offset_x_percent * viewport_width + mCurrOffset;
-//				float hit_y = viewport_offset_y_percent * viewport_height;
+
 				int hit = -1;
-				for (int i = 0; i < items.length; i++) {
-					if (!items[i].validate) continue;
-					if (items[i].rect.contain(hit_x, hit_y)) {
-						hit = i;
-						break;
-					}
+				if (Math.abs(viewport_offset_y_percent - 0.5f) < TOP_PERCENT && 
+						Math.abs(viewport_offset_x_percent - 0.5f) < LEFT_PERCENT) {
+					hit = (int) (-mCurrOffset / Distance);
 				}
-				
 				msg.getData().putInt("hit", hit);
 				synchronized (msg) {
 					msg.notify();
@@ -236,6 +231,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		final float left = -ratio;
 		final float right = ratio;
 
+		LEFT_PERCENT = NEAR * (ratio / (NEAR + (-PLAN_TRASLATE_Z)));
+		RIGHT_PERCENT = LEFT_PERCENT;
 		Matrix.frustumM(mProjectionMatrix, 0, left, right,
 				-PLAN_HEIGHT_MAXIMIN, PLAN_HEIGHT_MAXIMIN, NEAR, FAR);
 	}
@@ -317,6 +314,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	
 	private final static float NEAR = 1.5f;
 	private final static float FAR = Max_Depth + 5;
+	// p?: the top percent of nearest plan in viewport
+	// tanginta == tanginta --> p? / near == t / (near + t_z) -->> p? = near * (t / (near + t_z))
+	private final static float TOP_PERCENT = NEAR * (PLAN_HEIGHT_MAXIMIN / (NEAR + (-PLAN_TRASLATE_Z)));
+	private final static float BOTTOM_PERCENT = TOP_PERCENT;
+	private static float LEFT_PERCENT, RIGHT_PERCENT; // cause viewport change in width, this value should calced continuely
 	
 	private float calced_min_offset, calced_max_offset;
 	
