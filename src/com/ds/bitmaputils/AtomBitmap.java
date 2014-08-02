@@ -41,7 +41,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	/** mark time , increase timestamp
 	 * @return
 	 */
-	public Bitmap getBitmap() { // ZHUJJ-FIXME distingursh between file read fail and not load yet 
+	public Bitmap getBitmap() { //  ZHUJJ-FIXME 0 distingursh between file read fail and not load yet 
 		return getBitmap(null);
 	}
 	
