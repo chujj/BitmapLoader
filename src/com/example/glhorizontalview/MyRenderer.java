@@ -156,7 +156,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				updateItems(offset_x, offset_y);
 				break;
 			case MSG_FLING:
-				
+				float vx = msg.getData().getFloat("x");
+				float vy = msg.getData().getFloat("y");
+				DsLog.e("onFling");
+				mScroller.fling(mCurrOffset, 0, vx, vy, calced_min_offset, calced_max_offset, 0, 0);
+				inAutoAnimation = true;
 				break;
 			case MSG_FINISH:
 				float x = msg.getData().getFloat("x");
@@ -376,7 +380,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onFling(float velocity_x, float velocity_y) {
-
+			Message m = Message.obtain(null, MSG_FLING);
+			Bundle b = new Bundle();
+			b.putFloat("x", velocity_x);
+			b.putFloat("y", velocity_y);
+			m.setData(b);
+			sendMesg(m);
 		}
 
 		@Override

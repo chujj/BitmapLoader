@@ -1,5 +1,7 @@
 package com.ds.views;
 
+import com.ds.io.DsLog;
+
 import android.content.Context;
 import android.util.FloatMath;
 import android.view.animation.AnimationUtils;
@@ -19,17 +21,16 @@ public class MyScroller {
     private float mDeltaX;
     private float mDeltaY;
 
-    private int mMinX;
-    private int mMaxX;
-    private int mMinY;
-    private int mMaxY;
+    private float mMinX;
+    private float mMaxX;
+    private float mMinY;
+    private float mMaxY;
 
     private long mStartTime;
     private long mDuration;
     private float mDurationReciprocal;
     private boolean mFinished;
     private Interpolator mInterpolator;
-    private boolean mFlywheel;
 
     private float mVelocity;
 
@@ -39,9 +40,7 @@ public class MyScroller {
     private static float DECELERATION_RATE = (float) (Math.log(0.75) / Math.log(0.9));
     private static float ALPHA = 800; // pixels / seconds
     private static float START_TENSION = 0.4f; // Tension at start: (0.4 * total T, 1.0 * Distance)
-    private static float END_TENSION = 1.0f - START_TENSION;
-    private static final int NB_SAMPLES = 100;
-    private static final float[] SPLINE = new float[NB_SAMPLES + 1];
+
 
     /**
      * Create a Scroller with the default duration and interpolator.
@@ -96,44 +95,6 @@ public class MyScroller {
     public final float getCurrY() {
         return mCurrY;
     }
-    
-
-
-    /**
-     * Returns the start X offset in the scroll. 
-     * 
-     * @return The start X offset as an absolute distance from the origin.
-     */
-    public final float getStartX() {
-        return mStartX;
-    }
-    
-    /**
-     * Returns the start Y offset in the scroll. 
-     * 
-     * @return The start Y offset as an absolute distance from the origin.
-     */
-    public final float getStartY() {
-        return mStartY;
-    }
-    
-    /**
-     * Returns where the scroll will end. Valid only for "fling" scrolls.
-     * 
-     * @return The final X offset as an absolute distance from the origin.
-     */
-    public final float getFinalX() {
-        return mFinalX;
-    }
-    
-    /**
-     * Returns where the scroll will end. Valid only for "fling" scrolls.
-     * 
-     * @return The final Y offset as an absolute distance from the origin.
-     */
-    public final float getFinalY() {
-        return mFinalY;
-    }
 
     /**
      * Call this when you want to know the new location.  If it returns true,
@@ -158,20 +119,17 @@ public class MyScroller {
                 mCurrY = mStartY + (x * mDeltaY);
                 break;
             case FLING_MODE:
-                final float t = (float) timePassed / mDuration;
-                final int index = (int) (NB_SAMPLES * t);
-                final float t_inf = (float) index / NB_SAMPLES;
-                final float t_sup = (float) (index + 1) / NB_SAMPLES;
-                final float d_inf = SPLINE[index];
-                final float d_sup = SPLINE[index + 1];
-                final float distanceCoef = d_inf + (t - t_inf) / (t_sup - t_inf) * (d_sup - d_inf);
+                float t = timePassed /  (float)mDuration;
                 
-                mCurrX = mStartX + Math.round(distanceCoef * (mFinalX - mStartX));
+                t  = mInterpolator.getInterpolation(t);
+
+                mCurrX = mStartX + t * (mFinalX - mStartX);
+                DsLog.e(String.format("t_time:%d, t_past:%.3f, mCurrX:%.3f, finelX:%.3f\n",(int) mDuration, t, mCurrX, mFinalX));
                 // Pin to mMinX <= mCurrX <= mMaxX
                 mCurrX = Math.min(mCurrX, mMaxX);
                 mCurrX = Math.max(mCurrX, mMinX);
                 
-                mCurrY = mStartY + Math.round(distanceCoef * (mFinalY - mStartY));
+                mCurrY = mStartY + t * (mFinalY - mStartY);
                 // Pin to mMinY <= mCurrY <= mMaxY
                 mCurrY = Math.min(mCurrY, mMaxY);
                 mCurrY = Math.max(mCurrY, mMinY);
@@ -191,19 +149,6 @@ public class MyScroller {
         return true;
     }
 
-    /**
-     * Start scrolling by providing a starting point and the distance to travel.
-     * 
-     * @param startX Starting horizontal scroll offset in pixels. Positive
-     *        numbers will scroll the content to the left.
-     * @param startY Starting vertical scroll offset in pixels. Positive numbers
-     *        will scroll the content up.
-     * @param dx Horizontal distance to travel. Positive numbers will scroll the
-     *        content to the left.
-     * @param dy Vertical distance to travel. Positive numbers will scroll the
-     *        content up.
-     * @param duration Duration of the scroll in milliseconds.
-     */
     public void startScroll(float startX, float startY, float dx, float dy, long duration) {
         mMode = SCROLL_MODE;
         mFinished = false;
@@ -218,35 +163,15 @@ public class MyScroller {
         mDurationReciprocal = 1.0f / (float) mDuration;
     }
 
-    /**
-     * Start scrolling based on a fling gesture. The distance travelled will
-     * depend on the initial velocity of the fling.
-     * 
-     * @param startX Starting point of the scroll (X)
-     * @param startY Starting point of the scroll (Y)
-     * @param velocityX Initial velocity of the fling (X) measured in pixels per
-     *        second.
-     * @param velocityY Initial velocity of the fling (Y) measured in pixels per
-     *        second
-     * @param minX Minimum X value. The scroller will not scroll past this
-     *        point.
-     * @param maxX Maximum X value. The scroller will not scroll past this
-     *        point.
-     * @param minY Minimum Y value. The scroller will not scroll past this
-     *        point.
-     * @param maxY Maximum Y value. The scroller will not scroll past this
-     *        point.
-     */
-    public void fling(int startX, int startY, int velocityX, int velocityY,
-            int minX, int maxX, int minY, int maxY) {
+    public void fling(float startX, float startY, float velocityX, float velocityY,
+            float minX, float maxX, float minY, float maxY) {
         // Continue a scroll or fling in progress
-    	if (1 > 0)
-    		throw new RuntimeException("wrong case");
-        if (mFlywheel && !mFinished) {
+
+        if (!mFinished) {
             float oldVel = 0 ; // getCurrVelocity();
 
-            float dx = (float) (mFinalX - mStartX);
-            float dy = (float) (mFinalY - mStartY);
+            float dx = (mFinalX - mStartX);
+            float dy = (mFinalY - mStartY);
             float hyp = FloatMath.sqrt(dx * dx + dy * dy);
 
             float ndx = dx / hyp;
@@ -269,7 +194,7 @@ public class MyScroller {
         mVelocity = velocity;
         final double l = Math.log(START_TENSION * velocity / ALPHA);
         mDuration = (int) (1000.0 * Math.exp(l / (DECELERATION_RATE - 1.0)));
-        mStartTime = AnimationUtils.currentAnimationTimeMillis();
+        mStartTime = System.currentTimeMillis();
         mStartX = startX;
         mStartY = startY;
 
@@ -288,7 +213,7 @@ public class MyScroller {
         // Pin to mMinX <= mFinalX <= mMaxX
         mFinalX = Math.min(mFinalX, mMaxX);
         mFinalX = Math.max(mFinalX, mMinX);
-        
+
         mFinalY = startY + Math.round(totalDistance * coeffY);
         // Pin to mMinY <= mFinalY <= mMaxY
         mFinalY = Math.min(mFinalY, mMaxY);
@@ -306,56 +231,6 @@ public class MyScroller {
         mCurrX = mFinalX;
         mCurrY = mFinalY;
         mFinished = true;
-    }
-    
-    /**
-     * Extend the scroll animation. This allows a running animation to scroll
-     * further and longer, when used with {@link #setFinalX(int)} or {@link #setFinalY(int)}.
-     *
-     * @param extend Additional time to scroll in milliseconds.
-     * @see #setFinalX(int)
-     * @see #setFinalY(int)
-     */
-    public void extendDuration(int extend) {
-        int passed = timePassed();
-        mDuration = passed + extend;
-        mDurationReciprocal = 1.0f / mDuration;
-        mFinished = false;
-    }
-
-    /**
-     * Returns the time elapsed since the beginning of the scrolling.
-     *
-     * @return The elapsed time in milliseconds.
-     */
-    public int timePassed() {
-        return (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
-    }
-
-    /**
-     * Sets the final position (X) for this scroller.
-     *
-     * @param newX The new X offset as an absolute distance from the origin.
-     * @see #extendDuration(int)
-     * @see #setFinalY(int)
-     */
-    public void setFinalX(int newX) {
-        mFinalX = newX;
-        mDeltaX = mFinalX - mStartX;
-        mFinished = false;
-    }
-
-    /**
-     * Sets the final position (Y) for this scroller.
-     *
-     * @param newY The new Y offset as an absolute distance from the origin.
-     * @see #extendDuration(int)
-     * @see #setFinalX(int)
-     */
-    public void setFinalY(int newY) {
-        mFinalY = newY;
-        mDeltaY = mFinalY - mStartY;
-        mFinished = false;
     }
 
 }

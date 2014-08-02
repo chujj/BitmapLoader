@@ -7,4 +7,7 @@ public class TDS {
 	// ZHUJJ-TODO texture cache: Bitmap cache don't release or query a lot
 	// ZHUJJ-TODO Texture Tile size calced according Machine
 	// ZHUJJ-FIXME recycle time
+	// ZHUJJ background image
+	// ZHUJJ light
+	// ZHUJJ-TODO move into native
 }
