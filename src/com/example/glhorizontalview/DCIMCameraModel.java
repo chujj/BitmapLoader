@@ -59,34 +59,48 @@ public class DCIMCameraModel implements GLResourceModel {
 			mC.drawBitmap(bp, null, mRect, null);
 		}
 	}
+	
+	private class MyLoadPathRunnable implements Runnable {
 
-	public void loadPathContent(String path, boolean reload) {
-		if (reload)
-			mRender.modelChangedStart();
+		private String mPath;
+		public MyLoadPathRunnable(String path) {
+			mPath = path;
+		}
 		
-		File dir = new File(path);
-		File[] files = dir.listFiles(new FileFilter() {
-
-			@Override
-			public boolean accept(File arg0) {
-				boolean retval;
-				retval = arg0.getName().endsWith("jpg") ? true : 
-					arg0.getName().endsWith("png") ? true : 
-						arg0.isDirectory() ? arg0.getName().startsWith(".") ? false : true
-						: false;
-				return retval;
+		@Override
+		public void run() {
+			File dir = new File(mPath);
+			File[] files = dir.listFiles(new FileFilter() {
+				
+				@Override
+				public boolean accept(File arg0) {
+					boolean retval;
+					retval = arg0.getName().endsWith("jpg") ? true : 
+						arg0.getName().endsWith("png") ? true : 
+							arg0.isDirectory() ? arg0.getName().startsWith(".") ? false : true
+									: false;
+					return retval;
+				}
+			});
+			
+			mKeys = new Item[files.length];
+			
+			for (int i = 0; i < files.length; i++) {
+				mKeys[i] = new Item(files[i].isDirectory(), files[i].getName(),
+						files[i].getAbsolutePath());
 			}
-		});
-
-		mKeys = new Item[files.length];
-
-		for (int i = 0; i < files.length; i++) {
-			mKeys[i] = new Item(files[i].isDirectory(), files[i].getName(),
-					files[i].getAbsolutePath());
 		}
 
-		if (reload)
-			mRender.modelChangedEnd();
+	}
+
+	public void loadPathContent(String path, boolean reload) {
+		MyLoadPathRunnable run = new MyLoadPathRunnable(path);
+		if (reload) {
+			mRender.modelChanged(run);
+		} else {
+			run.run();
+		}
+
 	}
 
 	private class Item {

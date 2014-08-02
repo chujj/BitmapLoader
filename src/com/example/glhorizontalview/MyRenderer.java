@@ -140,9 +140,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		@Override
 		public void run() {
 			synchronized (mMessagesList) {
-				if (mMessagesList.size() > 0) {
+				while (mMessagesList.size() > 0) {
+					DsLog.e("handle msg start");
 					handleMessage(mMessagesList.remove(0));
 					mGLSurfaceView.requestRender();
+					DsLog.e("handle msg end");
 				}
 			}
 		}
@@ -200,6 +202,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				break;
 			case MSG_MODEL_RELOAD:
 				mMessagesList.clear();
+				((Runnable)msg.obj).run();
 				initDimensionLimit();
 				updateItems(0, 0);
 				break;
@@ -607,15 +610,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		return -1;
 	}
 
-	public void modelChangedStart() {
-		synchronized (mMessagesList) {
-			mMessagesList.clear();
-		}
-		
-	}
-	
-	public void modelChangedEnd() {
-		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD));
+	public void modelChanged(Runnable run) {
+		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD, run));
 	}
 
 }
