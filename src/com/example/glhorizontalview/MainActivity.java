@@ -1,12 +1,11 @@
 package com.example.glhorizontalview;
 
-import android.opengl.GLSurfaceView;
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.view.Menu;
+import android.opengl.GLSurfaceView;
+import android.os.Bundle;
 
 public class MainActivity extends Activity {
 	/** Hold a reference to our GLSurfaceView */
