@@ -139,10 +139,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		public void run() {
 			synchronized (mMessagesList) {
 				while (mMessagesList.size() > 0) {
-					DsLog.e("handle msg start");
+//					DsLog.e("handle msg start");
 					handleMessage(mMessagesList.remove(0));
 					mGLSurfaceView.requestRender();
-					DsLog.e("handle msg end");
+//					DsLog.e("handle msg end");
 				}
 			}
 		}
