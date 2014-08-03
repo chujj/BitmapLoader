@@ -48,6 +48,9 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	public Bitmap getBitmap(BitmapGotCallBack callback) {
 		if (mBitmap == null || isRecycled) {
 			mBitmap = BitmapNetGetter.tryGetBitmapFromUrlOrCallback(this, mInsideCallback);
+			if (mBitmap == null && !mRegistedCallback.contains(callback)) {
+				mRegistedCallback.add(callback);
+			}
 		}
 		markRead();
 		return mBitmap;
@@ -68,6 +71,10 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 			height = mBitmap.getHeight();
 			size = width * height;
 			isRecycled = false;
+			for (int i = 0; i < mRegistedCallback.size(); i++) {
+				mRegistedCallback.get(i).onBitmapGot(mBitmap);
+			}
+			mRegistedCallback.clear();
 		}
 	};
 

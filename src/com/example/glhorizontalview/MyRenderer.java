@@ -120,6 +120,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private static final int MSG_FINISH = 0x0002;
 	private static final int MSG_HIT_TEST = 0x0003;
 	private static final int MSG_MODEL_RELOAD = 0x0004;
+	private static final int MSG_REFRESH_IDX = 0x0005;
 	
 	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
 	
@@ -140,19 +141,21 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			synchronized (mMessagesList) {
 				while (mMessagesList.size() > 0) {
 //					DsLog.e("handle msg start");
-					handleMessage(mMessagesList.remove(0));
-					mGLSurfaceView.requestRender();
+					if (handleMessageAndNeedRefresh(mMessagesList.remove(0)))
+						mGLSurfaceView.requestRender();
 //					DsLog.e("handle msg end");
 				}
 			}
 		}
 
-		public void handleMessage(Message msg) {
+		public boolean handleMessageAndNeedRefresh(Message msg) {
+			boolean refresh = true;
+			
 			switch (msg.what) {
 			case MSG_ONSCRELL:
 				float offset_x = msg.getData().getFloat("x");
 				float offset_y = msg.getData().getFloat("y");
-				if (inAutoAnimation) return;
+				if (inAutoAnimation) return refresh;
 				updateItems(offset_x, offset_y);
 				break;
 			case MSG_FLING:
@@ -215,9 +218,19 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				initDimensionLimit();
 				updateItems(0, 0);
 				break;
+			case MSG_REFRESH_IDX:
+				refresh = false;
+				for (int i = 0; i < items.length; i++) {
+					if (items[i].validate && i == msg.arg1) {
+						refresh = true;
+						break;
+					}
+				}
+				break;
 			default:
 				break;
 			}
+			return refresh;
 		}
 	}
 	
@@ -632,8 +645,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD, run));
 	}
 	
-	public void refreshIdx() {
-		// ZHUJJ-FIXME 0 implement method body
+	public void refreshIdx(int idxToRefresh) {
+		sendMesg(Message.obtain(null, MSG_REFRESH_IDX, idxToRefresh, -1));
 	}
 
 }

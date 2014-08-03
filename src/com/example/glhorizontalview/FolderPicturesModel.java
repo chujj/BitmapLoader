@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.os.Environment;
 
 import com.ds.bitmaputils.AtomBitmap;
+import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.bitmaploader.R;
 
@@ -57,7 +58,7 @@ public class FolderPicturesModel implements GLResourceModel {
 		} else {
 			AtomBitmap abp = BitmapHelper.getInstance(mContext).getBitmap(
 					mKeys[aIdx].absPath);
-			Bitmap bp = abp.getBitmap();
+			Bitmap bp = abp.getBitmap(mKeys[aIdx]);
 			if (bp != null) {
 				final int b_w = bp.getWidth();
 				final int b_h = bp.getHeight();
@@ -73,7 +74,8 @@ public class FolderPicturesModel implements GLResourceModel {
 					mRect.offset( (require_width - f_w) / 2, (require_height - f_h) / 2);
 					mC.drawBitmap(bp, null, mRect, null);
 				}
-
+			} else {
+				
 			}
 		}
 	}
@@ -106,7 +108,7 @@ public class FolderPicturesModel implements GLResourceModel {
 			mKeys = new Item[files.length];
 			
 			for (int i = 0; i < files.length; i++) {
-				mKeys[i] = new Item(files[i].isDirectory(), files[i].getName(),
+				mKeys[i] = new Item(i, files[i].isDirectory(), files[i].getName(),
 						files[i].getAbsolutePath());
 			}
 		}
@@ -123,17 +125,24 @@ public class FolderPicturesModel implements GLResourceModel {
 
 	}
 
-	private class Item {
+	private class Item implements BitmapGotCallBack {
 		boolean isFolder;
 		String absPath;
 		String fName;
+		int mIdx;
 
-		public Item(boolean folder, String foldername, String path) {
+		public Item(int idx, boolean folder, String foldername, String path) {
+			mIdx = idx;
 			isFolder = folder;
 			if (isFolder) {
 				fName = foldername;
 			}
 			absPath = path;
+		}
+
+		@Override
+		public void onBitmapGot(Bitmap aBitmap) {
+			mRender.refreshIdx(mIdx);
 		}
 	}
 	
