@@ -30,6 +30,7 @@ public class BitmapNetGetter {
 	
 	private HashMap<Object, Bitmap> mBitmapCache;
 	private HashMap<Object, BitmapGotCallBack> mFetchTask;
+	private Bitmap mError;
 	private static synchronized BitmapNetGetter getInstance() {
 		if (sInstance == null) {
 			sInstance = new BitmapNetGetter();
@@ -44,6 +45,8 @@ public class BitmapNetGetter {
 		mBitmapCache = new HashMap<Object, Bitmap>();
 		mFetchTask = new HashMap<Object, BitmapGotCallBack>();
 		mTheradprint = new LogPrinter(android.util.Log.ERROR, "count-dump");
+		mError = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565);
+		mError.eraseColor(0xff0000ff);
 	}
 
 	/** Call set the cache path. Makesure call at first of all!
@@ -62,7 +65,7 @@ public class BitmapNetGetter {
 	public static void releaseBitmap(BitmapTask aTask) {
 		BitmapNetGetter instance = getInstance();
 		Bitmap release = instance.mBitmapCache.get(aTask.getTaskKey());
-		if (release != null) {
+		if (release != null && release != instance.mError) {
 			release.recycle();
 			instance.mBitmapCache.remove(aTask.getTaskKey());
 		}
@@ -171,6 +174,9 @@ public class BitmapNetGetter {
 								aTask.getFileSystemPath(),
 								aTask.getBitmapMaxWidth(),
 								aTask.getBitmapMaxHeight());
+						if (retval == null) {
+							retval = sInstance.mError;
+						}
 					} else { // origin
 						retval = BitmapFactory.decodeFile(aTask.getFileSystemPath());
 					}
