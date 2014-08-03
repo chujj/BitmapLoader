@@ -1,7 +1,6 @@
 package com.example.glhorizontalview;
 
 public class TDS {
-	// ZHUJJ-FIXME 0 max height scale
 	// ZHUJJ-FIXME 0 Fling with damping, spped addable
 	// ZHUJJ-FIXME 0 Wait image, 
 	// ZHUJJ-TODO texture cache: Bitmap cache don't release or query a lot

@@ -21,7 +21,7 @@ public class FolderPicturesModel implements GLResourceModel {
 	private Rect mRect;
 	private Item[] mKeys;
 	private Context mContext;
-	private Paint mPaint;
+	private Paint mPaint, mBgPaint;
 	private String initPath;
 	private PathContainerView mPathClickListener;
 
@@ -36,6 +36,8 @@ public class FolderPicturesModel implements GLResourceModel {
 		mPaint = new Paint();
 		mPaint.setTextSize(30);
 		mPathClickListener = pathContainerView;
+		mBgPaint = new Paint();
+		mBgPaint.setColor(0xffc3c3c3);
 	}
 
 	@Override
@@ -47,6 +49,8 @@ public class FolderPicturesModel implements GLResourceModel {
 	public void updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
 		mRect.set(0, 0, require_width, require_height);
+		mC.drawRect(mRect, mBgPaint);
+		
 		if (mKeys[aIdx].isFolder) {
 			mC.drawBitmap(mFolderBitmap, null, mRect, null);
 			mC.drawText(mKeys[aIdx].fName, 0, 40, mPaint);
@@ -54,9 +58,23 @@ public class FolderPicturesModel implements GLResourceModel {
 			AtomBitmap abp = BitmapHelper.getInstance(mContext).getBitmap(
 					mKeys[aIdx].absPath);
 			Bitmap bp = abp.getBitmap();
-			if (bp == null)
-				bp = mDefaultBitmap;
-			mC.drawBitmap(bp, null, mRect, null);
+			if (bp != null) {
+				final int b_w = bp.getWidth();
+				final int b_h = bp.getHeight();
+				if (b_w <= require_width && b_h <= require_height) { // center aligned
+					mC.drawBitmap(bp, (require_width - b_w) / 2, (require_height - b_h) /2, null);
+				} else { // scaled fix given rect size
+					final float s_w = 1.0f * require_width / b_w;
+					final float s_h = 1.0f * require_height / b_h;
+					final float f_s = Math.min(s_w, s_h);
+					final int f_w = (int) (b_w * f_s);
+					final int f_h = (int) (b_h * f_s);
+					mRect.set(0, 0, f_w, f_h);
+					mRect.offset( (require_width - f_w) / 2, (require_height - f_h) / 2);
+					mC.drawBitmap(bp, null, mRect, null);
+				}
+
+			}
 		}
 	}
 	
