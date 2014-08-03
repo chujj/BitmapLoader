@@ -163,8 +163,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				inAutoAnimation = true;
 				break;
 			case MSG_FINISH:
-				float x = msg.getData().getFloat("x");
-				float y = msg.getData().getFloat("y");
+				float x = 0;
+				if (msg.getData().containsKey("x")) {
+					 x = msg.getData().getFloat("x");
+				}
+				
 				if (mCurrOffset > calced_max_offset) {
 					float dx =  (mCurrOffset - calced_max_offset);
 					mScroller.startScroll(mCurrOffset, -1, -dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
@@ -174,7 +177,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
 					inAutoAnimation = true;
 				} else {
-					if (!inAutoAnimation && Math.abs(mCurrOffset % Distance) > 0.001) {
+					if (!inAutoAnimation && ((Math.abs( mCurrOffset % Distance) > 0.001) || x != 0)) {
 						float left = Math.abs(mCurrOffset % Distance);
 						float dx = 0; 
 						if (left < Distance /2) {
@@ -182,10 +185,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 						} else {
 							dx = Distance - left;
 						}
+						if (x != 0) {
+							dx = -x;
+						}
 						inAutoAnimation = true;
 						mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
 					}
 				}
+				break;
 				
 			case MSG_HIT_TEST:
 				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
@@ -198,7 +205,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				}
 				msg.getData().putInt("hit", hit);
 				synchronized (msg) {
-					msg.notify();
+					msg.notifyAll();
 				}
 				
 				break;
@@ -408,17 +415,21 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				DsLog.e(" onClick x y: " + x + " " + y + " hit: " + m.getData().getInt("hit", -1));
 				mModel.clickAt(hit);
 			} else {
-				; // ZHUJJ-FIXME 0 auto scroll accord with the down location ? 
+				// auto scroll accord with the down location
+				float offset = (Distance * -(Math.signum(x - 0.5f)));
+				m.setData(null);
+				m.what = MSG_FINISH;
+				b.clear();
+				b.putFloat("x", offset);
+				b.putFloat("y", y);
+				m.setData(b);
+				sendMesg(m);
 			}
 		}
 
 		@Override
 		public void onFinish(float x, float y) { // roll back
 			Message m = Message.obtain(null, MSG_FINISH);
-			Bundle b = new Bundle();
-			b.putFloat("x", x);
-			b.putFloat("y", y);
-			m.setData(b);
 			sendMesg(m);
 		}
 
