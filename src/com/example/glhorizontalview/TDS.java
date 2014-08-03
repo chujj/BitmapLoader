@@ -5,7 +5,6 @@ public class TDS {
 	// ZHUJJ-TODO Wait image, after net 
 	// ZHUJJ-TODO texture cache: Bitmap cache don't release or query a lot
 	// ZHUJJ-TODO Texture Tile size calced according Machine
-	// ZHUJJ-FIXME 0 recycle time
 	// ZHUJJ-FIXME 1 background image
 	// ZHUJJ-FIXME 1 light
 	// ZHUJJ-FIXME 2 move into native
