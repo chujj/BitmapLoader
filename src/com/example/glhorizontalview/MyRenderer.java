@@ -415,7 +415,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private boolean continueAnimation() {
 		boolean finish = mScroller.computeScrollOffset();
 		mCurrOffset = mScroller.getCurrX();
-		DsLog.e("curr: " + mCurrOffset + " durning: " + mScroller.getDuration());
+		DsLog.e("curr: " + mCurrOffset + " durning: " + mScroller.getDuration() + " finished? " + finish);
 		this.updateItems(0, 0);
 		return finish;
 	}

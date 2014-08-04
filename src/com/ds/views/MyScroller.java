@@ -147,6 +147,7 @@ public class MyScroller {
             }
         }
         else {
+        	DsLog.e("scroller durning over finish");
             mCurrX = mFinalX;
             mCurrY = mFinalY;
             mFinished = true;
@@ -177,6 +178,7 @@ public class MyScroller {
 
         mMode = FLING_MODE;
         mFinished = false;
+        mStartTime = System.currentTimeMillis();
         mDuration = duration;
         flingEnd = endOfFling;
         
