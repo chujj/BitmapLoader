@@ -111,6 +111,7 @@ public class MyScroller {
         if (timePassed < mDuration) {
             switch (mMode) {
             case SCROLL_MODE:
+            	DsLog.e("in scroll mode");
                 float x = timePassed * mDurationReciprocal;
 
                 x = mInterpolator.getInterpolation(x);
@@ -123,19 +124,23 @@ public class MyScroller {
                 
                 t  = mInterpolator.getInterpolation(t);
 
-                mCurrX = mStartX + t * (mFinalX - mStartX);
-                DsLog.e(String.format("t_time:%d, t_past:%.3f, mCurrX:%.3f, finelX:%.3f\n",(int) mDuration, t, mCurrX, mFinalX));
-                // Pin to mMinX <= mCurrX <= mMaxX
+                mCurrX = mStartX + t * mDeltaX;
                 mCurrX = Math.min(mCurrX, mMaxX);
                 mCurrX = Math.max(mCurrX, mMinX);
                 
-                mCurrY = mStartY + t * (mFinalY - mStartY);
-                // Pin to mMinY <= mCurrY <= mMaxY
+                mCurrY = mStartY + t * mDeltaY;
                 mCurrY = Math.min(mCurrY, mMaxY);
                 mCurrY = Math.max(mCurrY, mMinY);
 
-                if (mCurrX == mFinalX && mCurrY == mFinalY) {
+                DsLog.e(String.format("t_time:%d, t_past:%.3f, mCurrX:%.3f, finelX:%.3f\n",(int) mDuration, t, mCurrX, mFinalX));
+                if (((mCurrX - mFinalX  < 0.001))&& ((mCurrY - mFinalY) < 0.001)) {
+                	DsLog.e("fling finished");
+
                     mFinished = true;
+                    if (flingEnd != null) {
+                    	flingEnd.run();
+                    	flingEnd = null;
+                    }
                 }
 
                 break;
@@ -163,58 +168,32 @@ public class MyScroller {
         mDurationReciprocal = 1.0f / (float) mDuration;
     }
 
-    public void fling(float startX, float startY, float velocityX, float velocityY,
-            float minX, float maxX, float minY, float maxY) {
-        // Continue a scroll or fling in progress
-
-        if (!mFinished) {
-            float oldVel = 0 ; // getCurrVelocity();
-
-            float dx = (mFinalX - mStartX);
-            float dy = (mFinalY - mStartY);
-            float hyp = FloatMath.sqrt(dx * dx + dy * dy);
-
-            float ndx = dx / hyp;
-            float ndy = dy / hyp;
-
-            float oldVelocityX = ndx * oldVel;
-            float oldVelocityY = ndy * oldVel;
-            if (Math.signum(velocityX) == Math.signum(oldVelocityX) &&
-                    Math.signum(velocityY) == Math.signum(oldVelocityY)) {
-                velocityX += oldVelocityX;
-                velocityY += oldVelocityY;
-            }
-        }
+    private Runnable flingEnd;
+    public void fling(float startX, float startY, float dx, float dy,
+            float minX, float maxX, float minY, float maxY, long duration, Runnable endOfFling) {
+    	if (mMode == FLING_MODE && !mFinished) {
+    		return ;
+    	}
 
         mMode = FLING_MODE;
         mFinished = false;
-
-        float velocity = FloatMath.sqrt(velocityX * velocityX + velocityY * velocityY);
-     
-        mVelocity = velocity;
-        final double l = Math.log(START_TENSION * velocity / ALPHA);
-        mDuration = (int) (1000.0 * Math.exp(l / (DECELERATION_RATE - 1.0)));
-        mStartTime = System.currentTimeMillis();
-        mStartX = startX;
-        mStartY = startY;
-
-        float coeffX = velocity == 0 ? 1.0f : velocityX / velocity;
-        float coeffY = velocity == 0 ? 1.0f : velocityY / velocity;
-
-        int totalDistance =
-                (int) (ALPHA * Math.exp(DECELERATION_RATE / (DECELERATION_RATE - 1.0) * l));
+        mDuration = duration;
+        flingEnd = endOfFling;
         
         mMinX = minX;
         mMaxX = maxX;
         mMinY = minY;
         mMaxY = maxY;
 
-        mFinalX = startX + Math.round(totalDistance * coeffX);
+        mDeltaX = dx;
+        mDeltaY = dy;
+
+        mFinalX = startX + dx;
         // Pin to mMinX <= mFinalX <= mMaxX
         mFinalX = Math.min(mFinalX, mMaxX);
         mFinalX = Math.max(mFinalX, mMinX);
 
-        mFinalY = startY + Math.round(totalDistance * coeffY);
+        mFinalY = startY + dy;
         // Pin to mMinY <= mFinalY <= mMaxY
         mFinalY = Math.min(mFinalY, mMaxY);
         mFinalY = Math.max(mFinalY, mMinY);

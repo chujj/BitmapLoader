@@ -121,6 +121,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private static final int MSG_HIT_TEST = 0x0003;
 	private static final int MSG_MODEL_RELOAD = 0x0004;
 	private static final int MSG_REFRESH_IDX = 0x0005;
+	private static final int MSG_EXTERNAL_RUNNABLE = 0x0006;
 	
 	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
 	
@@ -153,6 +154,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			
 			switch (msg.what) {
 			case MSG_ONSCRELL:
+				DsLog.e("eventHub onScroll");
 				float offset_x = msg.getData().getFloat("x");
 				float offset_y = msg.getData().getFloat("y");
 				if (inAutoAnimation) return refresh;
@@ -161,43 +163,26 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			case MSG_FLING:
 				float vx = msg.getData().getFloat("x");
 				float vy = msg.getData().getFloat("y");
-				DsLog.e("onFling");
-				mScroller.fling(mCurrOffset, 0, vx, vy, calced_min_offset, calced_max_offset, 0, 0);
+				long durning =  (long) ( Math.abs(vx) * AUTO_ANIMATION_TIME_PER_PIXEL);
+				DsLog.e("eventHub onFling: vx: " + vx + " durning: " + durning);
+				mScroller.fling(mCurrOffset, 0, vx, 0, calced_min_offset - Distance, calced_max_offset + Distance, 0, 0, durning, rollback_routinue_msg);
 				inAutoAnimation = true;
 				break;
 			case MSG_FINISH:
+				DsLog.e("eventHub onFinish");
+				if (inAutoAnimation) return refresh;
+				DsLog.e("eventHub onFinish continue");
 				float x = 0;
 				if (msg.getData().containsKey("x")) {
 					 x = msg.getData().getFloat("x");
 				}
 				
-				if (mCurrOffset > calced_max_offset) {
-					float dx =  (mCurrOffset - calced_max_offset);
-					mScroller.startScroll(mCurrOffset, -1, -dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
-					inAutoAnimation = true;
-				} else if (mCurrOffset < calced_min_offset) {
-					float dx =  (calced_min_offset - mCurrOffset);
-					mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
-					inAutoAnimation = true;
-				} else {
-					if (!inAutoAnimation && ((Math.abs( mCurrOffset % Distance) > 0.001) || x != 0)) {
-						float left = Math.abs(mCurrOffset % Distance);
-						float dx = 0; 
-						if (left < Distance /2) {
-							dx = -left;
-						} else {
-							dx = Distance - left;
-						}
-						if (x != 0) {
-							dx = -x;
-						}
-						inAutoAnimation = true;
-						mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
-					}
-				}
+				rollback(x);
 				break;
 				
 			case MSG_HIT_TEST:
+				DsLog.e("eventHub hitTest");
+				if (inAutoAnimation) return refresh;
 				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
 
@@ -213,12 +198,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				
 				break;
 			case MSG_MODEL_RELOAD:
+				DsLog.e("eventHub modelReload");
 				mMessagesList.clear();
 				((Runnable)msg.obj).run();
 				initDimensionLimit();
 				updateItems(0, 0);
 				break;
 			case MSG_REFRESH_IDX:
+				DsLog.e("eventHub refreshIdx");
 				refresh = false;
 				for (int i = 0; i < items.length; i++) {
 					if (items[i].validate && i == msg.arg1) {
@@ -227,10 +214,57 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					}
 				}
 				break;
+			case MSG_EXTERNAL_RUNNABLE:
+				DsLog.e("eventHub external runnable");
+				((Runnable)msg.obj).run();
 			default:
 				break;
 			}
 			return refresh;
+		}
+	}
+	private Runnable rollback_routinue_msg = new Runnable() {
+
+		@Override
+		public void run() {
+			DsLog.e("fling rollback msg send");
+			sendMesg(Message.obtain(null, MSG_EXTERNAL_RUNNABLE, rollback_routinue));
+		}
+	};
+		
+	private Runnable rollback_routinue = new Runnable() {
+		
+		@Override
+		public void run() {
+			DsLog.e("fling rollback called");
+			rollback(0);
+		}
+	};
+	
+	private void rollback(float x) {
+		if (mCurrOffset > calced_max_offset) {
+			float dx =  (mCurrOffset - calced_max_offset);
+			mScroller.startScroll(mCurrOffset, -1, -dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+			inAutoAnimation = true;
+		} else if (mCurrOffset < calced_min_offset) {
+			float dx =  (calced_min_offset - mCurrOffset);
+			mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
+			inAutoAnimation = true;
+		} else {
+			if (!inAutoAnimation && ((Math.abs( mCurrOffset % Distance) > 0.001) || x != 0)) {
+				float left = Math.abs(mCurrOffset % Distance);
+				float dx = 0; 
+				if (left < Distance /2) {
+					dx = -left;
+				} else {
+					dx = Distance - left;
+				}
+				if (x != 0) {
+					dx = -x;
+				}
+				inAutoAnimation = true;
+				mScroller.startScroll(mCurrOffset, 0, -dx, 0, (long) (Math.abs(dx) * AUTO_ANIMATION_TIME_PER_PIXEL));
+			}
 		}
 	}
 	
@@ -381,7 +415,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private boolean continueAnimation() {
 		boolean finish = mScroller.computeScrollOffset();
 		mCurrOffset = mScroller.getCurrX();
-//		DsLog.e("curr: " + mCurrOffset + " dst: " + mScroller.getFinalX());
+		DsLog.e("curr: " + mCurrOffset + " durning: " + mScroller.getDuration());
 		this.updateItems(0, 0);
 		return finish;
 	}
@@ -390,6 +424,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onScroll(float offset_x, float offset_y) {
+//			DsLog.e("event Sender onscroll");
 			Message m = Message.obtain(null, MSG_ONSCRELL);
 			Bundle b = new Bundle();
 			b.putFloat("x", offset_x);
@@ -400,6 +435,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onFling(float velocity_x, float velocity_y) {
+//			DsLog.e("event Sender onFling");
 			Message m = Message.obtain(null, MSG_FLING);
 			Bundle b = new Bundle();
 			b.putFloat("x", velocity_x);
@@ -410,6 +446,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onClick(float x, float y) {
+//			DsLog.e("event Sender onClick");
 			Message m = Message.obtain(null, MSG_HIT_TEST);
 			Bundle b = new Bundle();
 			b.putFloat("viewport_offset_x_percent", x);
@@ -442,6 +479,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void onFinish(float x, float y) { // roll back
+//			DsLog.e("event Sender onFinish");
 			Message m = Message.obtain(null, MSG_FINISH);
 			sendMesg(m);
 		}

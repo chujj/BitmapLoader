@@ -70,7 +70,7 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		mEvent.onFling(velocityX / 80, velocityY / 80);
+		mEvent.onFling(velocityX / this.getContext().getResources().getDisplayMetrics().widthPixels, velocityY / 80);
 		return true;
 	}
 
