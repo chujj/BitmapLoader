@@ -148,7 +148,7 @@ public class FolderPicturesModel implements GLResourceModel {
 	
 	private String getInitPath() {
 		File rootsd = Environment.getExternalStorageDirectory();
-		File dcim = new File(rootsd.getAbsolutePath() + "/DCIM");
+		File dcim = new File(rootsd.getAbsolutePath() + "/wallpapers" ); //"/DCIM");
 		if (dcim.exists()) {
 			return dcim.getAbsolutePath();
 		} else {

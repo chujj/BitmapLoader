@@ -251,7 +251,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
 			inAutoAnimation = true;
 		} else {
-			if (!inAutoAnimation && ((Math.abs( mCurrOffset % Distance) > 0.001) || x != 0)) {
+			if (((Math.abs( mCurrOffset % Distance) > 0.001) || x != 0)) {
 				float left = Math.abs(mCurrOffset % Distance);
 				float dx = 0; 
 				if (left < Distance /2) {

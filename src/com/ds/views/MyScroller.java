@@ -133,7 +133,7 @@ public class MyScroller {
                 mCurrY = Math.max(mCurrY, mMinY);
 
                 DsLog.e(String.format("t_time:%d, t_past:%.3f, mCurrX:%.3f, finelX:%.3f\n",(int) mDuration, t, mCurrX, mFinalX));
-                if (((mCurrX - mFinalX  < 0.001))&& ((mCurrY - mFinalY) < 0.001)) {
+                if ((Math.abs(mCurrX - mFinalX) < 0.001)&& (Math.abs(mCurrY - mFinalY) < 0.001)) {
                 	DsLog.e("fling finished");
 
                     mFinished = true;
@@ -151,6 +151,12 @@ public class MyScroller {
             mCurrX = mFinalX;
             mCurrY = mFinalY;
             mFinished = true;
+            if (FLING_MODE == mMode) {
+            	if (flingEnd != null) {
+            		flingEnd.run();
+            		flingEnd = null;
+            	}
+            }
         }
         return true;
     }
@@ -182,6 +188,8 @@ public class MyScroller {
         mDuration = duration;
         flingEnd = endOfFling;
         
+        mStartX = startX;
+        mStartY = startY;
         mMinX = minX;
         mMaxX = maxX;
         mMinY = minY;
