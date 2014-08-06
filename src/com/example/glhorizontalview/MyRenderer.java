@@ -152,12 +152,17 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		public boolean handleMessageAndNeedRefresh(Message msg) {
 			boolean refresh = true;
 			
+			if (inAutoAnimation && !mScroller.isFinished() && mScroller.inFlingMode() && (msg.what == MSG_ONSCRELL || msg.what == MSG_FLING)) {
+				mScroller.forceFinished(true);
+				inAutoAnimation = false;
+			}
+			
 			switch (msg.what) {
 			case MSG_ONSCRELL:
-				DsLog.e("eventHub onScroll");
 				float offset_x = msg.getData().getFloat("x");
 				float offset_y = msg.getData().getFloat("y");
 				if (inAutoAnimation) return refresh;
+				DsLog.e("eventHub onScroll");
 				updateItems(offset_x, offset_y);
 				break;
 			case MSG_FLING:
@@ -169,9 +174,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				inAutoAnimation = true;
 				break;
 			case MSG_FINISH:
-				DsLog.e("eventHub onFinish");
 				if (inAutoAnimation) return refresh;
-				DsLog.e("eventHub onFinish continue");
+				DsLog.e("eventHub onFinish");
 				float x = 0;
 				if (msg.getData().containsKey("x")) {
 					 x = msg.getData().getFloat("x");
@@ -181,8 +185,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				break;
 				
 			case MSG_HIT_TEST:
-				DsLog.e("eventHub hitTest");
 				if (inAutoAnimation) return refresh;
+				DsLog.e("eventHub hitTest");
 				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
 
@@ -205,7 +209,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				updateItems(0, 0);
 				break;
 			case MSG_REFRESH_IDX:
-				DsLog.e("eventHub refreshIdx");
+//				DsLog.e("eventHub refreshIdx");
 				refresh = false;
 				for (int i = 0; i < items.length; i++) {
 					if (items[i].validate && i == msg.arg1) {
@@ -215,7 +219,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				}
 				break;
 			case MSG_EXTERNAL_RUNNABLE:
-				DsLog.e("eventHub external runnable");
+//				DsLog.e("eventHub external runnable");
 				((Runnable)msg.obj).run();
 			default:
 				break;
@@ -227,7 +231,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public void run() {
-			DsLog.e("fling rollback msg send");
+//			DsLog.e("fling rollback msg send");
 			sendMesg(Message.obtain(null, MSG_EXTERNAL_RUNNABLE, rollback_routinue));
 		}
 	};
@@ -415,7 +419,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private boolean continueAnimation() {
 		boolean finish = mScroller.computeScrollOffset();
 		mCurrOffset = mScroller.getCurrX();
-		DsLog.e("curr: " + mCurrOffset + " durning: " + mScroller.getDuration() + " finished? " + finish);
+//		DsLog.e("curr: " + mCurrOffset + " durning: " + mScroller.getDuration() + " finished? " + finish);
 		this.updateItems(0, 0);
 		return finish;
 	}

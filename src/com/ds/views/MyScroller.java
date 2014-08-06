@@ -67,6 +67,7 @@ public class MyScroller {
      */
     public final void forceFinished(boolean finished) {
         mFinished = finished;
+        flingEnd = null;
     }
     
     /**
@@ -111,7 +112,7 @@ public class MyScroller {
         if (timePassed < mDuration) {
             switch (mMode) {
             case SCROLL_MODE:
-            	DsLog.e("in scroll mode");
+//            	DsLog.e("in scroll mode");
                 float x = timePassed * mDurationReciprocal;
 
                 x = mInterpolator.getInterpolation(x);
@@ -132,7 +133,7 @@ public class MyScroller {
                 mCurrY = Math.min(mCurrY, mMaxY);
                 mCurrY = Math.max(mCurrY, mMinY);
 
-                DsLog.e(String.format("t_time:%d, t_past:%.3f, mCurrX:%.3f, finelX:%.3f\n",(int) mDuration, t, mCurrX, mFinalX));
+//                DsLog.e(String.format("t_time:%d, t_past:%.3f, mCurrX:%.3f, finelX:%.3f\n",(int) mDuration, t, mCurrX, mFinalX));
                 if ((Math.abs(mCurrX - mFinalX) < 0.001)&& (Math.abs(mCurrY - mFinalY) < 0.001)) {
                 	DsLog.e("fling finished");
 
@@ -221,5 +222,9 @@ public class MyScroller {
         mCurrY = mFinalY;
         mFinished = true;
     }
+
+	public boolean inFlingMode() {
+		return mMode == FLING_MODE;
+	}
 
 }
