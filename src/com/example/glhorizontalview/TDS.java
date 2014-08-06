@@ -1,7 +1,6 @@
 package com.example.glhorizontalview;
 
 public class TDS {
-	// ZHUJJ-FIXME 0 Fling with damping, spped addable
 	// ZHUJJ-TODO Wait image, after net 
 	// ZHUJJ-TODO texture cache: Bitmap cache don't release or query a lot
 	// ZHUJJ-TODO Texture Tile size calced according Machine
