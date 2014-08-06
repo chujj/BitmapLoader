@@ -185,7 +185,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				break;
 				
 			case MSG_HIT_TEST:
-				if (inAutoAnimation) return refresh;
 				DsLog.e("eventHub hitTest");
 				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
@@ -195,9 +194,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 						Math.abs(viewport_offset_x_percent - 0.5f) < LEFT_PERCENT) {
 					hit = (int) (-mCurrOffset / Distance);
 				}
-				msg.getData().putInt("hit", hit);
-				synchronized (msg) {
-					msg.notifyAll();
+				if (inAutoAnimation) hit = -1;
+				Bundle b = msg.getData();
+				b.putInt("hit", hit);
+				synchronized (b) {
+					b.notifyAll();
 				}
 				
 				break;
@@ -457,9 +458,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			b.putFloat("viewport_offset_y_percent", y);
 			m.setData(b);
 			sendMesg(m);
-			synchronized (m) {
+			synchronized (b) {
 				try {
-					m.wait();
+					b.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
