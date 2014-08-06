@@ -96,7 +96,7 @@ public class FolderPicturesModel implements GLResourceModel {
 				public boolean accept(File arg0) {
 					boolean retval;
 					String name = arg0.getName();
-					name = name.substring(name.length() - 3);
+					name = name.length() > 3 ? name.substring(name.length() - 3) : name;
 					retval = name.equalsIgnoreCase("jpg") ? true : 
 						name.equalsIgnoreCase("png") ? true : 
 							arg0.isDirectory() ? arg0.getName().startsWith(".") ? false : true
