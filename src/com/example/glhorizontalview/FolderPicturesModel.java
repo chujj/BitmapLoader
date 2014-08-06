@@ -38,7 +38,8 @@ public class FolderPicturesModel implements GLResourceModel {
 		mPaint.setTextSize(30);
 		mPathClickListener = pathContainerView;
 		mBgPaint = new Paint();
-		mBgPaint.setColor(0xffc3c3c3);
+//		mBgPaint.setColor(0xffc3c3c3);
+		mBgPaint.setColor(0xff000000);
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class FolderPicturesModel implements GLResourceModel {
 		
 		if (mKeys[aIdx].isFolder) {
 			mC.drawBitmap(mFolderBitmap, null, mRect, null);
-			mC.drawText(mKeys[aIdx].fName, 0, 40, mPaint);
+			mC.drawText(mKeys[aIdx].fName, 0, require_height / 2 + 40, mPaint);
 		} else {
 			AtomBitmap abp = BitmapHelper.getInstance(mContext).getBitmap(
 					mKeys[aIdx].absPath);

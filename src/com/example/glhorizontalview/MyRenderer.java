@@ -382,7 +382,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	////////////////////////////////animation part ////////////////////////////////
 	private final static int View_part = 1;
-
+	
+	private final int Tile_Size = 300;
+	
 	private final static float PLAN_HEIGHT_MAXIMIN = 1.0f;
 	private final static float PLAN_HALF_WIDTH_FIXED = 1.0f; // y = k*x^2
 	private final static float PLAN_NEARLEST_GAP = 0.4f;
@@ -502,7 +504,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		int size = mModel.getCount();
 		items = new Item[size];
 		Bitmap.Config cf = Bitmap.Config.RGB_565;
-		Bitmap bitmap = Bitmap.createBitmap(100, 100, cf);
+		Bitmap bitmap = Bitmap.createBitmap(Tile_Size, Tile_Size, cf);
 		Canvas c = new Canvas(bitmap);
 		for (int i = 0; i < size ;i++) {
 			items[i] = new Item(bitmap, c, p, i * Distance, i);
@@ -517,11 +519,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			mTilePoll[i] = new Tile(i, count);
 		}
 		
-		mTileBitmap = Bitmap.createBitmap(100 * count, 100, cf);
+		mTileBitmap = Bitmap.createBitmap(Tile_Size * count, Tile_Size, cf);
 		mTileTextureHandle = TextureHelper.loadTexture(mActivityContext, mTileBitmap);
 	}
-	
-	
+
 	private void updateItems(float offset_x, float offset_y) {
 		mCurrOffset += offset_x;
 		float progress = 0;
@@ -616,10 +617,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					mC.drawColor(0xffffffff);
 					
 					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
-					mModel.updateToCanvas(mIdx, mC, 100, 100);
+					mModel.updateToCanvas(mIdx, mC, Tile_Size, Tile_Size);
 					// we do not need to bind, which already bind before this called
 					GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
-							100 * mTileIdx, 
+							Tile_Size * mTileIdx, 
 							0, 
 							mBitmap);
 				}

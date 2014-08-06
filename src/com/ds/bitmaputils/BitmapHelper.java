@@ -11,8 +11,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 
 public class BitmapHelper {
-	public static int THUMBNAIL_WIDTH = 100;
-	public static int THUMBNAIL_HEIGHT = 100;
+	public static int THUMBNAIL_WIDTH = 300;
+	public static int THUMBNAIL_HEIGHT = 300;
 	
 	public static int FIT_SCREEN_WIDTH = 768;
 	public static int FIT_SCREEN_HEIGHT = 1280;
