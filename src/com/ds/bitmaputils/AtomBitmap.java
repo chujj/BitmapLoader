@@ -66,6 +66,8 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 		
 		@Override
 		public void onBitmapGot(Bitmap aBitmap) {
+			if (aBitmap == null) return;
+			
 			mBitmap = aBitmap;
 			width = mBitmap.getWidth();
 			height = mBitmap.getHeight();
@@ -94,7 +96,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 
 	@Override
 	public String getNetUrl() {
-		int a = 1 / 0;
+//		int a = 1 / 0;
 		return null;
 	}
 

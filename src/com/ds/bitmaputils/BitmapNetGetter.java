@@ -2,7 +2,9 @@ package com.ds.bitmaputils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
@@ -170,12 +172,17 @@ public class BitmapNetGetter {
 					if (aTask.getBitmapMaxWidth() != DECODE_ORIGIN_SIZE && 
 							aTask.getBitmapMaxHeight() != DECODE_ORIGIN_SIZE)
 					{
-						retval = decodeFileWithMaxSize(
-								aTask.getFileSystemPath(),
-								aTask.getBitmapMaxWidth(),
-								aTask.getBitmapMaxHeight());
-						if (retval == null) {
-							retval = sInstance.mError;
+						try {
+							retval = decodeFileWithMaxSize(
+									aTask.getFileSystemPath(),
+									aTask.getBitmapMaxWidth(),
+									aTask.getBitmapMaxHeight());
+							if (retval == null) {
+								retval = sInstance.mError;
+							}
+						} catch (OutOfMemoryError e) {
+							BitmapHelper.getInstance(null).recycleBitmaps();
+							retval = null;
 						}
 					} else { // origin
 						retval = BitmapFactory.decodeFile(aTask.getFileSystemPath());
@@ -216,10 +223,17 @@ public class BitmapNetGetter {
 			op.inSampleSize = sample;
 			op.inJustDecodeBounds = false;
 			retval = BitmapFactory.decodeStream(new FileInputStream(filepath), null, op);
-		} catch (Exception e) {
+		} catch (OutOfMemoryError e) {
+			throw e;
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			// ZHUJJ-FIXME 1 handle exception, should call task error occur
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//			// ZHUJJ-FIXME 1 handle exception, should call task error occur
+//		}
 		return retval;
 	}
 
