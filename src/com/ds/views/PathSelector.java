@@ -3,8 +3,14 @@ package com.ds.views;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.ds.ui.DsBitmapUtil;
+import com.ds.ui.DsCanvasUtil;
+import com.example.bitmaploader.R;
+
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.NinePatchDrawable;
 import android.os.Environment;
 import android.text.Html;
 import android.text.TextUtils;
@@ -17,12 +23,14 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 	private String initPath = "/sdcard/";
 	
 	private String pathString;
+	private NinePatchDrawable m9Bg; 
 
 	public PathSelector(Context context) {
 		super(context);
 		initPath = Environment.getExternalStorageDirectory().getAbsolutePath();
 		this.setCurrPath(initPath);
-		this.setBackgroundColor(0xffff0000);
+		this.setBackgroundColor(0xff000000);
+		m9Bg = DsBitmapUtil.getNinePatchDrawable(context, R.drawable.debug_button_focused);
 	}
 	
 	public void setCurrPath(String path) {
@@ -83,12 +91,21 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 			mLists.get(i).measure(widthMeasureSpec, heightMeasureSpec);
 			width += mLists.get(i).getMeasuredWidth();
 		}
+		height = mLists.get(0).getMeasuredHeight();
+		width = Math.max(width, getContext().getResources().getDisplayMetrics().widthPixels);
 		this.setMeasuredDimension(width, height);
 	}
 
-	private class MyTextView extends TextView {
+	private final float TextSize = 32f;
+	private final float TEXT_BORDER_PADDING = 15f;
+	
+	private class MyTextView extends View {
 
 		private String mAbsPath;
+		private String mName;
+		private Paint mPaint;
+		private float width, height, text_x, text_y;
+		
 		public MyTextView(Context context, String name, String absPath) {
 			super(context);
 			if (TextUtils.isEmpty(name) && !TextUtils.isEmpty(absPath)) { // may be root "/"
@@ -96,16 +113,28 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 			} else {
 				name += "/";
 			}
-			this.setText(Html.fromHtml(name).toString());
-			this.setSingleLine();
-			this.setPaintFlags(this.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+			mName = name;
 			mAbsPath = absPath;
+			mPaint = new Paint();
+			mPaint.setTextSize(TextSize);
+			mPaint.setColor(0xff000000);
+			
+			width = TEXT_BORDER_PADDING *2 + mPaint.measureText(mName);
+			height = TEXT_BORDER_PADDING * 2 + TextSize;
+			text_x = (width -  mPaint.measureText(mName) )/ 2;
+			text_y = DsCanvasUtil.calcYWhenTextAlignCenter((int)height, mPaint);
 		}
 
 		@Override
 		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-			this.setMeasuredDimension((int) (this.getTextSize() * this.getText().length()), (int) this.getTextSize());
+			this.setMeasuredDimension((int)width, (int) height);
+		}
+
+		@Override
+		protected void onDraw(Canvas canvas) {
+			m9Bg.setBounds(0, 0, this.getMeasuredWidth(), this.getMeasuredHeight());
+			m9Bg.draw(canvas);
+			canvas.drawText(mName, text_x, text_y, mPaint);
 		}
 
 	}
