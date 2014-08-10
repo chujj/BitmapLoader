@@ -38,8 +38,8 @@ public class FolderPicturesModel implements GLResourceModel {
 		mPaint.setTextSize(30);
 		mPathClickListener = pathContainerView;
 		mBgPaint = new Paint();
-//		mBgPaint.setColor(0xffc3c3c3);
-		mBgPaint.setColor(0xff000000);
+		mBgPaint.setColor(0xffc3c3c3);
+//		mBgPaint.setColor(0xff000000);
 	}
 
 	@Override

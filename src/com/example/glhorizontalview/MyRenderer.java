@@ -30,25 +30,30 @@ import com.learnopengles.android.common.ShaderHelper;
 import com.learnopengles.android.common.TextureHelper;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
-	private final Context mActivityContext;
+	protected final static int BytesPerFloat = 4;
+	protected final static int PositionDataSize = 3;
+	protected final static int TextureCoordinateDataSize = 2;
 
+	private final Context mActivityContext;
+	
 	private float[] mModelMatrix = new float[16];
 	private float[] mViewMatrix = new float[16];
 	private float[] mProjectionMatrix = new float[16];
 	private float[] mMVPMatrix = new float[16];
-
+	
 	private final FloatBuffer mCubePositions;
 	private final FloatBuffer mCubeTextureCoordinates;
-
+	
 	private int mMVPMatrixHandle;
 	private int mTextureUniformHandle;
 	private int mPositionHandle;
 	private int mTextureCoordinateHandle;
 	private int mProgramHandle;
-
-	private final int mBytesPerFloat = 4;
-	private final int mPositionDataSize = 3;
-	private final int mTextureCoordinateDataSize = 2;
+	
+	private Item[] items;
+	private Tile[] mTilePoll;
+	private Bitmap mTileBitmap;
+	private int mTileTextureHandle;
 
 	private GLSurfaceView mGLSurfaceView;
 	public MyRenderer(Context activityContext, GLSurfaceView sv, GLResourceModel aModel) {
@@ -104,13 +109,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				1.0f, 0.0f, };
 
 		mCubePositions = ByteBuffer
-				.allocateDirect(cubePositionData.length * mBytesPerFloat)
+				.allocateDirect(cubePositionData.length * BytesPerFloat)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
 		mCubePositions.put(cubePositionData).position(0);
 
 		mCubeTextureCoordinates = ByteBuffer
 				.allocateDirect(
-						cubeTextureCoordinateData.length * mBytesPerFloat)
+						cubeTextureCoordinateData.length * BytesPerFloat)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
 		mCubeTextureCoordinates.put(cubeTextureCoordinateData).position(0);
 	}
@@ -122,6 +127,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private static final int MSG_MODEL_RELOAD = 0x0004;
 	private static final int MSG_REFRESH_IDX = 0x0005;
 	private static final int MSG_EXTERNAL_RUNNABLE = 0x0006;
+	private static final int MSG_SWITCH_RENDER_MODE = 0x0007;
 	
 	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
 	
@@ -162,7 +168,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				float offset_x = msg.getData().getFloat("x");
 				float offset_y = msg.getData().getFloat("y");
 				if (inAutoAnimation) return refresh;
-				DsLog.e("eventHub onScroll");
+//				DsLog.e("eventHub onScroll");
 				updateItems(offset_x, offset_y);
 				break;
 			case MSG_FLING:
@@ -222,6 +228,17 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			case MSG_EXTERNAL_RUNNABLE:
 //				DsLog.e("eventHub external runnable");
 				((Runnable)msg.obj).run();
+				break;
+			case MSG_SWITCH_RENDER_MODE:
+				int nextMode = msg.arg1;
+				if (nextMode == mCurrMode) break;
+				// recalc size
+				initDimensionLimit();
+				updateItems(0, 0);
+				// release last texture hander
+				// realloc texture handel
+				// redraw
+				break;
 			default:
 				break;
 			}
@@ -247,6 +264,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	};
 	
 	private void rollback(float x) {
+		
 		if (mCurrOffset > calced_max_offset) {
 			float dx =  (mCurrOffset - calced_max_offset);
 			mScroller.startScroll(mCurrOffset, -1, -dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
@@ -256,6 +274,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			mScroller.startScroll(mCurrOffset, -1, dx, 0,(long) ( dx * AUTO_ANIMATION_TIME_PER_PIXEL));
 			inAutoAnimation = true;
 		} else {
+			if (mCurrMode == MODE_PLANE) return;
+			
 			if (((Math.abs( mCurrOffset % Distance) > 0.001) || x != 0)) {
 				float left = Math.abs(mCurrOffset % Distance);
 				float dx = 0; 
@@ -306,6 +326,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 	}
 
+	private float PLANE_VISIABLE_NEAR_X_START, PLANE_VISIABLE_NEAR_X_END;
 	@Override
 	public void onSurfaceChanged(GL10 glUnused, int width, int height) {
 		GLES20.glViewport(0, 0, width, height);
@@ -313,8 +334,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		final float ratio = (float) width / height;
 		final float left = -ratio;
 		final float right = ratio;
+		
+		PLANE_VISIABLE_NEAR_X_START = - (ratio / NEAR * (NEAR + (-PLAN_TRASLATE_Z)));
+		PLANE_VISIABLE_NEAR_X_END = -PLANE_VISIABLE_NEAR_X_START;
 
-		LEFT_PERCENT = NEAR * (ratio / (NEAR + (-PLAN_TRASLATE_Z)));
+		LEFT_PERCENT = (NEAR * (PLAN_HALF_WIDTH_FIXED / (NEAR + (-PLAN_TRASLATE_Z)))) / ratio; // ZHUJJ bug, percent bigger then I thought
 		RIGHT_PERCENT = LEFT_PERCENT;
 		Matrix.frustumM(mProjectionMatrix, 0, left, right,
 				-PLAN_HEIGHT_MAXIMIN, PLAN_HEIGHT_MAXIMIN, NEAR, FAR);
@@ -348,18 +372,18 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			items[i].prepareToDraw2();
 
 			Matrix.setIdentityM(mModelMatrix, 0);
-			Matrix.translateM(mModelMatrix, 0, items[i].offsetX, 0.0f, PLAN_TRASLATE_Z + items[i].offsetZ);
+			Matrix.translateM(mModelMatrix, 0, items[i].offsetX, items[i].y, PLAN_TRASLATE_Z + items[i].offsetZ);
 			Matrix.rotateM(mModelMatrix, 0, items[i].degree, 0.0f, 1.0f, 0.0f);
 			
 			mCubePositions.position(0);
-			GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize,
+			GLES20.glVertexAttribPointer(mPositionHandle, PositionDataSize,
 					GLES20.GL_FLOAT, false, 0, mCubePositions);
 			GLES20.glEnableVertexAttribArray(mPositionHandle);
 			
 			FloatBuffer fb = mTilePoll[items[i].mTileIdx].mCoordinates;
 			fb.position(0);
 			GLES20.glVertexAttribPointer(mTextureCoordinateHandle,
-					mTextureCoordinateDataSize, GLES20.GL_FLOAT, false, 0,
+					TextureCoordinateDataSize, GLES20.GL_FLOAT, false, 0,
 					fb);
 			GLES20.glEnableVertexAttribArray(mTextureCoordinateHandle);
 			
@@ -415,6 +439,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private float mCurrOffset;
 	
 	private GLResourceModel mModel;
+	
+	private int mCurrMode = MODE_CURVE;
+	private final static int MODE_CURVE = 0;
+	private final static int MODE_PLANE = 1;
 	
 	/** 
 	 * @return true if animation should draw nextframe yet
@@ -494,6 +522,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	};
 
 	private void initDimensionLimit() {
+		mCurrMode = MODE_PLANE;
+//		mCurrMode = MODE_CURVE;
+		
 		mScroller = new MyScroller(mActivityContext);
 		mCurrOffset = 0;
 
@@ -507,13 +538,21 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		Bitmap bitmap = Bitmap.createBitmap(Tile_Size, Tile_Size, cf);
 		Canvas c = new Canvas(bitmap);
 		for (int i = 0; i < size ;i++) {
-			items[i] = new Item(bitmap, c, p, i * Distance, i);
+			items[i] = new Item(bitmap, c, p, i * Distance, i, mCurrMode);
 		}
 		
-		calced_max_offset = 0;
-		calced_min_offset =  -( items.length - 1 ) * Distance;
+		if (mCurrMode == MODE_CURVE) {
+			calced_max_offset = 0;
+			calced_min_offset =  -( items.length - 1 ) * Distance;
+		} else {
+			calced_max_offset = 0;
+			calced_min_offset =  -( items.length / PLANE_ROW_COUNT ) * Distance;
+		}
 		
 		int count = (ONE_SIZE_COUNT * 2) + 1 + 1;
+		if (mCurrMode == MODE_PLANE) {
+			count = 10;
+		}
 		mTilePoll = new Tile[count];
 		for (int i = 0; i < mTilePoll.length; i++) {
 			mTilePoll[i] = new Tile(i, count);
@@ -539,6 +578,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mCurrOffset =  Math.max(min - Distance, 
 				Math.min(mCurrOffset, max + Distance));
 
+//		DsLog.e("currentOffset: " + mCurrOffset);
 		for (int i = 0; i < items.length; i++) {
 			items[i].calcOffset(
 					Math.max( min, Math.min(max, mCurrOffset))
@@ -546,36 +586,56 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 //			DsLog.e("item " + i + ":" + items[i].toString());
 		}
 	}
-
 	
+	public final static int PLANE_ROW_COUNT = 3;
+	public final static float PLANE_HEIGHT = Distance * PLANE_ROW_COUNT - PLAN_NEARLEST_GAP;
+	public final static float PLANE_TOP_Y_OFFSET_START =  PLANE_HEIGHT / 2;
+	public final static float PLANE_OFFSET_Z = (((Distance * PLANE_ROW_COUNT + PLAN_NEARLEST_GAP ) / 2) *
+			NEAR / PLAN_HEIGHT_MAXIMIN) - NEAR;
+
 	private class Item {
-		private float x, offsetX, offsetZ, degree;
+		private float x, y, offsetX, offsetZ, degree;
 		private boolean validate;
 		private Bitmap mBitmap;
-		private int mTextureHandle;
+		
 		private int mTileIdx;
 		private Canvas mC;
 		private Paint mP;
 		private int mIdx;
+		private int mMode;
 		
 		
-		public Item(Bitmap bitmap, Canvas c, Paint p, float  ax, int idx) {
+		public Item(Bitmap bitmap, Canvas c, Paint p, float  ax, int idx, int currmode) {
+			mMode = currmode;
+			
 			mBitmap = bitmap;
-			mTextureHandle = -1;
-//			mTextureHandle = TextureHelper.loadTexture(mActivityContext, bitmap);
-//			DsLog.e("try load text with result: " + mTextureHandle);
 			validate = false;
-			x = ax;
-			offsetX = -1;
 			mTileIdx = 0;
 			mC = c;
 			mP = p;
 			mIdx = idx;
+			if (mMode == MODE_CURVE) {
+				x = ax;
+				offsetX = -1;
+				y = 0;
+			} else {
+				y = PLANE_TOP_Y_OFFSET_START - idx % PLANE_ROW_COUNT * Distance - PLAN_HALF_WIDTH_FIXED;
+				x = idx / PLANE_ROW_COUNT * Distance;
+				offsetZ =  -PLANE_OFFSET_Z;
+			}
 		}
 
 		public void calcOffset(float offset_x, float f) {
 //			if (offset_x == offsetX) return;
 			
+			if (mMode == MODE_CURVE) {
+				calcOffsetModeCurve(offset_x, f);
+			} else {
+				calcOffsetModePlane(offset_x, f);
+			}
+		}
+		
+		private final void calcOffsetModeCurve(float offset_x, float f) {
 			degree = f;
 			offsetX = offset_x + x; // x changed
 			offsetZ = (float) (-K * Math.pow(offsetX, 2)); // z changed;
@@ -599,12 +659,40 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				}
 			}
 		}
+		
+		private final void calcOffsetModePlane(float offset_x, float f) {
+			degree = f;
+			offsetX = offset_x + x; // x changed
+			boolean old_stat = validate;
+			final float left = offsetX;
+			final float right = offsetX + PLAN_HALF_WIDTH_FIXED * 2;
+			if ((left > PLANE_VISIABLE_NEAR_X_START && left < PLANE_VISIABLE_NEAR_X_END) || 
+					(right > PLANE_VISIABLE_NEAR_X_START && right < PLANE_VISIABLE_NEAR_X_END)) {
+				validate = true;
+			} else {
+				validate = false;
+			}
+
+			if (old_stat != validate) {
+				if (validate) {
+					int tile = findUnusedTile();
+					if (tile == -1) {
+						throw new RuntimeException("Find tile fail, unacceptable");
+					} else {
+						mTilePoll[tile].markInUse();
+						mTileIdx = tile;
+					}
+				} else  {
+					if (mTileIdx == -1) {
+						throw new RuntimeException("here tile should in used before release, unacceptable");
+					}
+					mTilePoll[mTileIdx].unmark();
+					mTileIdx = -1;
+				}
+			}
+		}
 				
 		public void deprecateToDraw() {
-//			if (mTextureHandle != -1) {
-//				TextureHelper.deleteTexture(mActivityContext, mTextureHandle);
-//				mTextureHandle = -1;
-//			}
 		}
 
 		public void prepareToDraw2() {
@@ -615,7 +703,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					; // nothing to do
 				} else {
 					mC.drawColor(0xffffffff);
-					
+
 					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
 					mModel.updateToCanvas(mIdx, mC, Tile_Size, Tile_Size);
 					// we do not need to bind, which already bind before this called
@@ -629,53 +717,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		@Override
 		public String toString() {
-			return "ox: " + x + " ostx: " + offsetX + " ostz: " + offsetZ + " th: " + mTextureHandle;
+			return "ox: " + x + " oy: " + y + " ostx: " + offsetX + " ostz: " + offsetZ;
 		}
 
 	}
-	
-	private Item[] items;
-	
-	private Tile[] mTilePoll;
-	private Bitmap mTileBitmap;
-	private int mTileTextureHandle;
 
-	private class Tile {
-		private FloatBuffer mCoordinates;
-		private boolean inUse , dataLoaded;
-
-		public Tile(int i, int length) {
-			float step = 1.0f / length;
-			float start =  i * step;
-			float end =  start + step;
-			float[] cubeTextureCoordinateData = {
-					// Front face
-					start, 0.0f, 
-					start, 1.0f, 
-					end, 0.0f, 
-					start, 1.0f, 
-					end, 1.0f,
-					end, 0.0f, };
-			mCoordinates = ByteBuffer
-				.allocateDirect(
-						cubeTextureCoordinateData.length * mBytesPerFloat)
-				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-			mCoordinates.put(cubeTextureCoordinateData).position(0);
-			inUse = false;
-			dataLoaded = false;
-		}
-
-		public void unmark() {
-			inUse = false;
-			dataLoaded = false;
-		}
-
-		public void markInUse() {
-			inUse = true;
-			dataLoaded = false;
-		}
-		
-	}
 	private int findUnusedTile() {
 		for (int i = 0; i < mTilePoll.length; i++) {
 			if (!mTilePoll[i].inUse) {
@@ -691,6 +737,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	
 	public void refreshIdx(int idxToRefresh) {
 		sendMesg(Message.obtain(null, MSG_REFRESH_IDX, idxToRefresh, -1));
+	}
+	
+	public void changeRenderMode (int mode) {
+		sendMesg(Message.obtain(null, MSG_SWITCH_RENDER_MODE, mode, -1));
 	}
 
 }
