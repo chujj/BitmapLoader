@@ -1,22 +1,25 @@
 package com.example.glhorizontalview;
 
-import com.ds.views.PathSelector;
-import com.ds.views.PathSelector.PathListener;
-
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.opengl.GLSurfaceView;
+import android.graphics.Canvas;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.Toast;
 
-public class PathContainerView extends ViewGroup implements PathListener {
+import com.ds.views.PathSelector;
+import com.ds.views.PathSelector.PathListener;
+
+public class PathContainerView extends ViewGroup implements PathListener, OnClickListener {
 	private MyGLSurfaceView mGLSurfaceView;
 	private PathSelector mPathSelector;
 	private HorizontalScrollView mHorizontalView;
 	private FolderPicturesModel mModel;
 	private MyRenderer mRender;
+	private ModeSWitchVIew mSwitchBtn;
 
 	public PathContainerView(Context context) {
 		super(context);
@@ -53,6 +56,10 @@ public class PathContainerView extends ViewGroup implements PathListener {
 		this.addView(mGLSurfaceView);
 		mHorizontalView.addView(mPathSelector);
 		this.addView(mHorizontalView);
+		
+		mSwitchBtn = new ModeSWitchVIew(context);
+		this.addView(mSwitchBtn);
+		mSwitchBtn.setOnClickListener(this);
 	}
 
 	@Override
@@ -62,7 +69,8 @@ public class PathContainerView extends ViewGroup implements PathListener {
 		
 		int h = mPathSelector.getMeasuredHeight();
 		
-		mHorizontalView.layout(0, 0, width, h);
+		mHorizontalView.layout(0, 0, width - 100, h);
+		mSwitchBtn.layout(width - 100, 0	, width, h);
 		mGLSurfaceView.layout(0, h, width, height);
 	}
 
@@ -92,6 +100,32 @@ public class PathContainerView extends ViewGroup implements PathListener {
 	public void insideClickAtPath(String absPath) {
 		mPathSelector.setCurrPath(absPath);
 		mModel.loadPathContent(absPath, true);
+		
+	}
+	
+	private class ModeSWitchVIew extends View {
+
+		public ModeSWitchVIew(Context context) {
+			super(context);
+			
+		}
+
+		@Override
+		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+			
+			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		}
+
+		@Override
+		protected void onDraw(Canvas canvas) {
+			canvas.drawColor(0xff880000);
+		}
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		mRender.changeRenderMode(-1);
 		
 	}
 

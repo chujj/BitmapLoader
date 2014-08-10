@@ -8,19 +8,19 @@ public class TDS {
 	// 4. focus
 	
 	/// Feature
-	// ZHUJJ 0 single picture scaleable, use library
-	// ZHUJJ 0 9 tile renderer
+	// ZHUJJ 0 [ ] single picture scaleable, use library
+	// ZHUJJ 0 [ ] 9 tile renderer more specuail, [ ]clickable test, [x]switch btn
 	// ZHUJJ 1 renderer mode switch btn, home btn
 	// ZHUJJ 1 path, add, remember last session
 	// ZHUJJ 1 sort: name , time(all by single model/folder)
-	// ZHUJJ 1 logo and translation animation
+	// ZHUJJ 0 [ ] logo and translation animation
 	// ZHUJJ 2 proguard
 	// ZHUJJ 2 umeng statistic + update
 	// ZHUJJ 2 native signature check intergrate
 	// ZHUJJ publish
 	
 	/// Improve
-	// ZHUJJ 0 tile count, for more cache, but release then display switched
+	// ZHUJJ 0 [ ] tile count, for more cache, but release then display switched
 	// ZHUJJ optional auto flash folder by sum5 algorithm of blog of gameengine
 	// ZHUJJ optional generate texture
 

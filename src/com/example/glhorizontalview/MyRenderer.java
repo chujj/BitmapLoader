@@ -232,6 +232,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			case MSG_SWITCH_RENDER_MODE:
 				int nextMode = msg.arg1;
 				if (nextMode == mCurrMode) break;
+				
+				mCurrMode = nextMode;
 				// recalc size
 				initDimensionLimit();
 				updateItems(0, 0);
@@ -522,7 +524,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	};
 
 	private void initDimensionLimit() {
-		mCurrMode = MODE_PLANE;
+//		mCurrMode = MODE_PLANE;
 //		mCurrMode = MODE_CURVE;
 		
 		mScroller = new MyScroller(mActivityContext);
@@ -740,6 +742,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	public void changeRenderMode (int mode) {
+		if (mode == -1) {
+			if (mCurrMode == MODE_CURVE) {
+				mode = MODE_PLANE;
+			} else {
+				mode = MODE_CURVE;
+			}
+		}
 		sendMesg(Message.obtain(null, MSG_SWITCH_RENDER_MODE, mode, -1));
 	}
 
