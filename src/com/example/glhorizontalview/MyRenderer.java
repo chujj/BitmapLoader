@@ -214,8 +214,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
 
 				int hit = -1;
-				if (Math.abs(viewport_offset_y_percent - 0.5f) < TOP_PERCENT && 
-						Math.abs(viewport_offset_x_percent - 0.5f) < LEFT_PERCENT) {
+				if ( (Math.abs(viewport_offset_y_percent - 0.5f) / 0.5)< TOP_PERCENT && 
+						(Math.abs(viewport_offset_x_percent - 0.5f) / 0.5)< LEFT_PERCENT) {
 					hit = (int) (-mCurrOffset / Distance);
 				}
 				if (inAutoAnimation) hit = -1;
@@ -358,7 +358,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		PLANE_VISIABLE_NEAR_X_START = - (ratio / NEAR * (NEAR + (-PLAN_TRASLATE_Z)));
 		PLANE_VISIABLE_NEAR_X_END = -PLANE_VISIABLE_NEAR_X_START;
 
-		LEFT_PERCENT = (NEAR * (PLAN_HALF_WIDTH_FIXED / (NEAR + (-PLAN_TRASLATE_Z)))) / ratio; // ZHUJJ bug, percent bigger then I thought
+		LEFT_PERCENT = (NEAR * (PLAN_HALF_WIDTH_FIXED / (-PLAN_TRASLATE_Z))) / ratio;
 		RIGHT_PERCENT = LEFT_PERCENT;
 		Matrix.frustumM(mProjectionMatrix, 0, left, right,
 				-PLAN_HEIGHT_MAXIMIN, PLAN_HEIGHT_MAXIMIN, NEAR, FAR);
@@ -465,7 +465,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private final static float FAR = Max_Depth + 5;
 	// p?: the top percent of nearest plan in viewport
 	// tanginta == tanginta --> p? / near == t / (near + t_z) -->> p? = near * (t / (near + t_z))
-	private final static float TOP_PERCENT = NEAR * (PLAN_HEIGHT_MAXIMIN / (NEAR + (-PLAN_TRASLATE_Z)));
+	private final static float TOP_PERCENT = NEAR * (PLAN_HEIGHT_MAXIMIN / ( -PLAN_TRASLATE_Z)) / PLAN_HEIGHT_MAXIMIN;
 	private final static float BOTTOM_PERCENT = TOP_PERCENT;
 	private static float LEFT_PERCENT, RIGHT_PERCENT; // cause viewport change in width, this value should calced continuely
 	
