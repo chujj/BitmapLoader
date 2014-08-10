@@ -9,11 +9,10 @@ public class TDS {
 	
 	/// Feature
 	// ZHUJJ 0 [ ] single picture scaleable, use library
-	// ZHUJJ 0 [ ] 9 tile renderer more specuail, [ ]clickable test, [x]switch btn
 	// ZHUJJ 1 renderer mode switch btn, home btn
 	// ZHUJJ 1 path, add, remember last session
 	// ZHUJJ 1 sort: name , time(all by single model/folder)
-	// ZHUJJ 0 [ ] logo and translation animation
+	// ZHUJJ 0 [ ] logo animation, [X] logo
 	// ZHUJJ 2 proguard
 	// ZHUJJ 2 umeng statistic + update
 	// ZHUJJ 2 native signature check intergrate

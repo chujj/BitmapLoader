@@ -153,7 +153,7 @@ public class FolderPicturesModel implements GLResourceModel {
 		if (dcim.exists()) {
 			return dcim.getAbsolutePath();
 		} else {
-			return "/";
+			return rootsd.getAbsolutePath();
 		}
 	}
 

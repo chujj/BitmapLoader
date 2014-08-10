@@ -214,9 +214,26 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
 
 				int hit = -1;
-				if ( (Math.abs(viewport_offset_y_percent - 0.5f) / 0.5)< TOP_PERCENT && 
-						(Math.abs(viewport_offset_x_percent - 0.5f) / 0.5)< LEFT_PERCENT) {
-					hit = (int) (-mCurrOffset / Distance);
+				if (mCurrMode == MODE_CURVE) {
+					if ( (Math.abs(viewport_offset_y_percent - 0.5f) / 0.5)< TOP_PERCENT && 
+							(Math.abs(viewport_offset_x_percent - 0.5f) / 0.5)< LEFT_PERCENT) {
+						hit = (int) (-mCurrOffset / Distance);
+					}
+				} else {
+					float dx = (PLANE_VISIABLE_NEAR_X_END - PLANE_VISIABLE_NEAR_X_START) * viewport_offset_x_percent + PLANE_VISIABLE_NEAR_X_START;
+					int idx = -1;
+					for (int i = 0; i < items.length; i+= PLANE_ROW_COUNT) {
+						if( (dx > items[i].offsetX - PLAN_HALF_WIDTH_FIXED) && (dx < items[i].offsetX + PLAN_HALF_WIDTH_FIXED)) {
+							idx = i;
+							break;
+						}
+					}
+					if (idx != -1) {
+						int _offset_y = (int) ((1 - viewport_offset_y_percent )/ (1.0f / PLANE_ROW_COUNT));
+						hit = idx + _offset_y;
+					} else {
+						hit = -1;
+					}
 				}
 				if (inAutoAnimation) hit = -1;
 				Bundle b = msg.getData();
@@ -482,7 +499,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	
 	private GLResourceModel mModel;
 	
-	private int mCurrMode = MODE_CURVE;
+	private int mCurrMode =
+			MODE_PLANE;
+//			MODE_CURVE;
 	private final static int MODE_CURVE = 0;
 	private final static int MODE_PLANE = 1;
 	
@@ -529,9 +548,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			b.putFloat("viewport_offset_x_percent", x);
 			b.putFloat("viewport_offset_y_percent", y);
 			m.setData(b);
-			sendMesg(m);
 			synchronized (b) {
 				try {
+					sendMesg(m); // avoid notified before call wait, so synchnized on object_b
 					b.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -542,6 +561,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				DsLog.e(" onClick x y: " + x + " " + y + " hit: " + m.getData().getInt("hit", -1));
 				mModel.clickAt(hit);
 			} else {
+				if (mCurrMode == MODE_PLANE) return;
 				// auto scroll accord with the down location
 				float offset = (Distance * -(Math.signum(x - 0.5f)));
 				m.setData(null);
