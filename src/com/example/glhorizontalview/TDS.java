@@ -1,12 +1,34 @@
 package com.example.glhorizontalview;
 
 public class TDS {
+	/// Target
+	// 1. no crash, test by testin
+	// 2. 9-9 publish
+	// 3. mvc indiviual
+	// 4. focus
+	
+	/// Feature
+	// ZHUJJ 0 single picture scaleable, use library
+	// ZHUJJ 0 9 tile renderer
+	// ZHUJJ 1 renderer mode switch btn, home btn
+	// ZHUJJ 1 path, add, remember last session
+	// ZHUJJ 1 sort: name , time(all by single model/folder)
+	// ZHUJJ 1 logo and translation animation
+	// ZHUJJ 2 proguard
+	// ZHUJJ 2 umeng statistic + update
+	// ZHUJJ 2 native signature check intergrate
+	// ZHUJJ publish
+	
+	/// Improve
+	// ZHUJJ 0 tile count, for more cache, but release then display switched
+	// ZHUJJ optional auto flash folder by sum5 algorithm of blog of gameengine
+	// ZHUJJ optional generate texture
+
+	/// Bugs
 	// ZHUJJ-TODO Wait image, after net 
 	// ZHUJJ-TODO texture cache: Bitmap cache don't release or query a lot
 	// ZHUJJ-TODO Texture Tile size calced according Machine
-	// ZHUJJ-FIXME 1 background image
-	// ZHUJJ-FIXME 1 light
-	// ZHUJJ-FIXME 2 move into native
-	// ZHUJJ-FIXME 2 native signature check intergrate
-	// ZHUJJ-FIXME 3 release after all FIXME fixed, public
+	// ZHUJJ-TODO light
+	// ZHUJJ-TODO move into native
+
 }

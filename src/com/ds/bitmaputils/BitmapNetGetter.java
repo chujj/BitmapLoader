@@ -232,7 +232,7 @@ public class BitmapNetGetter {
 		}
 //		catch (Exception e) {
 //			e.printStackTrace();
-//			// ZHUJJ-FIXME 1 handle exception, should call task error occur
+//			// ZHUJJ handle exception, should call task error occur
 //		}
 		return retval;
 	}
