@@ -355,13 +355,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		final float left = -ratio;
 		final float right = ratio;
 		
-		PLANE_VISIABLE_NEAR_X_START = - (ratio / NEAR * (NEAR + (-PLAN_TRASLATE_Z)));
+		PLANE_VISIABLE_NEAR_X_START = - (ratio / NEAR * ( -PLAN_TRASLATE_Z + PLANE_OFFSET_Z));
 		PLANE_VISIABLE_NEAR_X_END = -PLANE_VISIABLE_NEAR_X_START;
 
 		LEFT_PERCENT = (NEAR * (PLAN_HALF_WIDTH_FIXED / (-PLAN_TRASLATE_Z))) / ratio;
 		RIGHT_PERCENT = LEFT_PERCENT;
 		Matrix.frustumM(mProjectionMatrix, 0, left, right,
 				-PLAN_HEIGHT_MAXIMIN, PLAN_HEIGHT_MAXIMIN, NEAR, FAR);
+		
+		updateItems(0, 0);
 	}
 
 	@Override
@@ -591,7 +593,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		int count = (ONE_SIZE_COUNT * 2) + 1 + 1;
 		if (mCurrMode == MODE_PLANE) {
-			count = 10;
+			count = 20;
 		}
 		count ++; // for logo
 		mTilePoll = new Tile[count];
@@ -718,8 +720,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			degree = f;
 			offsetX = offset_x + x; // x changed
 			boolean old_stat = validate;
-			final float left = offsetX;
-			final float right = offsetX + PLAN_HALF_WIDTH_FIXED * 2;
+			final float left = offsetX - PLAN_HALF_WIDTH_FIXED;
+			final float right = offsetX + PLAN_HALF_WIDTH_FIXED ;
 			if ((left > PLANE_VISIABLE_NEAR_X_START && left < PLANE_VISIABLE_NEAR_X_END) || 
 					(right > PLANE_VISIABLE_NEAR_X_START && right < PLANE_VISIABLE_NEAR_X_END)) {
 				validate = true;
