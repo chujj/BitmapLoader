@@ -41,8 +41,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private float[] mProjectionMatrix = new float[16];
 	private float[] mMVPMatrix = new float[16];
 	
-	private final FloatBuffer mCubePositions;
-	private final FloatBuffer mCubeTextureCoordinates;
+	private final FloatBuffer mFrontPositions, mBackPositions;
+	private final FloatBuffer mFrontTextureCoordinates;
 	
 	private int mMVPMatrixHandle;
 	private int mTextureUniformHandle;
@@ -51,15 +51,17 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private int mProgramHandle;
 	
 	private Item[] items;
-	private Tile[] mTilePoll;
+	private Tile[] mTilePoll; private final int logoTileIdx = 0;
 	private Bitmap mTileBitmap;
 	private int mTileTextureHandle;
+	private Bitmap mLogo;
 
 	private GLSurfaceView mGLSurfaceView;
 	public MyRenderer(Context activityContext, GLSurfaceView sv, GLResourceModel aModel) {
 		mActivityContext = activityContext;
 		mGLSurfaceView = sv;
 		mModel = aModel;
+		mLogo = BitmapFactory.decodeResource(activityContext.getResources(), R.drawable.tm);
 		if (aModel == null) {
 			mModel = new GLResourceModel() {
 				
@@ -108,16 +110,32 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				1.0f, 1.0f,
 				1.0f, 0.0f, };
 
-		mCubePositions = ByteBuffer
+		mFrontPositions = ByteBuffer
 				.allocateDirect(cubePositionData.length * BytesPerFloat)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		mCubePositions.put(cubePositionData).position(0);
+		mFrontPositions.put(cubePositionData).position(0);
 
-		mCubeTextureCoordinates = ByteBuffer
+		mFrontTextureCoordinates = ByteBuffer
 				.allocateDirect(
 						cubeTextureCoordinateData.length * BytesPerFloat)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		mCubeTextureCoordinates.put(cubeTextureCoordinateData).position(0);
+		mFrontTextureCoordinates.put(cubeTextureCoordinateData).position(0);
+		
+		
+		// reverse for logo
+		// X, Y, Z
+		final float[] logoPlanePositionData = {
+				PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, -0f,
+				PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, -0f,
+				-PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, -0f,
+				PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, -0f, 
+				-PLAN_HALF_WIDTH_FIXED, -PLAN_HEIGHT_MAXIMIN, -0f, 
+				-PLAN_HALF_WIDTH_FIXED, PLAN_HEIGHT_MAXIMIN, -0f, 
+		};
+		mBackPositions = ByteBuffer
+				.allocateDirect(logoPlanePositionData.length * BytesPerFloat)
+				.order(ByteOrder.nativeOrder()).asFloatBuffer();
+		mBackPositions.put(logoPlanePositionData).position(0);
 	}
 	
 	private static final int MSG_ONSCRELL = 0x0000;
@@ -377,12 +395,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			Matrix.translateM(mModelMatrix, 0, items[i].offsetX, items[i].y, PLAN_TRASLATE_Z + items[i].offsetZ);
 			Matrix.rotateM(mModelMatrix, 0, items[i].degree, 0.0f, 1.0f, 0.0f);
 			
-			mCubePositions.position(0);
+			mFrontPositions.position(0);
 			GLES20.glVertexAttribPointer(mPositionHandle, PositionDataSize,
-					GLES20.GL_FLOAT, false, 0, mCubePositions);
+					GLES20.GL_FLOAT, false, 0, mFrontPositions);
 			GLES20.glEnableVertexAttribArray(mPositionHandle);
 			
-			FloatBuffer fb = mTilePoll[items[i].mTileIdx].mCoordinates;
+			FloatBuffer fb = mTilePoll[ 
+//			                            logoTileIdx 
+			                            items[i].mTileIdx
+			                            ].mCoordinates;
 			fb.position(0);
 			GLES20.glVertexAttribPointer(mTextureCoordinateHandle,
 					TextureCoordinateDataSize, GLES20.GL_FLOAT, false, 0,
@@ -394,6 +415,23 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			
 			GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 			
+			GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+			
+			// draw logo
+			mBackPositions.position(0);
+			GLES20.glVertexAttribPointer(mPositionHandle, PositionDataSize,
+					GLES20.GL_FLOAT, false, 0, mBackPositions);
+			GLES20.glEnableVertexAttribArray(mPositionHandle);
+
+			fb = mTilePoll[logoTileIdx].mCoordinates;
+			fb.position(0);
+			GLES20.glVertexAttribPointer(mTextureCoordinateHandle,
+					TextureCoordinateDataSize, GLES20.GL_FLOAT, false, 0,
+					fb);
+			GLES20.glEnableVertexAttribArray(mTextureCoordinateHandle);
+
+			GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+
 			GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
 		}
 		
@@ -421,7 +459,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			Distance * Distance / 4));
 	private final static int ONE_SIZE_COUNT = 2;
 	private final static float Max_Depth = (float) (K * Math.pow((Distance * ONE_SIZE_COUNT), 2));
-	private final static float Over_Max_Rotate_Degree = 45f;
+	private final static float Over_Max_Rotate_Degree = 180f;
 	
 	private final static float NEAR = 1.5f;
 	private final static float FAR = Max_Depth + 5;
@@ -555,6 +593,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		if (mCurrMode == MODE_PLANE) {
 			count = 10;
 		}
+		count ++; // for logo
 		mTilePoll = new Tile[count];
 		for (int i = 0; i < mTilePoll.length; i++) {
 			mTilePoll[i] = new Tile(i, count);
@@ -562,6 +601,19 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		mTileBitmap = Bitmap.createBitmap(Tile_Size * count, Tile_Size, cf);
 		mTileTextureHandle = TextureHelper.loadTexture(mActivityContext, mTileBitmap);
+		mTileBitmap.recycle();
+
+		mTilePoll[logoTileIdx].inUse = true;
+		mTilePoll[logoTileIdx].dataLoaded = true;
+		// draw logo, and update into texture
+		c.drawColor(0xff000000);
+		c.drawBitmap(mLogo, (Tile_Size - mLogo.getWidth()) / 2, (Tile_Size - mLogo.getHeight()) / 2, null);
+//		mLogo.recycle();
+//		mLogo = null;
+		GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
+				Tile_Size * logoTileIdx, 
+				0, 
+				bitmap);
 	}
 
 	private void updateItems(float offset_x, float offset_y) {
