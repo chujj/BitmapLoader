@@ -644,8 +644,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	public final static int PLANE_ROW_COUNT = 3;
 	public final static float PLANE_HEIGHT = Distance * PLANE_ROW_COUNT - PLAN_NEARLEST_GAP;
 	public final static float PLANE_TOP_Y_OFFSET_START =  PLANE_HEIGHT / 2;
-	public final static float PLANE_OFFSET_Z = (((Distance * PLANE_ROW_COUNT + PLAN_NEARLEST_GAP ) / 2) *
-			NEAR / PLAN_HEIGHT_MAXIMIN) - NEAR;
+	public final static float PLANE_OFFSET_Z = ( ((Distance * PLANE_ROW_COUNT + PLAN_NEARLEST_GAP ) / 2) *
+			NEAR / PLAN_HEIGHT_MAXIMIN) - ( -PLAN_TRASLATE_Z);
 
 	private class Item {
 		private float x, y, offsetX, offsetZ, degree;
