@@ -466,7 +466,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	////////////////////////////////animation part ////////////////////////////////
 	private final static int View_part = 1;
 	
-	private final int Tile_Size = 300;
+	private final int Tile_Size = 100; // ZHUJJ-FIXME use different tile_size under differnt reder_mode, accord the screen size
 	
 	private final static float PLAN_HEIGHT_MAXIMIN = 1.0f;
 	private final static float PLAN_HALF_WIDTH_FIXED = 1.0f; // y = k*x^2
@@ -613,7 +613,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		int count = (ONE_SIZE_COUNT * 2) + 1 + 1;
 		if (mCurrMode == MODE_PLANE) {
-			count = 20;
+			count = 10;
 		}
 		count ++; // for logo
 		mTilePoll = new Tile[count];

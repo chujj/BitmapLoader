@@ -106,6 +106,9 @@ public class FolderPicturesModel implements GLResourceModel {
 				}
 			});
 			
+			if (files == null) {
+				files = new File[0];
+			}
 			mKeys = new Item[files.length];
 			
 			for (int i = 0; i < files.length; i++) {
