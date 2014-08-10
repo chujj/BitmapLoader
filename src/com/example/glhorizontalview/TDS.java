@@ -24,10 +24,12 @@ public class TDS {
 	// ZHUJJ optional generate texture
 
 	/// Bugs
+	// ZHUJJ-TODO release texture handle in glserver when allocnew: me860 allocation fail?
 	// ZHUJJ-TODO Wait image, after net 
 	// ZHUJJ-TODO texture cache: Bitmap cache don't release or query a lot
 	// ZHUJJ-TODO Texture Tile size calced according Machine
 	// ZHUJJ-TODO light
 	// ZHUJJ-TODO move into native
+	
 
 }
