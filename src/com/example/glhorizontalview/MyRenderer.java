@@ -72,10 +72,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				}
 				
 				@Override
-				public void updateToCanvas(int aIdx, Canvas mC,
+				public boolean updateToCanvas(int aIdx, Canvas mC,
 						int require_width, int require_height) {
 					// we draw nothing here
-					
+					return true;
 				}
 
 				@Override
@@ -501,8 +501,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private GLResourceModel mModel;
 	
 	private int mCurrMode =
-			MODE_PLANE;
-//			MODE_CURVE;
+//			MODE_PLANE;
+			MODE_CURVE;
 	private final static int MODE_CURVE = 0;
 	private final static int MODE_PLANE = 1;
 	
@@ -809,12 +809,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					mC.drawColor(0xffffffff);
 
 					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
-					mModel.updateToCanvas(mIdx, mC, Curve_Tile_Size, Curve_Tile_Size);
+					mTilePoll[mTileIdx].dataLoaded = mModel.updateToCanvas(mIdx, mC, Curve_Tile_Size, Curve_Tile_Size);
 					// we do not need to bind, which already bind before this called
 					GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
 							Curve_Tile_Size * mTilePoll[mTileIdx].column_idx, 
 							Curve_Tile_Size * mTilePoll[mTileIdx].row_idx,
 							mBitmap);
+					DsLog.e("update pixel of id: " + mIdx);
 				}
 			}
 		}

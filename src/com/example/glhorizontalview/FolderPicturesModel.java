@@ -48,14 +48,17 @@ public class FolderPicturesModel implements GLResourceModel {
 	}
 
 	@Override
-	public void updateToCanvas(int aIdx, Canvas mC, int require_width,
+	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
+		boolean validate = false;
+		
 		mRect.set(0, 0, require_width, require_height);
 		mC.drawRect(mRect, mBgPaint);
 		
 		if (mKeys[aIdx].isFolder) {
 			mC.drawBitmap(mFolderBitmap, null, mRect, null);
 			mC.drawText(mKeys[aIdx].fName, 0, require_height / 2 + 40, mPaint);
+			validate = true;
 		} else {
 			AtomBitmap abp = BitmapHelper.getInstance(mContext).getBitmap(
 					mKeys[aIdx].absPath);
@@ -75,10 +78,13 @@ public class FolderPicturesModel implements GLResourceModel {
 					mRect.offset( (require_width - f_w) / 2, (require_height - f_h) / 2);
 					mC.drawBitmap(bp, null, mRect, null);
 				}
+				validate = true;
 			} else {
-				
+				validate = false;
 			}
 		}
+		
+		return validate;
 	}
 	
 	private class MyLoadPathRunnable implements Runnable {

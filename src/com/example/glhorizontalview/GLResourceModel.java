@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 public interface GLResourceModel {
 	public int getCount();
 
-	public void updateToCanvas(int aIdx, Canvas mC, int require_width, int require_height);
+	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width, int require_height);
 
 	/** called on UI Thread
 	 * @param hit
