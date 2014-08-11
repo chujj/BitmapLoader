@@ -2,6 +2,8 @@ package com.example.glhorizontalview;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -115,6 +117,15 @@ public class FolderPicturesModel implements GLResourceModel {
 			if (files == null) {
 				files = new File[0];
 			}
+			
+			Arrays.sort(files, new Comparator<File>() {
+
+				@Override
+				public int compare(File lhs, File rhs) { // ZHUJJ-FIXME implement the comparator
+					return (int) (lhs.lastModified() - rhs.lastModified());
+				}
+			});
+			
 			mKeys = new Item[files.length];
 			
 			for (int i = 0; i < files.length; i++) {
