@@ -4,14 +4,23 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.Toast;
 
+import com.ds.io.DsLog;
+import com.ds.ui.DsCanvasUtil;
 import com.ds.views.PathSelector;
 import com.ds.views.PathSelector.PathListener;
+
+import ds.android.ui.core.DsPopMenu;
+import ds.android.ui.core.DsPopMenuItem;
+import ds.android.ui.core.DsPopMenuLayout;
+import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 
 public class PathContainerView extends ViewGroup implements PathListener, OnClickListener {
 	private MyGLSurfaceView mGLSurfaceView;
@@ -20,6 +29,9 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private FolderPicturesModel mModel;
 	private MyRenderer mRender;
 	private ModeSWitchVIew mSwitchBtn;
+	
+	private DsPopMenuLayout mMenuLayout;
+	private DsPopMenu mMenu;
 
 	public PathContainerView(Context context) {
 		super(context);
@@ -60,8 +72,36 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mSwitchBtn = new ModeSWitchVIew(context);
 		this.addView(mSwitchBtn);
 		mSwitchBtn.setOnClickListener(this);
+		
+		mMenuLayout = new DsPopMenuLayout(context);
+//		mMenuLayout.setBackgroundColor(0xffaa0000);
+		this.addView(mMenuLayout);
+		
+		mMenu = new DsPopMenu(context);
+		mMenu.setMaxColumn(1);
+		mMenu.addPopMenuItem(new MenuDivider(context, "+Layout", 0));
+		mMenu.addPopMenuItem(new MenuDivider(context, "-Grid", 1));
+		mMenu.addPopMenuItem(new MenuDivider(context, "-Slide", 2));
+		mMenu.addPopMenuItem(new MenuDivider(context, "+Sort", 0));
+		mMenu.addPopMenuItem(new MenuDivider(context, "-Time", 3));
+		mMenu.addPopMenuItem(new MenuDivider(context, "-Size", 4));
+		mMenu.addPopMenuItem(new MenuDivider(context, "-Name", 5));
+		mMenu.setPopMenuClickListener(new DsPopMenuClickListener() {
+			
+			@Override
+			public void onPopMenuItemClick(int aPopMenuId, int aPopMenuItemId) {
+				if (aPopMenuItemId == 1) {
+					mRender.changeRenderMode(MyRenderer.MODE_PLANE);
+				} else if (aPopMenuItemId == 2) {
+					mRender.changeRenderMode(MyRenderer.MODE_CURVE);
+				}
+				
+				mMenuLayout.dismissPopMenu();
+			}
+		});
 	}
 
+	private final int TOOL_BAR_WIDTH = 100;
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		int height = this.getMeasuredHeight();
@@ -69,9 +109,10 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		
 		int h = mPathSelector.getMeasuredHeight();
 		
-		mHorizontalView.layout(0, 0, width - 100, h);
-		mSwitchBtn.layout(width - 100, 0	, width, h);
+		mHorizontalView.layout(0, 0, width - TOOL_BAR_WIDTH, h);
+		mSwitchBtn.layout(width - TOOL_BAR_WIDTH, 0	, width, h);
 		mGLSurfaceView.layout(0, h, width, height);
+		mMenuLayout.layout(0, 0, width, height);
 	}
 
 	@Override
@@ -125,8 +166,35 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 
 	@Override
 	public void onClick(View v) {
-		mRender.changeRenderMode(-1);
-		
+		if (mMenuLayout.isPopMenuShow()) {
+			mMenuLayout.dismissPopMenu();
+		} else {
+			mMenuLayout.showPopMenu(mMenu, new Point(this.getMeasuredWidth() , mPathSelector.getMeasuredHeight()));
+		}
+//		
+	}
+	
+	private class MenuDivider extends DsPopMenuItem {
+
+		private String mString;
+		private Paint mPaint;
+		public MenuDivider(Context aContext, String msg, int id) {
+			super(aContext);
+			mString = msg;
+			mPaint = new Paint();
+			mPaint.setColor(0xffffffff);
+			mPaint.setTextSize(24);
+			mPaint.setAntiAlias(true);
+			this.setMargin(0);
+			this.setId(id);
+		}
+
+		@Override
+		protected void onDraw(Canvas canvas) {
+			super.onDraw(canvas);
+			canvas.drawText(mString, (this.getMeasuredWidth() - mPaint.measureText(mString)) / 2, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
+		}
+
 	}
 
 }

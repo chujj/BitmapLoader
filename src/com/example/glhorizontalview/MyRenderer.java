@@ -501,10 +501,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private GLResourceModel mModel;
 	
 	private int mCurrMode =
-			MODE_PLANE;
-//			MODE_CURVE;
-	private final static int MODE_CURVE = 0;
-	private final static int MODE_PLANE = 1;
+//			MODE_PLANE;
+			MODE_CURVE;
+	public final static int MODE_CURVE = 0;
+	public final static int MODE_PLANE = 1;
 	
 	/** 
 	 * @return true if animation should draw nextframe yet
