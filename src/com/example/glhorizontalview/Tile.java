@@ -8,6 +8,7 @@ public class Tile {
 		protected FloatBuffer mCoordinates;
 		protected boolean inUse , dataLoaded;
 		protected int row_idx, column_idx;
+		private int mUsedByToken;
 
 		public Tile(int i, int length, int interater) {
 			float step = 1.0f / interater;
@@ -34,16 +35,22 @@ public class Tile {
 			mCoordinates.put(cubeTextureCoordinateData).position(0);
 			inUse = false;
 			dataLoaded = false;
+			mUsedByToken = -1;
 		}
 
 		public void unmark() {
 			inUse = false;
-			dataLoaded = false;
 		}
 
-		public void markInUse() {
+		public void markInUse(int usedByToken) {
 			inUse = true;
-			dataLoaded = false;
+			if (usedByToken != mUsedByToken)
+				dataLoaded = false;
+			mUsedByToken = usedByToken;
+		}
+
+		public int getUsedToken() {
+			return mUsedByToken;
 		}
 		
 	}

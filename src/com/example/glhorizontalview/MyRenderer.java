@@ -65,7 +65,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		if (aModel == null) {
 			mModel = new GLResourceModel() {
 				
-				private static final int size = 20;
+				private static final int size = 40;
 				@Override
 				public int getCount() {
 					return size;
@@ -295,7 +295,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		@Override
 		public void run() {
-			DsLog.e("fling rollback called");
+//			DsLog.e("fling rollback called");
 			rollback(0);
 		}
 	};
@@ -501,8 +501,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private GLResourceModel mModel;
 	
 	private int mCurrMode =
-//			MODE_PLANE;
-			MODE_CURVE;
+			MODE_PLANE;
+//			MODE_CURVE;
 	private final static int MODE_CURVE = 0;
 	private final static int MODE_PLANE = 1;
 	
@@ -631,6 +631,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		if (mCurrMode == MODE_PLANE) {
 			count = 20;
 		}
+		count = 20; // ZHUJJ for test make all tile count to 20;
 		count ++; // for logo
 		
 		
@@ -653,7 +654,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mTileTextureHandle = TextureHelper.loadTexture(mActivityContext, mTileBitmap);
 		mTileBitmap.recycle();
 
-		mTilePoll[logoTileIdx].inUse = true;
+		mTilePoll[logoTileIdx].markInUse(logoTileIdx); // ZHUJJ NOTE, here is some trick. Cause inUsed flag marked, the idx will not calced in reuse
 		mTilePoll[logoTileIdx].dataLoaded = true;
 		// draw logo, and update into texture
 		c.drawColor(0xff000000);
@@ -702,7 +703,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		private boolean validate;
 		private Bitmap mBitmap;
 		
-		private int mTileIdx;
+		private int mTileIdx, mLastTileIdx;
 		private Canvas mC;
 		private Paint mP;
 		private int mIdx;
@@ -714,7 +715,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			
 			mBitmap = bitmap;
 			validate = false;
-			mTileIdx = 0;
+			mTileIdx = -1;
+			mLastTileIdx = -1;
 			mC = c;
 			mP = p;
 			mIdx = idx;
@@ -745,23 +747,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			offsetZ = (float) (-K * Math.pow(offsetX, 2)); // z changed;
 			boolean old_stat = validate;
 			validate = (-offsetZ > Max_Depth) ? false : true;
-			if (old_stat != validate) {
-				if (validate) {
-					int tile = findUnusedTile();
-					if (tile == -1) {
-						throw new RuntimeException("Find tile fail, unacceptable");
-					} else {
-						mTilePoll[tile].markInUse();
-						mTileIdx = tile;
-					}
-				} else  {
-					if (mTileIdx == -1) {
-						throw new RuntimeException("here tile should in used before release, unacceptable");
-					}
-					mTilePoll[mTileIdx].unmark();
-					mTileIdx = -1;
-				}
-			}
+			markOrReleaseTile(old_stat);
 		}
 		
 		private final void calcOffsetModePlane(float offset_x, float f) {
@@ -777,20 +763,31 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				validate = false;
 			}
 
+			markOrReleaseTile(old_stat);
+		}
+		
+		private final void markOrReleaseTile(boolean old_stat) {
 			if (old_stat != validate) {
 				if (validate) {
+					if (mLastTileIdx != -1 && mTilePoll[mLastTileIdx].getUsedToken() == mIdx) {
+						mTilePoll[mLastTileIdx].markInUse(mIdx);
+						mTileIdx = mLastTileIdx;
+						return;
+					}
+
 					int tile = findUnusedTile();
 					if (tile == -1) {
 						throw new RuntimeException("Find tile fail, unacceptable");
 					} else {
-						mTilePoll[tile].markInUse();
+						mTilePoll[tile].markInUse(mIdx);
 						mTileIdx = tile;
 					}
 				} else  {
 					if (mTileIdx == -1) {
-						throw new RuntimeException("here tile should in used before release, unacceptable");
+						throw new RuntimeException("validate changed here, but why last idx is  still invalidate? unacceptable");
 					}
 					mTilePoll[mTileIdx].unmark();
+					mLastTileIdx = mTileIdx;
 					mTileIdx = -1;
 				}
 			}
@@ -815,7 +812,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 							Curve_Tile_Size * mTilePoll[mTileIdx].column_idx, 
 							Curve_Tile_Size * mTilePoll[mTileIdx].row_idx,
 							mBitmap);
-					DsLog.e("update pixel of id: " + mIdx);
+					DsLog.e("update pixel of id: " + mIdx  + " into tile: " + mTileIdx);
 				}
 			}
 		}
@@ -828,12 +825,25 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	}
 
 	private int findUnusedTile() {
+		int first_cached = -1;
+		int first_clean = -1;
+		
 		for (int i = 0; i < mTilePoll.length; i++) {
-			if (!mTilePoll[i].inUse) {
-				return i;
-			}
+			
+			if (!mTilePoll[i].inUse ) { // cached
+				if (first_cached == -1 && mTilePoll[i].getUsedToken() != -1) {
+					first_cached = i;
+				} else if (first_clean == -1 && mTilePoll[i].getUsedToken() == -1) {
+					first_clean = i;
+				}
+			} 
 		}
-		return -1;
+
+		if (first_clean != -1) {
+			return first_clean;
+		} else {
+			return first_cached;
+		}
 	}
 
 	public void modelChanged(Runnable run) {

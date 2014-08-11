@@ -19,7 +19,6 @@ public class TDS {
 	// ZHUJJ publish
 	
 	/// Improve
-	// ZHUJJ 0 [ ] tile count, for more cache, but release then display switched
 	// ZHUJJ optional auto flash folder by sum5 algorithm of blog of gameengine
 	// ZHUJJ optional generate texture
 

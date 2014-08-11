@@ -135,7 +135,7 @@ public class MyScroller {
 
 //                DsLog.e(String.format("t_time:%d, t_past:%.3f, mCurrX:%.3f, finelX:%.3f\n",(int) mDuration, t, mCurrX, mFinalX));
                 if ((Math.abs(mCurrX - mFinalX) < 0.001)&& (Math.abs(mCurrY - mFinalY) < 0.001)) {
-                	DsLog.e("fling finished");
+//                	DsLog.e("fling finished");
 
                     mFinished = true;
                     if (flingEnd != null) {
@@ -148,7 +148,7 @@ public class MyScroller {
             }
         }
         else {
-        	DsLog.e("scroller durning over finish");
+//        	DsLog.e("scroller durning over finish");
             mCurrX = mFinalX;
             mCurrY = mFinalY;
             mFinished = true;
