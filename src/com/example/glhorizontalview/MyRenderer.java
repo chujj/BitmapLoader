@@ -53,7 +53,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private Item[] items;
 	private Tile[] mTilePoll; private final int logoTileIdx = 0;
 	private Bitmap mTileBitmap;
-	private int mTileTextureHandle;
+	private int mTileTextureHandle = -1;
 	private Bitmap mLogo;
 
 	private GLSurfaceView mGLSurfaceView;
@@ -193,13 +193,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				float vx = msg.getData().getFloat("x");
 				float vy = msg.getData().getFloat("y");
 				long durning =  (long) ( Math.abs(vx) * AUTO_ANIMATION_TIME_PER_PIXEL);
-				DsLog.e("eventHub onFling: vx: " + vx + " durning: " + durning);
+//				DsLog.e("eventHub onFling: vx: " + vx + " durning: " + durning);
 				mScroller.fling(mCurrOffset, 0, vx, 0, calced_min_offset - Distance, calced_max_offset + Distance, 0, 0, durning, rollback_routinue_msg);
 				inAutoAnimation = true;
 				break;
 			case MSG_FINISH:
 				if (inAutoAnimation) return refresh;
-				DsLog.e("eventHub onFinish");
+//				DsLog.e("eventHub onFinish");
 				float x = 0;
 				if (msg.getData().containsKey("x")) {
 					 x = msg.getData().getFloat("x");
@@ -209,7 +209,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				break;
 				
 			case MSG_HIT_TEST:
-				DsLog.e("eventHub hitTest");
+//				DsLog.e("eventHub hitTest");
 				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
 
@@ -244,7 +244,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				
 				break;
 			case MSG_MODEL_RELOAD:
-				DsLog.e("eventHub modelReload");
+//				DsLog.e("eventHub modelReload");
 				mMessagesList.clear();
 				((Runnable)msg.obj).run();
 				initDimensionLimit();
@@ -466,7 +466,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	////////////////////////////////animation part ////////////////////////////////
 	private final static int View_part = 1;
 	
-	private final int Tile_Size = 100; // ZHUJJ-FIXME use different tile_size under differnt reder_mode, accord the screen size
+	private int Curve_Tile_Size = 300; // ZHUJJ-TODO use different tile_size under differnt reder_mode, accord the screen size
+	private int Plane_Tile_Size = 100;
 	
 	private final static float PLAN_HEIGHT_MAXIMIN = 1.0f;
 	private final static float PLAN_HALF_WIDTH_FIXED = 1.0f; // y = k*x^2
@@ -582,6 +583,16 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		}
 
 	};
+	
+	private void dumpTextureLimit () {
+		int[] maxSize = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxSize, 0);
+
+		int[] maxNum = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, maxNum, 0);
+
+		DsLog.e("max pixels size: " + maxSize[0] + " max_pixel_unit: " + maxNum[0]);
+	}
 
 	private void initDimensionLimit() {
 //		mCurrMode = MODE_PLANE;
@@ -597,7 +608,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		int size = mModel.getCount();
 		items = new Item[size];
 		Bitmap.Config cf = Bitmap.Config.RGB_565;
-		Bitmap bitmap = Bitmap.createBitmap(Tile_Size, Tile_Size, cf);
+		Bitmap bitmap = Bitmap.createBitmap(Curve_Tile_Size, Curve_Tile_Size, cf);
 		Canvas c = new Canvas(bitmap);
 		for (int i = 0; i < size ;i++) {
 			items[i] = new Item(bitmap, c, p, i * Distance, i, mCurrMode);
@@ -611,17 +622,34 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			calced_min_offset =  -( items.length / PLANE_ROW_COUNT ) * Distance;
 		}
 		
+		// get the max texture size
+		int[] t_max_size = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, t_max_size, 0);
+
+		// calc the tile count maybe used in render routine
 		int count = (ONE_SIZE_COUNT * 2) + 1 + 1;
 		if (mCurrMode == MODE_PLANE) {
-			count = 10;
+			count = 20;
 		}
 		count ++; // for logo
+		
+		
+		// setup the tile cache's position all in one texture
+		int it = (int) Math.round(Math.sqrt(count)); // we put all tile as squarly as possible
+		if ((it * Curve_Tile_Size) > t_max_size[0]) {
+			throw new RuntimeException("multi textures NOT Supported!: square count: " + it + " tile_size: " + Curve_Tile_Size + " bigger than limit: " + t_max_size[0]);
+		}
+
 		mTilePoll = new Tile[count];
 		for (int i = 0; i < mTilePoll.length; i++) {
-			mTilePoll[i] = new Tile(i, count);
+			mTilePoll[i] = new Tile(i, count, it);
 		}
-		
-		mTileBitmap = Bitmap.createBitmap(Tile_Size * count, Tile_Size, cf);
+
+		mTileBitmap = Bitmap.createBitmap(Curve_Tile_Size * it, Curve_Tile_Size * it, cf);
+		if (mTileTextureHandle != -1) {
+			TextureHelper.deleteTexture(mActivityContext, mTileTextureHandle);
+			mTileTextureHandle = -1;
+		}
 		mTileTextureHandle = TextureHelper.loadTexture(mActivityContext, mTileBitmap);
 		mTileBitmap.recycle();
 
@@ -629,12 +657,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mTilePoll[logoTileIdx].dataLoaded = true;
 		// draw logo, and update into texture
 		c.drawColor(0xff000000);
-		c.drawBitmap(mLogo, (Tile_Size - mLogo.getWidth()) / 2, (Tile_Size - mLogo.getHeight()) / 2, null);
+		c.drawBitmap(mLogo, (Curve_Tile_Size - mLogo.getWidth()) / 2, (Curve_Tile_Size - mLogo.getHeight()) / 2, null);
 //		mLogo.recycle();
 //		mLogo = null;
 		GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
-				Tile_Size * logoTileIdx, 
-				0, 
+				Curve_Tile_Size * mTilePoll[logoTileIdx].column_idx, 
+				Curve_Tile_Size * mTilePoll[logoTileIdx].row_idx,
 				bitmap);
 	}
 
@@ -781,11 +809,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					mC.drawColor(0xffffffff);
 
 					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
-					mModel.updateToCanvas(mIdx, mC, Tile_Size, Tile_Size);
+					mModel.updateToCanvas(mIdx, mC, Curve_Tile_Size, Curve_Tile_Size);
 					// we do not need to bind, which already bind before this called
 					GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
-							Tile_Size * mTileIdx, 
-							0, 
+							Curve_Tile_Size * mTilePoll[mTileIdx].column_idx, 
+							Curve_Tile_Size * mTilePoll[mTileIdx].row_idx,
 							mBitmap);
 				}
 			}

@@ -7,19 +7,26 @@ import java.nio.FloatBuffer;
 public class Tile {
 		protected FloatBuffer mCoordinates;
 		protected boolean inUse , dataLoaded;
+		protected int row_idx, column_idx;
 
-		public Tile(int i, int length) {
-			float step = 1.0f / length;
-			float start =  i * step;
-			float end =  start + step;
+		public Tile(int i, int length, int interater) {
+			float step = 1.0f / interater;
+			row_idx = i / interater;
+			column_idx = i % interater;
+			
+			float x_start =  column_idx * step;
+			float x_end =  x_start + step;
+			float y_start = row_idx * step;
+			float y_end = y_start + step;
+			
 			float[] cubeTextureCoordinateData = {
 					// Front face
-					start, 0.0f, 
-					start, 1.0f, 
-					end, 0.0f, 
-					start, 1.0f, 
-					end, 1.0f,
-					end, 0.0f, };
+					x_start, y_start, 
+					x_start, y_end, 
+					x_end, y_start, 
+					x_start, y_end, 
+					x_end, y_end,
+					x_end, y_start, };
 			mCoordinates = ByteBuffer
 				.allocateDirect(
 						cubeTextureCoordinateData.length * MyRenderer.BytesPerFloat)
