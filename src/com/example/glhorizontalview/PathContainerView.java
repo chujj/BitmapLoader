@@ -17,6 +17,7 @@ import com.ds.ui.DsCanvasUtil;
 import com.ds.views.PathSelector;
 import com.ds.views.PathSelector.PathListener;
 import com.example.glhorizontalview.data.FolderPicturesModel;
+import com.example.glhorizontalview.data.IData;
 
 import ds.android.ui.core.DsPopMenu;
 import ds.android.ui.core.DsPopMenuItem;
@@ -95,7 +96,15 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 					mRender.changeRenderMode(MyRenderer.MODE_PLANE);
 				} else if (aPopMenuItemId == 2) {
 					mRender.changeRenderMode(MyRenderer.MODE_CURVE);
+				} else if (aPopMenuItemId == 3) { // s_time
+					mModel.sort(IData.SORT_NAME);
+				} else if (aPopMenuItemId == 4) { // s_size
+					mModel.sort(IData.SORT_SIZE);
+				} else if (aPopMenuItemId == 5) { // s_name
+					mModel.sort(IData.SORT_NAME);
 				}
+				
+				
 				
 				mMenuLayout.dismissPopMenu();
 			}

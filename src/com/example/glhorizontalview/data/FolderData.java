@@ -70,8 +70,7 @@ public class FolderData implements IData {
 		mKeys = new Item[files.length];
 
 		for (int i = 0; i < files.length; i++) {
-			mKeys[i] = new Item(i, files[i].isDirectory(), files[i].getName(),
-					files[i].getAbsolutePath());
+			mKeys[i] = new Item(i, files[i]);
 		}
 	}
 	
@@ -79,15 +78,17 @@ public class FolderData implements IData {
 		boolean isFolder;
 		String absPath;
 		String fName;
+		long lastModify;
+		long size;
 		int mIdx;
 
-		public Item(int idx, boolean folder, String foldername, String path) {
+		public Item(int idx, File file) {
 			mIdx = idx;
-			isFolder = folder;
-			if (isFolder) {
-				fName = foldername;
-			}
-			absPath = path;
+			isFolder = file.isDirectory();
+			fName = file.getName();
+			absPath = file.getAbsolutePath();
+			lastModify = file.lastModified();
+			size = file.length();
 		}
 
 		@Override
@@ -103,8 +104,31 @@ public class FolderData implements IData {
 	}
 
 	@Override
-	public void sort(int flag) {
-		// ZHUJJ Auto-generated method stub
+	public void sort(final int flag) {
+		Arrays.sort(mKeys, new Comparator<Item>() {
+
+			@Override
+			public int compare(Item lhs, Item rhs) {
+				boolean revert = ( (flag & IData.SORT_REVERSE )== IData.SORT_REVERSE );
+				int result = 0;
+				if (flag == IData.SORT_NAME) {
+					result = lhs.fName.compareTo(rhs.fName);
+				} else if (flag == IData.SORT_LASTMODIFY) {
+					result = (int) (lhs.lastModify - rhs.lastModify);
+				} else if (flag == IData.SORT_SIZE) {
+					result = (int) (lhs.size - rhs.size);
+				}
+				
+				if (revert)
+					result = - result;
+				
+				return result;
+			}
+		});
+		
+		for (int i = 0; i < mKeys.length; i++) {
+			mKeys[i].mIdx = i;
+		}
 		
 	}
 

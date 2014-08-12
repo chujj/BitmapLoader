@@ -40,10 +40,9 @@ public class FolderPicturesModel implements GLResourceModel {
 		return mIDataStack.peek().updateToCanvas(aIdx, mC, require_width, require_height);
 	}
 	
-	private class MyLoadPathRunnable implements Runnable {
-
+	private class LoadPathRunnable implements Runnable {
 		private String mPath;
-		public MyLoadPathRunnable(String path) {
+		public LoadPathRunnable(String path) {
 			mPath = path;
 		}
 		
@@ -55,7 +54,7 @@ public class FolderPicturesModel implements GLResourceModel {
 	}
 
 	public void loadPathContent(String path, boolean reload) {
-		MyLoadPathRunnable run = new MyLoadPathRunnable(path);
+		LoadPathRunnable run = new LoadPathRunnable(path);
 		if (reload) {
 			mRender.modelChanged(run);
 		} else {
@@ -77,7 +76,24 @@ public class FolderPicturesModel implements GLResourceModel {
 	public String InitPath() {
 		return initPath;
 	}
+	
+	private class SortRunnable implements Runnable {
+		private int mSortFlag;
+		public SortRunnable(int sortflag) {
+			mSortFlag = sortflag;
+		}
 
+		@Override
+		public void run() {
+			mIDataStack.peek().sort(mSortFlag);
+		}
+		
+	}
+	
+	public void sort(int sortName) {
+		mRender.modelChanged(new SortRunnable(sortName));
+	}
+	
 	@Override
 	public void clickAt(int hit) {
 		mIDataStack.peek().clickAt(hit);

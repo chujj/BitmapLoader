@@ -11,7 +11,6 @@ public class TDS {
 	// ZHUJJ 0 single picture scaleable, use library
 	// ZHUJJ 0 [ ] renderer mode switch btn, home btn
 	// ZHUJJ 0 [ ] path, add, remember last session
-	// ZHUJJ 0 [ ] sort: name , time(all by single model/folder)
 	// ZHUJJ 1 [ ] logo animation
 	// ZHUJJ 2 proguard
 	// ZHUJJ 2 umeng statistic + update

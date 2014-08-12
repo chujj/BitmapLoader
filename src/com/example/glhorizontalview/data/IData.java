@@ -6,8 +6,7 @@ public interface IData {
 	public static final int SORT_REVERSE = 1 << 4;
 	public static final int SORT_NAME = 1;
 	public static final int SORT_LASTMODIFY = 2;
-	public static final int SORT_DATE = 3;
-	public static final int SORT_SIZE = 4;
+	public static final int SORT_SIZE = 3;
 	
 	public boolean supportSort(int sortby);
 	
