@@ -8,11 +8,11 @@ public class TDS {
 	// 4. focus
 	
 	/// Feature
-	// ZHUJJ 0 [ ] single picture scaleable, use library
-	// ZHUJJ 1 renderer mode switch btn, home btn
-	// ZHUJJ 1 path, add, remember last session
-	// ZHUJJ 1 sort: name , time(all by single model/folder)
-	// ZHUJJ 0 [ ] logo animation, [X] logo
+	// ZHUJJ 0 single picture scaleable, use library
+	// ZHUJJ 0 [ ] renderer mode switch btn, home btn
+	// ZHUJJ 0 [ ] path, add, remember last session
+	// ZHUJJ 0 [ ] sort: name , time(all by single model/folder)
+	// ZHUJJ 1 [ ] logo animation
 	// ZHUJJ 2 proguard
 	// ZHUJJ 2 umeng statistic + update
 	// ZHUJJ 2 native signature check intergrate
@@ -23,7 +23,6 @@ public class TDS {
 	// ZHUJJ optional generate texture
 
 	/// Bugs
-	// ZHUJJ-TODO release texture handle in glserver when allocnew: me860 allocation fail?
 	// ZHUJJ-TODO Wait image, after net 
 	// ZHUJJ-TODO texture cache: Bitmap cache don't release or query a lot
 	// ZHUJJ-TODO Texture Tile size calced according Machine
