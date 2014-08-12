@@ -1,8 +1,11 @@
 package com.example.glhorizontalview.controll;
 
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -16,11 +19,13 @@ import com.ds.io.DsLog;
 import com.ds.ui.DsCanvasUtil;
 import com.ds.views.PathSelector;
 import com.ds.views.PathSelector.PathListener;
+import com.example.bitmaploader.R;
 import com.example.glhorizontalview.MyGLSurfaceView;
 import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.data.FolderPicturesModel;
 import com.example.glhorizontalview.data.IData;
 
+import ds.android.ui.core.BitmapButton;
 import ds.android.ui.core.DsPopMenu;
 import ds.android.ui.core.DsPopMenuItem;
 import ds.android.ui.core.DsPopMenuLayout;
@@ -32,7 +37,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private HorizontalScrollView mHorizontalView;
 	private FolderPicturesModel mModel;
 	private MyRenderer mRender;
-	private ModeSWitchVIew mSwitchBtn;
+	private View mSwitchBtn;
 	
 	private DsPopMenuLayout mMenuLayout;
 	private DsPopMenu mMenu;
@@ -73,8 +78,9 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mHorizontalView.addView(mPathSelector);
 		this.addView(mHorizontalView);
 		
-		mSwitchBtn = new ModeSWitchVIew(context);
+		mSwitchBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_menu)); //  ModeSWitchVIew(context);
 		this.addView(mSwitchBtn);
+		mSwitchBtn.setBackgroundColor(0xff000000);
 		mSwitchBtn.setOnClickListener(this);
 		
 		mMenuLayout = new DsPopMenuLayout(context);
@@ -83,13 +89,13 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		
 		mMenu = new DsPopMenu(context);
 		mMenu.setMaxColumn(1);
-		mMenu.addPopMenuItem(new MenuDivider(context, "+Layout", 0)); // ZHUJJ-FIXME update the UI
-		mMenu.addPopMenuItem(new MenuDivider(context, "-Grid", 1));
-		mMenu.addPopMenuItem(new MenuDivider(context, "-Slide", 2));
-		mMenu.addPopMenuItem(new MenuDivider(context, "+Sort", 0));
-		mMenu.addPopMenuItem(new MenuDivider(context, "-Time", 3));
-		mMenu.addPopMenuItem(new MenuDivider(context, "-Size", 4));
-		mMenu.addPopMenuItem(new MenuDivider(context, "-Name", 5));
+		mMenu.addPopMenuItem(new MenuDivider(context, " Layout", 0)); // ZHUJJ-FIXME update the UI
+		mMenu.addPopMenuItem(new MenuItem(context, " Grid", 1));
+		mMenu.addPopMenuItem(new MenuItem(context, " Slide", 2));
+		mMenu.addPopMenuItem(new MenuDivider(context, " Sort", 0));
+		mMenu.addPopMenuItem(new MenuItem(context, " Time", 3));
+		mMenu.addPopMenuItem(new MenuItem(context, " Size", 4));
+		mMenu.addPopMenuItem(new MenuItem(context, " Name", 5));
 		mMenu.setPopMenuClickListener(new DsPopMenuClickListener() {
 			
 			@Override
@@ -113,7 +119,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		});
 	}
 
-	private final int TOOL_BAR_WIDTH = 100;
+	
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		int height = this.getMeasuredHeight();
@@ -121,6 +127,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		
 		int h = mPathSelector.getMeasuredHeight();
 		
+		int TOOL_BAR_WIDTH = mSwitchBtn.getMeasuredWidth(); 
 		mHorizontalView.layout(0, 0, width - TOOL_BAR_WIDTH, h);
 		mSwitchBtn.layout(width - TOOL_BAR_WIDTH, 0	, width, h);
 		mGLSurfaceView.layout(0, h, width, height);
@@ -155,26 +162,6 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mModel.loadPathContent(absPath, true);
 		
 	}
-	
-	private class ModeSWitchVIew extends View {
-
-		public ModeSWitchVIew(Context context) {
-			super(context);
-			
-		}
-
-		@Override
-		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-			
-			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		}
-
-		@Override
-		protected void onDraw(Canvas canvas) {
-			canvas.drawColor(0xff880000);
-		}
-
-	}
 
 	@Override
 	public void onClick(View v) {
@@ -183,11 +170,9 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		} else {
 			mMenuLayout.showPopMenu(mMenu, new Point(this.getMeasuredWidth() , mPathSelector.getMeasuredHeight()));
 		}
-//		
 	}
 	
 	private class MenuDivider extends DsPopMenuItem {
-
 		private String mString;
 		private Paint mPaint;
 		public MenuDivider(Context aContext, String msg, int id) {
@@ -199,14 +184,52 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 			mPaint.setAntiAlias(true);
 			this.setMargin(0);
 			this.setId(id);
+			this.setBackgroundColor(0xff43ace8);
+		}
+
+		@Override
+		protected void onDraw(Canvas canvas) {
+			canvas.drawText(mString, 0, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
+		}
+
+		@Override
+		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+			this.setMeasuredDimension(100, 40);
+		}
+
+
+	}
+
+	private class MenuItem extends DsPopMenuItem {
+
+		private String mString;
+		private Paint mPaint;
+		public MenuItem(Context aContext, String msg, int id) {
+			super(aContext);
+			mString = msg;
+			mPaint = new Paint();
+			mPaint.setColor(0xff000000);
+			mPaint.setTextSize(24);
+			mPaint.setAntiAlias(true);
+			this.setMargin(0);
+			this.setId(id);
+			this.setBackgroundColor(0xff888888);
 		}
 
 		@Override
 		protected void onDraw(Canvas canvas) {
 			super.onDraw(canvas);
-			canvas.drawText(mString, (this.getMeasuredWidth() - mPaint.measureText(mString)) / 2, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
+			canvas.drawText(mString, 24, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
 		}
 
+
+		@Override
+		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+			this.setMeasuredDimension(100, 40);
+		}
 	}
 
 }

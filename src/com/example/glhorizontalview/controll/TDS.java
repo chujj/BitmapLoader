@@ -9,8 +9,7 @@ public class TDS {
 	
 	/// Feature
 	// ZHUJJ 0 single picture scaleable, use library
-	// ZHUJJ 0 [ ] renderer mode switch btn, home btn
-	// ZHUJJ 0 [ ] path, add, remember last session
+	// ZHUJJ 0 [ ] home btn, [ ] home data mode [ ] path, add, back key, [] remember last session
 	// ZHUJJ 1 [ ] logo animation
 	// ZHUJJ 2 proguard
 	// ZHUJJ 2 umeng statistic + update
