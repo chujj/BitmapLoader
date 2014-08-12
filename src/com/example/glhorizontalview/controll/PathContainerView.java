@@ -1,4 +1,4 @@
-package com.example.glhorizontalview;
+package com.example.glhorizontalview.controll;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -16,6 +16,8 @@ import com.ds.io.DsLog;
 import com.ds.ui.DsCanvasUtil;
 import com.ds.views.PathSelector;
 import com.ds.views.PathSelector.PathListener;
+import com.example.glhorizontalview.MyGLSurfaceView;
+import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.data.FolderPicturesModel;
 import com.example.glhorizontalview.data.IData;
 

@@ -41,7 +41,7 @@
 <!--             </intent-filter> -->
         </activity>
         <activity
-            android:name="com.example.glhorizontalview.PathViewerActivity"
+            android:name="com.example.glhorizontalview.controll.PathViewerActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

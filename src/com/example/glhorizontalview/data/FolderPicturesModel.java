@@ -10,7 +10,7 @@ import android.os.Environment;
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.MyRenderer;
-import com.example.glhorizontalview.PathContainerView;
+import com.example.glhorizontalview.controll.PathContainerView;
 
 public class FolderPicturesModel implements GLResourceModel {
 

@@ -1,4 +1,4 @@
-package com.example.glhorizontalview;
+package com.example.glhorizontalview.controll;
 
 public class TDS {
 	/// Target

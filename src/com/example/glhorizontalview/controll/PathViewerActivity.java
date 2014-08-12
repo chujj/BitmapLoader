@@ -1,4 +1,4 @@
-package com.example.glhorizontalview;
+package com.example.glhorizontalview.controll;
 
 import java.io.IOException;
 
