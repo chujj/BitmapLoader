@@ -16,6 +16,7 @@ import com.ds.io.DsLog;
 import com.ds.ui.DsCanvasUtil;
 import com.ds.views.PathSelector;
 import com.ds.views.PathSelector.PathListener;
+import com.example.glhorizontalview.data.FolderPicturesModel;
 
 import ds.android.ui.core.DsPopMenu;
 import ds.android.ui.core.DsPopMenuItem;

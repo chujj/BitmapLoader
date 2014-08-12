@@ -1,4 +1,4 @@
-package com.example.glhorizontalview;
+package com.example.glhorizontalview.data;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -17,6 +17,9 @@ import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.bitmaploader.R;
+import com.example.glhorizontalview.GLResourceModel;
+import com.example.glhorizontalview.MyRenderer;
+import com.example.glhorizontalview.PathContainerView;
 
 public class FolderPicturesModel implements GLResourceModel {
 
