@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -156,6 +157,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 
 	public void onPause() {
 		mGLSurfaceView.onPause();
+		mModel.onPause();
 	}
 
 	@Override
@@ -242,4 +244,20 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		}
 	}
 
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+			return mModel.backPressed();
+		}
+		return false;
+	}
+
+
+	@Override
+	public boolean dispatchKeyShortcutEvent(KeyEvent event) {
+		// ZHUJJ Auto-generated method stub
+		return super.dispatchKeyShortcutEvent(event);
+	}
+
+	
 }

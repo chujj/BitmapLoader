@@ -1,16 +1,22 @@
 package com.example.glhorizontalview.data;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
-
-import com.example.bitmaploader.R;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Environment;
+
+import com.example.bitmaploader.R;
 
 public class HomeData  implements IData {
 	private final static String serilized_file_name = "home_ticket";
@@ -59,6 +65,27 @@ public class HomeData  implements IData {
 		});
 		
 		if (exist_file != null && exist_file.length == 1) { // load from it
+			File serilizedFile = new File(mFather.getContext().getFilesDir(), serilized_file_name);
+			try {
+				BufferedReader in = new BufferedReader(new FileReader(serilizedFile));
+				String line = in.readLine();
+				while (line != null) {
+					String[] defines = line.split(type_sperater);
+					HomeItem it = new HomeItem();
+					it.mType = Integer.parseInt(defines[0]);
+					it.mDefine = defines[1].trim();
+					mItems.add(it);
+					line = in.readLine();
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			if (mItems.size() == 0) {
+				buildDefault();
+			}
 			
 		} else { // use default
 			buildDefault();
@@ -68,9 +95,19 @@ public class HomeData  implements IData {
 	private void buildDefault() {
 		HomeItem it = new HomeItem();
 		it.mType = TYPE_PATH_DEFAULT;
-		it.mDefine = "/sdcard/";
+		it.mDefine = getInitPath();
 		
 		mItems.add(it);
+	}
+	
+	private String getInitPath() {
+		File rootsd = Environment.getExternalStorageDirectory();
+		File dcim = new File(rootsd.getAbsolutePath() + "/wallpapers" ); //"/DCIM");
+		if (dcim.exists()) {
+			return dcim.getAbsolutePath();
+		} else {
+			return rootsd.getAbsolutePath();
+		}
 	}
 	
 	@Override
@@ -112,11 +149,36 @@ public class HomeData  implements IData {
 
 	@Override
 	public void clickAt(int hit) {
-		// ZHUJJ Auto-generated method stub
+		HomeItem it = mItems.get(hit);
+		if (it.mType == TYPE_PATH_DEFAULT || it.mType == TYPE_PATH_FAV) {
+			mFather.clickAtPathInside(this, hit, it.mDefine);
+		} else {
+			; // ZHUJJ-TODO, add more actions
+		}
 	}
 	
 	public void serilizedToFile() {
-		
+		File serilizedFile = new File(mFather.getContext().getFilesDir(), serilized_file_name);
+		try {
+			FileOutputStream fo = new FileOutputStream(serilizedFile, false);
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < mItems.size(); i++) {
+				sb.setLength(0);
+				HomeItem it = mItems.get(i);
+				sb.append(it.mType);
+				sb.append(type_sperater);
+				sb.append(it.mDefine);
+				sb.append("\n");
+				byte[] content = sb.toString().getBytes();
+				fo.write(content, 0, content.length);
+			}
+			fo.flush();
+			fo.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private class HomeItem {

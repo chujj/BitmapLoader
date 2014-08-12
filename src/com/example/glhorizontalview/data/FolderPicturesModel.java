@@ -17,16 +17,17 @@ public class FolderPicturesModel implements GLResourceModel {
 	private Stack<IData> mIDataStack;
 	
 	private Context mContext;
-	private String initPath;
+	private String initPath = "/";
 	private PathContainerView mPathClickListener;
+	private HomeData mHomeData;
 
 	public FolderPicturesModel(Context context, PathContainerView pathContainerView) {
 		mContext = context;
 		BitmapHelper.getInstance(mContext);
 		mIDataStack = new Stack<IData>();
 		
-		loadPathContent(initPath = getInitPath(), false);
-		
+		mIDataStack.push(mHomeData = HomeData.build(this));
+
 		mPathClickListener = pathContainerView;
 	}
 
@@ -62,16 +63,6 @@ public class FolderPicturesModel implements GLResourceModel {
 			run.run();
 		}
 
-	}
-
-	private String getInitPath() {
-		File rootsd = Environment.getExternalStorageDirectory();
-		File dcim = new File(rootsd.getAbsolutePath() + "/wallpapers" ); //"/DCIM");
-		if (dcim.exists()) {
-			return dcim.getAbsolutePath();
-		} else {
-			return rootsd.getAbsolutePath();
-		}
 	}
 
 	public String InitPath() {
@@ -117,10 +108,38 @@ public class FolderPicturesModel implements GLResourceModel {
 		mRender.refreshIdx(mIdx);
 	}
 
-	protected void clickAtPathInside(FolderData folderData, int hit, String nextAbsPath) {
+	protected void clickAtPathInside(IData folderData, int hit, String nextAbsPath) {
 		if (folderData == null || mIDataStack.peek() != folderData) return;
 		
 		mPathClickListener.insideClickAtPath(nextAbsPath);
+	}
+	
+	private class PopStack implements Runnable {
+
+		@Override
+		public void run() {
+			if (!mIDataStack.empty()) {
+				IData poped = mIDataStack.pop();
+				poped.toString();
+			}
+		}
+		
+	}
+
+	public boolean backPressed() {
+		if (mIDataStack.size() == 1) {
+			return false;
+		} else if (mIDataStack.size() > 1) {
+			mRender.modelChanged(new PopStack());
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+
+	public void onPause() {
+		mHomeData.serilizedToFile();
 	}
 
 }

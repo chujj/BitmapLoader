@@ -8,6 +8,7 @@ import com.example.httepsernvertest.MyServer.Responce;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 public class PathViewerActivity extends Activity {
@@ -39,15 +40,6 @@ public class PathViewerActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		mContentView.onResume();
-//		mContentView.postDelayed(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				BitmapHelper.getInstance(PathViewerActivity.this).recycleBitmaps();
-//				Toast.makeText(PathViewerActivity.this, "recycle", Toast.LENGTH_LONG).show();
-//				
-//			}
-//		}, 10000);
 	}
 
 	@Override
@@ -55,7 +47,6 @@ public class PathViewerActivity extends Activity {
 		super.onPause();
 		mContentView.onPause();
 	}
-	
 
 //	@Override
 //	protected void onDestroy() {
@@ -64,6 +55,14 @@ public class PathViewerActivity extends Activity {
 //		}
 //		super.onDestroy();
 //	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		if (mContentView.dispatchKeyEvent(event)) {
+			return true;
+		}
+		return super.onKeyUp(keyCode, event);
+	}
 
 	@Override
 	public void onLowMemory() {
