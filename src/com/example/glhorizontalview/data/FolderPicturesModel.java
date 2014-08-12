@@ -24,6 +24,7 @@ public class FolderPicturesModel implements GLResourceModel {
 		mContext = context;
 		BitmapHelper.getInstance(mContext);
 		mIDataStack = new Stack<IData>();
+		
 		loadPathContent(initPath = getInitPath(), false);
 		
 		mPathClickListener = pathContainerView;

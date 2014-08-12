@@ -24,6 +24,7 @@ public class FolderData implements IData {
 	private Rect mRect;
 	private Paint mPaint, mBgPaint;
 	private FolderPicturesModel mFather;
+	
 	public FolderData(FolderPicturesModel father, String abspath) {
 		mRect = new Rect();
 		mFather = father;
