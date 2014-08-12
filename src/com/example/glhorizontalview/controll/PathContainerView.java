@@ -37,7 +37,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private HorizontalScrollView mHorizontalView;
 	private FolderPicturesModel mModel;
 	private MyRenderer mRender;
-	private View mSwitchBtn;
+	private View mSwitchBtn, mHomeBtn;
 	
 	private DsPopMenuLayout mMenuLayout;
 	private DsPopMenu mMenu;
@@ -78,7 +78,12 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mHorizontalView.addView(mPathSelector);
 		this.addView(mHorizontalView);
 		
-		mSwitchBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_menu)); //  ModeSWitchVIew(context);
+		mHomeBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_homepage));
+		this.addView(mHomeBtn);
+		mHomeBtn.setBackgroundColor(0xff000000);
+		mHomeBtn.setOnClickListener(this);
+		
+		mSwitchBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_menu));
 		this.addView(mSwitchBtn);
 		mSwitchBtn.setBackgroundColor(0xff000000);
 		mSwitchBtn.setOnClickListener(this);
@@ -128,7 +133,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		int h = mPathSelector.getMeasuredHeight();
 		
 		int TOOL_BAR_WIDTH = mSwitchBtn.getMeasuredWidth(); 
-		mHorizontalView.layout(0, 0, width - TOOL_BAR_WIDTH, h);
+		mHorizontalView.layout(0, 0, width - TOOL_BAR_WIDTH - TOOL_BAR_WIDTH, h);
+		mHomeBtn.layout(width - TOOL_BAR_WIDTH - TOOL_BAR_WIDTH, 0	, width - TOOL_BAR_WIDTH, h);
 		mSwitchBtn.layout(width - TOOL_BAR_WIDTH, 0	, width, h);
 		mGLSurfaceView.layout(0, h, width, height);
 		mMenuLayout.layout(0, 0, width, height);
@@ -165,10 +171,14 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 
 	@Override
 	public void onClick(View v) {
-		if (mMenuLayout.isPopMenuShow()) {
-			mMenuLayout.dismissPopMenu();
-		} else {
-			mMenuLayout.showPopMenu(mMenu, new Point(this.getMeasuredWidth() , mPathSelector.getMeasuredHeight()));
+		if (v == mHomeBtn) {
+			
+		} else if (v == mSwitchBtn) {
+			if (mMenuLayout.isPopMenuShow()) {
+				mMenuLayout.dismissPopMenu();
+			} else {
+				mMenuLayout.showPopMenu(mMenu, new Point(this.getMeasuredWidth() , mPathSelector.getMeasuredHeight()));
+			}
 		}
 	}
 	
