@@ -143,6 +143,8 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		MyTextView tv = (MyTextView) v;
+		if (tv.mAbsPath.equals(pathString)) return;
+		
 		this.setCurrPath(tv.mAbsPath);
 		if (mListener != null) {
 			mListener.onPathChange(pathString);
