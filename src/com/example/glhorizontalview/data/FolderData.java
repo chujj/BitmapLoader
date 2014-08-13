@@ -65,14 +65,6 @@ public class FolderData implements IData {
 			files = new File[0];
 		}
 
-		Arrays.sort(files, new Comparator<File>() {
-
-			@Override
-			public int compare(File lhs, File rhs) { // ZHUJJ-FIXME implement the comparator
-				return (int) (lhs.lastModified() - rhs.lastModified());
-			}
-		});
-
 		mKeys = new Item[files.length];
 
 		for (int i = 0; i < files.length; i++) {

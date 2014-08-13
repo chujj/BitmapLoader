@@ -24,7 +24,7 @@ public class MenuActivity extends Activity {
 		
 		DsPopMenu mMenu = new DsPopMenu(context);
 		mMenu.setMaxColumn(1);
-		mMenu.addPopMenuItem(new MenuDivider(context, " Layout", 0)); // ZHUJJ-FIXME update the UI
+		mMenu.addPopMenuItem(new MenuDivider(context, " Layout", 0));
 		mMenu.addPopMenuItem(new MenuItem(context, " Grid", 1));
 		mMenu.addPopMenuItem(new MenuItem(context, " Slide", 2));
 		mMenu.addPopMenuItem(new MenuDivider(context, " Sort", 0));

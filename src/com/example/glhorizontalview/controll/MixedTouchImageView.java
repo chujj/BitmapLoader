@@ -70,7 +70,7 @@ public class MixedTouchImageView extends RelativeLayout {
 		}
 		
 		public void setPosition(int position) {
-			/* ZHUJJ
+			/* zhujj: Need no more
 			mGrounpOffset = position;
 			Bitmap bm = BitmapGetter.tryGetBitmapFromUrlOrCallback(
 					new BitmapTask() {
