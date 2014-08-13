@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class PathSelector extends ViewGroup implements OnClickListener {
-	private String initPath = "/sdcard/";
+	private String initPath = "/";
 	
 	private String pathString;
 	private NinePatchDrawable m9Bg; 
@@ -29,11 +29,12 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 		super(context);
 		initPath = Environment.getExternalStorageDirectory().getAbsolutePath();
 		this.setCurrPath(initPath);
-		this.setBackgroundColor(0xff000000);
 		m9Bg = DsBitmapUtil.getNinePatchDrawable(context, R.drawable.debug_button_focused);
 	}
 	
 	public void setCurrPath(String path) {
+		if (path == null || path.length() == 0 || path.equals(pathString)) return;
+		
 		File next = new File(path);
 		if (next.exists() && next.isDirectory()) {
 			pathString = path;

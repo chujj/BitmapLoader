@@ -5,12 +5,10 @@ import ru.truba.touchgallery.GalleryWidget.GalleryViewPager;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.support.v4.view.PagerAdapter;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.Toast;
 
-import com.ds.io.DsLog;
 import com.ds.ui.DsCanvasUtil;
 import com.example.bitmaploader.R;
 import com.example.glhorizontalview.MyGLSurfaceView;
@@ -29,9 +26,9 @@ import com.example.glhorizontalview.data.IData;
 
 import ds.android.ui.core.BitmapButton;
 import ds.android.ui.core.DsPopMenu;
+import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 import ds.android.ui.core.DsPopMenuItem;
 import ds.android.ui.core.DsPopMenuLayout;
-import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 
 public class PathContainerView extends ViewGroup implements PathListener, OnClickListener {
 	private MyGLSurfaceView mGLSurfaceView;
@@ -50,6 +47,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		super(context);
 
 		mGLSurfaceView = new MyGLSurfaceView(context);
+		this.setBackgroundColor(0xff000000);
 
 		// Check if the system supports OpenGL ES 2.0.
 		final ActivityManager activityManager = (ActivityManager) context
@@ -59,13 +57,10 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
 		if (supportsEs2) {
-
 			mGLSurfaceView.setEGLContextClientVersion(2);
-
-			mGLSurfaceView.setRenderer(mRender = new MyRenderer(context, mGLSurfaceView,
-//					null
-					mModel = new FolderPicturesModel(context, this)
-					));
+			mModel = new FolderPicturesModel(context, this);
+			mGLSurfaceView.setRenderer(mRender = new MyRenderer(context,
+					mGLSurfaceView, mModel));
 		} else {
 			Toast.makeText(context,
 					"not support GLES2, require better machine",
@@ -74,13 +69,12 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		}
 		
 		mPathSelector = new PathSelector(context);
-		mPathSelector.setCurrPath(mModel.InitPath());
 		mPathSelector.setListener(this);
 		mHorizontalView = new HorizontalScrollView(context);
-		
 		this.addView(mGLSurfaceView);
 		mHorizontalView.addView(mPathSelector);
 		this.addView(mHorizontalView);
+		modelChanged(); // force change pathselector into invisiable
 		
 		mHomeBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_homepage));
 		this.addView(mHomeBtn);
@@ -120,9 +114,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 				} else if (aPopMenuItemId == 5) { // s_name
 					mModel.sort(IData.SORT_NAME);
 				}
-				
-				
-				
+
 				mMenuLayout.dismissPopMenu();
 			}
 		});
@@ -131,15 +123,6 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mGalleryViewer.setBackgroundColor(0xff000000);
 		this.addView(mGalleryViewer);
 		mGalleryViewer.setVisibility(View.INVISIBLE);
-		
-//		mGalleryViewer.postDelayed(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				MyPagerAdapter adapter = new MyPagerAdapter(getContext(), null);
-//				showGallery(adapter);
-//			}
-//		}, 5000);
 	}
 	
 	public void showGallery(MyPagerAdapter pagerAdapter) {
@@ -188,10 +171,13 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mModel.loadPathContent(abspath, true);
 	}
 
-	public void insideClickAtPath(String absPath) {
+	public void clickAtPathFromView(String absPath) {
 		mPathSelector.setCurrPath(absPath);
 		mModel.loadPathContent(absPath, true);
-		
+	}
+	
+	public void setPathOnly(String absPath) {
+		mPathSelector.setCurrPath(absPath);
 	}
 
 	@Override
@@ -279,11 +265,17 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		return false;
 	}
 
-
-	@Override
-	public boolean dispatchKeyShortcutEvent(KeyEvent event) {
-		// ZHUJJ Auto-generated method stub
-		return super.dispatchKeyShortcutEvent(event);
+	/**
+	 *  // Called From UI thread
+	 */
+	public void modelChanged() {
+		if (mModel.isTopLocalFolder()) {
+			mPathSelector.setCurrPath(mModel.getPath());
+			mHorizontalView.setVisibility(View.VISIBLE); 
+		} else {
+			mHorizontalView.setVisibility(View.INVISIBLE);
+		}
+		
 	}
 
 	

@@ -17,14 +17,13 @@ public class FolderPicturesModel implements GLResourceModel {
 	private Stack<IData> mIDataStack;
 	
 	private Context mContext;
-	private String initPath = "/";
 	public PathContainerView mPathClickListener;
 	private HomeData mHomeData;
 
 	public FolderPicturesModel(Context context, PathContainerView pathContainerView) {
 		mContext = context;
 		BitmapHelper.getInstance(mContext);
-		mIDataStack = new Stack<IData>();
+		mIDataStack = new Stack<IData>(); // ZHUJJ-TODO search stack find same model while path is same
 		
 		mIDataStack.push(mHomeData = HomeData.build(this));
 
@@ -51,8 +50,19 @@ public class FolderPicturesModel implements GLResourceModel {
 		@Override
 		public void run() {
 			mIDataStack.push(new FolderData(FolderPicturesModel.this, mPath));
+			tellFatherTestTopOnUi();
 		}
 
+	}
+	
+	private void tellFatherTestTopOnUi() {
+		mPathClickListener.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				mPathClickListener.modelChanged();
+			}
+		});
 	}
 
 	public void loadPathContent(String path, boolean reload) {
@@ -65,10 +75,6 @@ public class FolderPicturesModel implements GLResourceModel {
 
 	}
 
-	public String InitPath() {
-		return initPath;
-	}
-	
 	private class SortRunnable implements Runnable {
 		private int mSortFlag;
 		public SortRunnable(int sortflag) {
@@ -111,7 +117,7 @@ public class FolderPicturesModel implements GLResourceModel {
 	protected void clickAtPathInside(IData folderData, int hit, String nextAbsPath) {
 		if (folderData == null || mIDataStack.peek() != folderData) return;
 		
-		mPathClickListener.insideClickAtPath(nextAbsPath);
+		mPathClickListener.clickAtPathFromView(nextAbsPath);
 	}
 	
 	private class PopStack implements Runnable {
@@ -121,9 +127,17 @@ public class FolderPicturesModel implements GLResourceModel {
 			if (!mIDataStack.empty()) {
 				IData poped = mIDataStack.pop();
 				poped.toString();
+				tellFatherTestTopOnUi();
 			}
 		}
 		
+	}
+	
+	public String getPath() {
+		if (mIDataStack.peek() instanceof FolderData) {
+			return ((FolderData)mIDataStack.peek()).getmPath();
+		} 
+		return null;
 	}
 
 	public boolean backPressed() {
@@ -140,6 +154,13 @@ public class FolderPicturesModel implements GLResourceModel {
 
 	public void onPause() {
 		mHomeData.serilizedToFile();
+	}
+
+	public boolean isTopLocalFolder() {
+		if (mIDataStack.peek() instanceof FolderData) {
+			return true;
+		}
+		return false;
 	}
 
 }

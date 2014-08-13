@@ -19,6 +19,10 @@ import com.example.glhorizontalview.controll.MyPagerAdapter;
 
 public class FolderData implements IData {
 	private String mPath;
+	public String getmPath() {
+		return mPath;
+	}
+
 	private Item[] mKeys;
 	
 	private Bitmap mFolderBitmap;
