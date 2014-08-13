@@ -1,6 +1,7 @@
 package com.example.glhorizontalview.controll;
 
 
+import ru.truba.touchgallery.GalleryWidget.GalleryViewPager;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
@@ -9,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.support.v4.view.PagerAdapter;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,6 +44,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	
 	private DsPopMenuLayout mMenuLayout;
 	private DsPopMenu mMenu;
+	
+	private GalleryViewPager mGalleryViewer;
 
 	public PathContainerView(Context context) {
 		super(context);
@@ -123,9 +127,28 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 				mMenuLayout.dismissPopMenu();
 			}
 		});
+		
+		mGalleryViewer = new GalleryViewPager(context);
+		mGalleryViewer.setBackgroundColor(0xff000000);
+		this.addView(mGalleryViewer);
+		mGalleryViewer.setVisibility(View.INVISIBLE);
+		
+//		mGalleryViewer.postDelayed(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				MyPagerAdapter adapter = new MyPagerAdapter(getContext(), null);
+//				showGallery(adapter);
+//			}
+//		}, 5000);
+	}
+	
+	public void showGallery(MyPagerAdapter pagerAdapter) {
+		mGalleryViewer.setAdapter(pagerAdapter);
+		mGalleryViewer.setVisibility(View.VISIBLE);
+		this.postInvalidate();
 	}
 
-	
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		int height = this.getMeasuredHeight();
@@ -139,6 +162,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mSwitchBtn.layout(width - TOOL_BAR_WIDTH, 0	, width, h);
 		mGLSurfaceView.layout(0, h, width, height);
 		mMenuLayout.layout(0, 0, width, height);
+		mGalleryViewer.layout(0, 0, width, height);
 	}
 
 	@Override
@@ -247,7 +271,11 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent event) {
 		if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-			return mModel.backPressed();
+			if (mGalleryViewer.getVisibility() == View.VISIBLE) {
+				mGalleryViewer.setVisibility(View.INVISIBLE);
+				return true;
+			} else 
+				return mModel.backPressed();
 		}
 		return false;
 	}

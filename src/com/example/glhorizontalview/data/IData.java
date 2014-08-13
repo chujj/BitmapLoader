@@ -1,5 +1,6 @@
 package com.example.glhorizontalview.data;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 public interface IData {
@@ -17,6 +18,7 @@ public interface IData {
 	public int getCount();
 
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width, int require_height);
+//	public Bitmap gotBitmap(); 
 
 	/** called on UI Thread
 	 * @param hit

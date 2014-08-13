@@ -18,7 +18,7 @@ public class FolderPicturesModel implements GLResourceModel {
 	
 	private Context mContext;
 	private String initPath = "/";
-	private PathContainerView mPathClickListener;
+	public PathContainerView mPathClickListener;
 	private HomeData mHomeData;
 
 	public FolderPicturesModel(Context context, PathContainerView pathContainerView) {

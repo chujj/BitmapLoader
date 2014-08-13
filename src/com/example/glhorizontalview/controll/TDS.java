@@ -8,7 +8,6 @@ public class TDS {
 	// 4. focus
 	
 	/// Feature
-	// ZHUJJ 0 single picture scaleable, use library
 	// ZHUJJ 1 [ ] logo animation
 	// ZHUJJ 2 proguard
 	// ZHUJJ 2 umeng statistic + update

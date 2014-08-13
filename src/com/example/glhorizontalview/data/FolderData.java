@@ -15,6 +15,7 @@ import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.bitmaploader.R;
+import com.example.glhorizontalview.controll.MyPagerAdapter;
 
 public class FolderData implements IData {
 	private String mPath;
@@ -182,6 +183,10 @@ public class FolderData implements IData {
 	public void clickAt(int hit) {
 		if (mKeys[hit].isFolder) {
 			mFather.clickAtPathInside(FolderData.this, hit, mKeys[hit].absPath);
+		} else {
+			mFather.mPathClickListener.showGallery(new MyPagerAdapter(mFather
+					.getContext(), BitmapHelper.getInstance( // ZHUJJ 1 change from AtomBitmap to CBitmap which could get the high-qulity bitmap resource
+					mFather.getContext()).getBitmap(mKeys[hit].absPath)));
 		}
 	}
 }
