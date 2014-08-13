@@ -20,11 +20,10 @@ import android.widget.Toast;
 
 import com.ds.io.DsLog;
 import com.ds.ui.DsCanvasUtil;
-import com.ds.views.PathSelector;
-import com.ds.views.PathSelector.PathListener;
 import com.example.bitmaploader.R;
 import com.example.glhorizontalview.MyGLSurfaceView;
 import com.example.glhorizontalview.MyRenderer;
+import com.example.glhorizontalview.controll.PathSelector.PathListener;
 import com.example.glhorizontalview.data.FolderPicturesModel;
 import com.example.glhorizontalview.data.IData;
 

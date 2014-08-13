@@ -1,4 +1,4 @@
-package com.ds.views;
+package com.example.glhorizontalview.controll;
 
 import java.io.File;
 import java.util.ArrayList;
