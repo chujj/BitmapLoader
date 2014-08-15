@@ -18,6 +18,11 @@ import android.os.Environment;
 import android.widget.Toast;
 
 import com.example.bitmaploader.R;
+import com.example.glhorizontalview.controll.PathContainerView;
+
+import dalvik.system.PathClassLoader;
+import ds.android.ui.core.DsPopMenu;
+import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 
 public class HomeData  implements IData {
 	private final static String serilized_file_name = "home_ticket";
@@ -159,10 +164,35 @@ public class HomeData  implements IData {
 	}
 
 	@Override
-	public void longClick(int hit) { 
-		// ZHUJJ-FIXME add delete btn and logic
+	public void longClick(int hit) {
+		DsPopMenu menu = new DsPopMenu(mFather.getContext());
+		menu.addPopMenuItem(new PathContainerView.MenuItem(mFather.getContext(), "del", 1));
+		menu.setPopMenuClickListener(new DelMenuListener(hit));
+			
+		
+		mFather.showMenuForHome(menu);
+	}
+	
+	
+	private class DelMenuListener implements DsPopMenuClickListener {
+		private int mHitIdx;
+
+		public DelMenuListener(int hit) {
+			mHitIdx = hit;
+		}
+
+		@Override
+		public void onPopMenuItemClick(int aPopMenuId, int aPopMenuItemId) {
+			if (aPopMenuItemId == 1) {
+				mItems.remove(mHitIdx);
+			}
+			
+			mFather.homedataReloaded();
+			mFather.mPathClickListener.dismissMenu();
+		}
 		
 	}
+	
 	
 	public void serilizedToFile() {
 		File serilizedFile = new File(mFather.getContext().getFilesDir(), serilized_file_name);

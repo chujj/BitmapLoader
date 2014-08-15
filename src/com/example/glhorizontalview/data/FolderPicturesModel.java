@@ -210,6 +210,10 @@ public class FolderPicturesModel implements GLResourceModel {
 		}
 		
 	}
+	
+	public void showMenuForHome(DsPopMenu menu) {
+		mPathClickListener.showMenu(menu);
+	}
 
 
 }
