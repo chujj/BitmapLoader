@@ -156,6 +156,12 @@ public class HomeData  implements IData {
 			; // ZHUJJ-TODO, add more actions
 		}
 	}
+
+	@Override
+	public void longClick(int hit) { 
+		// ZHUJJ-FIXME add delete btn and logic
+		
+	}
 	
 	public void serilizedToFile() {
 		File serilizedFile = new File(mFather.getContext().getFilesDir(), serilized_file_name);
@@ -185,5 +191,6 @@ public class HomeData  implements IData {
 		private int mType;
 		private String mDefine;
 	}
+
 
 }

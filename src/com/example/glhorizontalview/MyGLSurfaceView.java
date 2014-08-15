@@ -65,6 +65,7 @@ public class MyGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public void onLongPress(MotionEvent e) {
+		mEvent.onLongPress(e.getX() / this.getMeasuredWidth(), 1 - (e.getY() / this.getMeasuredHeight()));
 	}
 
 	@Override

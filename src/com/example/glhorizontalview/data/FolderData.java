@@ -185,4 +185,11 @@ public class FolderData implements IData {
 					mFather.getContext()).getBitmap(mKeys[hit].absPath)));
 		}
 	}
+	
+	@Override
+	public void longClick(int hit) {
+		// ZHUJJ-FIXME add pop menu
+		
+	}
+
 }

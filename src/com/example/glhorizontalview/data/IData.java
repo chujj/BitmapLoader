@@ -25,4 +25,6 @@ public interface IData {
 	 */
 	public void clickAt(int hit);
 
+	public void longClick(int hit);
+
 }

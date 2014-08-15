@@ -87,6 +87,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				public void currRenderView(MyRenderer render) {
 
 				}
+
+				@Override
+				public void longClick(int hit) {
+					// ZHUJJ Auto-generated method stub
+					
+				}
 			};
 		}
 		mModel.currRenderView(this);
@@ -582,6 +588,31 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			sendMesg(m);
 		}
 
+		@Override
+		public void onLongPress(float x, float y) {
+			Message m = Message.obtain(null, MSG_HIT_TEST);
+			Bundle b = new Bundle();
+			b.putFloat("viewport_offset_x_percent", x);
+			b.putFloat("viewport_offset_y_percent", y);
+			m.setData(b);
+			synchronized (b) {
+				try {
+					sendMesg(m); // avoid notified before call wait, so synchnized on object_b
+					b.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			int hit = m.getData().getInt("hit", -1);
+			DsLog.e(" onLongPress at x y: " + x + " " + y + " hit: " + hit);
+			if (hit != -1) {
+				mModel.longClick(hit);
+			} else {
+				
+			}
+			
+		}
+
 	};
 	
 	private void dumpTextureLimit () {
@@ -806,6 +837,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					mC.drawColor(0xffffffff);
 
 					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
+					// zhujj: here, we should always make set the dataLoaded flag to save time. But I print the time cost is very small, and the 
+					// algorithem of change the flag is complex, so I just ignore here.
 					mTilePoll[mTileIdx].dataLoaded = mModel.updateToCanvas(mIdx, mC, Curve_Tile_Size, Curve_Tile_Size);
 					// we do not need to bind, which already bind before this called
 					GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 

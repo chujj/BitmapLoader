@@ -96,7 +96,12 @@ public class FolderPicturesModel implements GLResourceModel {
 	public void clickAt(int hit) {
 		mIDataStack.peek().clickAt(hit);
 	}
-
+	
+	@Override
+	public void longClick(int hit) {
+		mIDataStack.peek().longClick(hit);
+	}
+	
 	private MyRenderer mRender;
 	@Override
 	public void currRenderView(MyRenderer render) {

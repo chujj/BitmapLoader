@@ -13,4 +13,6 @@ public interface GLResourceModel {
 	public void clickAt(int hit);
 	
 	public void currRenderView(MyRenderer render);
+
+	public void longClick(int hit);
 }
