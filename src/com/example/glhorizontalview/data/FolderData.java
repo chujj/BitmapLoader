@@ -188,7 +188,8 @@ public class FolderData implements IData {
 	
 	@Override
 	public void longClick(int hit) {
-		// ZHUJJ-FIXME add pop menu
+		Item it = mKeys[hit];
+		mFather.showMenuForFolder(this, it.absPath, it.fName, it.isFolder);
 		
 	}
 

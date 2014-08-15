@@ -252,7 +252,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			case MSG_MODEL_RELOAD:
 //				DsLog.e("eventHub modelReload");
 				mMessagesList.clear();
-				((Runnable)msg.obj).run();
+				if (msg.obj != null)
+					((Runnable)msg.obj).run();
 				initDimensionLimit();
 				updateItems(0, 0);
 				break;

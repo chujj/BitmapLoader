@@ -193,6 +193,14 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		}
 	}
 	
+	public void showMenu(DsPopMenu menu) {
+		mMenuLayout.showPopMenu(menu);
+	}
+	
+	public void dismissMenu() {
+		mMenuLayout.dismissPopMenu();
+	}
+	
 	private class MenuDivider extends DsPopMenuItem {
 		private String mString;
 		private Paint mPaint;
@@ -223,7 +231,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 
 	}
 
-	private class MenuItem extends DsPopMenuItem {
+	public static class MenuItem extends DsPopMenuItem {
 
 		private String mString;
 		private Paint mPaint;

@@ -12,6 +12,9 @@ import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.controll.PathContainerView;
 
+import ds.android.ui.core.DsPopMenu;
+import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
+
 public class FolderPicturesModel implements GLResourceModel {
 
 	private Stack<IData> mIDataStack;
@@ -167,5 +170,46 @@ public class FolderPicturesModel implements GLResourceModel {
 		}
 		return false;
 	}
+
+	public void showMenuForFolder(FolderData folderData, String absPath,
+			String fName, boolean isFolder) {
+		DsPopMenu menu = new DsPopMenu(getContext());
+		menu.addPopMenuItem(new PathContainerView.MenuItem(getContext(), "fav", 1));
+		menu.setPopMenuClickListener(new FolderMenuListener(absPath, fName, isFolder));
+		mPathClickListener.showMenu(menu);
+	}
+	
+	private class FolderMenuListener implements DsPopMenuClickListener {
+		
+		private String mAbsPath;
+		private String mFName;
+		private boolean mIsFolder;
+
+		public FolderMenuListener(String absPath, String fName, boolean isFolder) {
+			mAbsPath = absPath;
+			mFName = fName;
+			mIsFolder = isFolder;
+		}
+
+		@Override
+		public void onPopMenuItemClick(int aPopMenuId, int aPopMenuItemId) {
+			if (aPopMenuItemId == 1) {
+				mHomeData.tryAddFav(mAbsPath, mFName, mIsFolder);
+			}
+			
+			mPathClickListener.dismissMenu();
+		}
+		
+	}
+
+	public void homedataReloaded() {
+		if (mIDataStack.peek() == mHomeData) {
+			mRender.modelChanged(null);
+		} else {
+			; // nothing
+		}
+		
+	}
+
 
 }

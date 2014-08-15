@@ -15,6 +15,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Environment;
+import android.widget.Toast;
 
 import com.example.bitmaploader.R;
 
@@ -190,6 +191,30 @@ public class HomeData  implements IData {
 	private class HomeItem {
 		private int mType;
 		private String mDefine;
+	}
+
+	public void tryAddFav(String mAbsPath, String mFName, boolean mIsFolder) {
+		boolean exist = false;
+		for (int i = 0; i < mItems.size(); i++) {
+			if (mItems.get(i).mDefine.endsWith(mAbsPath)) {
+				exist = true;
+				break;
+			}
+		}
+		
+		if (exist) { // show toast
+			Toast.makeText(mFather.getContext(), "mFName already exist in Fav", Toast.LENGTH_LONG).show();
+		} else {
+			// add to fav
+			HomeItem newFav = new HomeItem();
+			newFav.mType = TYPE_PATH_FAV;
+			newFav.mDefine = mAbsPath;
+			mItems.add(newFav);
+			// reload model, or mark reload delay
+			mFather.homedataReloaded();
+			
+		}
+		
 	}
 
 
