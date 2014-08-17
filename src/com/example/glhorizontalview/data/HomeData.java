@@ -27,7 +27,7 @@ import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 
 public class HomeData  implements IData {
 	private final static String serilized_file_name = "home_ticket";
-	private final float TEXT_AREA_HEIGHT_PERCENT_OF_FOLDERBITMAP = 0.125f; // crop height from folder.png
+	private final static float TEXT_AREA_HEIGHT_PERCENT_OF_FOLDERBITMAP = 0.125f; // crop height from folder.png
 	
 	private static final boolean debug_background = false;
 	
@@ -39,9 +39,10 @@ public class HomeData  implements IData {
 	private FolderPicturesModel mFather;
 	private ArrayList<HomeItem> mItems;
 
-	private Bitmap mFolderBitmap;
+	private static Bitmap sFolderBitmap;
 	private Rect mRect;
-	private Paint mTextPaint, mBgPaint;
+	private static Paint sTextPaint;
+	private static Paint sBgPaint;
 	
 	
 	public static HomeData build(FolderPicturesModel father) {
@@ -54,18 +55,24 @@ public class HomeData  implements IData {
 		
 		mRect = new Rect();
 
-		mFolderBitmap = BitmapFactory.decodeResource(father.getContext().getResources(), R.drawable.folder);
+		if (sFolderBitmap == null) {
+			sFolderBitmap = BitmapFactory.decodeResource(father.getContext().getResources(), R.drawable.folder);
+		}
 
-		mTextPaint = new Paint();
-		mTextPaint.setAntiAlias(true);
-		mTextPaint.setColor(0xffc3c3c3);
-		mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+		if (sTextPaint == null) {
+			sTextPaint = new Paint();
+			sTextPaint.setAntiAlias(true);
+			sTextPaint.setColor(0xffc3c3c3);
+			sTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+		}
 
-		mBgPaint = new Paint();
-		if (debug_background) {
-			mBgPaint.setColor(0xffc3c3c3);
-		} else {
-			mBgPaint.setColor(0xff000000);
+		if (sBgPaint == null) {
+			sBgPaint = new Paint();
+			if (debug_background) {
+				sBgPaint.setColor(0xffc3c3c3);
+			} else {
+				sBgPaint.setColor(0xff000000);
+			}
 		}
 		
 		loadFromFile();
@@ -146,6 +153,22 @@ public class HomeData  implements IData {
 		return mItems.size();
 	}
 	
+	protected static void drawFolderToCanvas(Canvas mC, int require_width,
+			int require_height, String descript, Rect mBgRect) {
+		mC.drawRect(mBgRect, sBgPaint);
+
+		mC.drawBitmap(sFolderBitmap, null, mBgRect, null);
+
+		float text_size = TEXT_AREA_HEIGHT_PERCENT_OF_FOLDERBITMAP * require_height / 2;
+		int max_count = (int) ((require_width  / text_size)  - 1);
+		if (descript.length() > max_count) {
+			descript = "..." + descript.substring(descript.length() - max_count + 3);
+		} else {
+
+		}
+		sTextPaint.setTextSize(text_size);
+		mC.drawText(descript, (require_width - sTextPaint.measureText(descript) ) / 2, require_height - text_size, sTextPaint);
+	}
 	
 	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
@@ -155,20 +178,8 @@ public class HomeData  implements IData {
 
 		mRect.set(0, 0, require_width, require_height);
 		if (it.mType == TYPE_PATH_DEFAULT || it.mType == TYPE_PATH_FAV) {
-			mC.drawRect(mRect, mBgPaint);
-			
-			mC.drawBitmap(mFolderBitmap, null, mRect, null);
-			
 			String descript = it.mShortName == null ? it.mDefine : it.mShortName;
-			float text_size = TEXT_AREA_HEIGHT_PERCENT_OF_FOLDERBITMAP * require_height / 2;
-			int max_count = (int) ((require_width  / text_size)  - 1);
-			if (descript.length() > max_count) {
-				descript = "..." + descript.substring(descript.length() - max_count + 3);
-			} else {
-				
-			}
-			mTextPaint.setTextSize(text_size);
-			mC.drawText(descript, (require_width - mTextPaint.measureText(descript) ) / 2, require_height - text_size, mTextPaint);
+			drawFolderToCanvas(mC, require_width, require_height, descript, mRect);
 		} else {
 			mC.drawColor(0xff00aaaa);
 		}

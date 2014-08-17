@@ -25,20 +25,15 @@ public class FolderData implements IData {
 
 	private Item[] mKeys;
 	
-	private Bitmap mFolderBitmap;
+	
 	private Rect mRect;
-	private Paint mPaint, mBgPaint;
+	private Paint mBgPaint;
 	private FolderPicturesModel mFather;
 	
 	public FolderData(FolderPicturesModel father, String abspath) {
 		mRect = new Rect();
 		mFather = father;
 
-		mFolderBitmap = BitmapFactory.decodeResource(father.getContext().getResources(), R.drawable.folder);
-
-		mPaint = new Paint();
-		mPaint.setTextSize(30);
-		
 		mBgPaint = new Paint();
 		mBgPaint.setColor(0xffc3c3c3);
 //		mBgPaint.setColor(0xff000000);
@@ -144,8 +139,7 @@ public class FolderData implements IData {
 		mC.drawRect(mRect, mBgPaint);
 
 		if (mKeys[aIdx].isFolder) {
-			mC.drawBitmap(mFolderBitmap, null, mRect, null);
-			mC.drawText(mKeys[aIdx].fName, 0, require_height / 2 + 40, mPaint);
+			HomeData.drawFolderToCanvas(mC, require_width, require_height, mKeys[aIdx].fName, mRect);
 			validate = true;
 		} else {
 			AtomBitmap abp = BitmapHelper.getInstance(mFather.getContext()).getBitmap(
