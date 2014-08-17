@@ -1,10 +1,13 @@
 package com.example.glhorizontalview.data;
 
+import java.io.File;
 import java.util.Stack;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.net.Uri;
 
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.bitmaploader.R;
@@ -178,7 +181,12 @@ public class FolderPicturesModel implements GLResourceModel {
 	public void showMenuForFolder(FolderData folderData, String absPath,
 			String fName, boolean isFolder, float x, float y) {
 		DsPopMenu menu = new DsPopMenu(getContext());
-		menu.addPopMenuItem(new PathContainerView.MenuItem(getContext(), mContext.getString(R.string.menu_add_fav), 1));
+		if (isFolder) {
+			menu.addPopMenuItem(new PathContainerView.MenuItem(getContext(), mContext.getString(R.string.menu_add_fav), 1));
+			menu.setPopMenuClickListener(new FolderMenuListener(absPath, fName, isFolder));
+		} else {
+			menu.addPopMenuItem(new PathContainerView.MenuItem(getContext(), mContext.getString(R.string.menu_share), 2));
+		}
 		menu.setPopMenuClickListener(new FolderMenuListener(absPath, fName, isFolder));
 		mPathClickListener.showMenu(menu, x, y);
 	}
@@ -199,6 +207,12 @@ public class FolderPicturesModel implements GLResourceModel {
 		public void onPopMenuItemClick(int aPopMenuId, int aPopMenuItemId) {
 			if (aPopMenuItemId == 1) {
 				mHomeData.tryAddFav(mAbsPath, mFName, mIsFolder);
+			} else if (aPopMenuItemId == 2) {
+				Intent shareIntent = new Intent(Intent.ACTION_SEND); 
+				File file = new File(mAbsPath); 
+				shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); 
+				shareIntent.setType("image/*"); 
+				mContext.startActivity(Intent.createChooser(shareIntent, mContext.getString(R.string.menu_share))); 
 			}
 			
 			mPathClickListener.dismissMenu();

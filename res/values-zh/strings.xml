@@ -14,4 +14,5 @@
     
     <string name="menu_add_fav">标记常用</string>
     <string name="menu_del_fav">取消标记</string>
+    <string name="menu_share">分享</string>
 </resources>
