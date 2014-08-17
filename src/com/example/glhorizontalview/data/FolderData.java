@@ -189,7 +189,9 @@ public class FolderData implements IData {
 	@Override
 	public void longClick(int hit) {
 		Item it = mKeys[hit];
-		mFather.showMenuForFolder(this, it.absPath, it.fName, it.isFolder);
+		if (it.isFolder) { // only folder support to add into home
+			mFather.showMenuForFolder(this, it.absPath, it.fName, it.isFolder);
+		}
 		
 	}
 
