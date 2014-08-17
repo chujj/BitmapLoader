@@ -138,7 +138,6 @@ public class HomeData  implements IData {
 	
 	@Override
 	public boolean supportSort(int sortby) {
-		// ZHUJJ Auto-generated method stub
 		return false;
 	}
 

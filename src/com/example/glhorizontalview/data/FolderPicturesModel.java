@@ -89,6 +89,10 @@ public class FolderPicturesModel implements GLResourceModel {
 		
 	}
 	
+	public boolean supportSort() {
+		return mIDataStack.peek().supportSort(-1);
+	}
+	
 	public void sort(int sortName) {
 		mRender.modelChanged(new SortRunnable(sortName));
 	}

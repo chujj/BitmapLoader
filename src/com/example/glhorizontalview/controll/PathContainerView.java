@@ -39,7 +39,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private View mSwitchBtn, mHomeBtn;
 	
 	private DsPopMenuLayout mMenuLayout;
-	private DsPopMenu mMenu;
+	private DsPopMenu mFullMenu, mMenuWithoutSort;
 	
 	private GalleryViewPager mGalleryViewer;
 
@@ -77,7 +77,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		modelChanged(); // force change pathselector into invisiable
 		
 		mHomeBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_homepage));
-		this.addView(mHomeBtn);
+//		this.addView(mHomeBtn);
 		mHomeBtn.setBackgroundColor(0xff000000);
 		mHomeBtn.setOnClickListener(this);
 		
@@ -89,40 +89,57 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mMenuLayout = new DsPopMenuLayout(context);
 //		mMenuLayout.setBackgroundColor(0xffaa0000);
 		this.addView(mMenuLayout);
-		
-		mMenu = new DsPopMenu(context);
-		mMenu.setMaxColumn(1);
-		mMenu.addPopMenuItem(new MenuDivider(context, " Layout", 0)); // ZHUJJ-FIXME update the UI
-		mMenu.addPopMenuItem(new MenuItem(context, " Grid", 1));
-		mMenu.addPopMenuItem(new MenuItem(context, " Slide", 2));
-		mMenu.addPopMenuItem(new MenuDivider(context, " Sort", 0));
-		mMenu.addPopMenuItem(new MenuItem(context, " Time", 3));
-		mMenu.addPopMenuItem(new MenuItem(context, " Size", 4));
-		mMenu.addPopMenuItem(new MenuItem(context, " Name", 5));
-		mMenu.setPopMenuClickListener(new DsPopMenuClickListener() {
-			
-			@Override
-			public void onPopMenuItemClick(int aPopMenuId, int aPopMenuItemId) {
-				if (aPopMenuItemId == 1) {
-					mRender.changeRenderMode(MyRenderer.MODE_PLANE);
-				} else if (aPopMenuItemId == 2) {
-					mRender.changeRenderMode(MyRenderer.MODE_CURVE);
-				} else if (aPopMenuItemId == 3) { // s_time
-					mModel.sort(IData.SORT_NAME);
-				} else if (aPopMenuItemId == 4) { // s_size
-					mModel.sort(IData.SORT_SIZE);
-				} else if (aPopMenuItemId == 5) { // s_name
-					mModel.sort(IData.SORT_NAME);
-				}
 
-				mMenuLayout.dismissPopMenu();
-			}
-		});
-		
 		mGalleryViewer = new GalleryViewPager(context);
 		mGalleryViewer.setBackgroundColor(0xff000000);
 		this.addView(mGalleryViewer);
 		mGalleryViewer.setVisibility(View.INVISIBLE);
+		
+		buildMenu(context);
+	}
+	
+	private void buildMenu(Context context) {
+		mFullMenu = new DsPopMenu(context);
+		mFullMenu.setMaxColumn(1);
+		mFullMenu.addPopMenuItem(new MenuDivider(context, " Layout", 0)); // ZHUJJ-FIXME update the UI
+		mFullMenu.addPopMenuItem(new MenuItem(context, " Grid", 1));
+		mFullMenu.addPopMenuItem(new MenuItem(context, " Slide", 2));
+		mFullMenu.addPopMenuItem(new MenuDivider(context, " Sort", 0));
+		mFullMenu.addPopMenuItem(new MenuItem(context, " Time", 3));
+		mFullMenu.addPopMenuItem(new MenuItem(context, " Size", 4));
+		mFullMenu.addPopMenuItem(new MenuItem(context, " Name", 5));
+		
+		
+		mMenuWithoutSort = new DsPopMenu(context);
+		mMenuWithoutSort.setMaxColumn(1);
+		mMenuWithoutSort.addPopMenuItem(new MenuDivider(context, " Layout", 0));
+		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, " Grid", 1));
+		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, " Slide", 2));
+
+		MenuListener listener = new MenuListener();
+		
+		mFullMenu.setPopMenuClickListener(listener);
+		mMenuWithoutSort.setPopMenuClickListener(listener);
+	}
+	
+	
+	private class MenuListener implements DsPopMenuClickListener {
+		@Override
+		public void onPopMenuItemClick(int aPopMenuId, int aPopMenuItemId) {
+			if (aPopMenuItemId == 1) {
+				mRender.changeRenderMode(MyRenderer.MODE_PLANE);
+			} else if (aPopMenuItemId == 2) {
+				mRender.changeRenderMode(MyRenderer.MODE_CURVE);
+			} else if (aPopMenuItemId == 3) { // s_time
+				mModel.sort(IData.SORT_NAME);
+			} else if (aPopMenuItemId == 4) { // s_size
+				mModel.sort(IData.SORT_SIZE);
+			} else if (aPopMenuItemId == 5) { // s_name
+				mModel.sort(IData.SORT_NAME);
+			}
+
+			mMenuLayout.dismissPopMenu();
+		}
 	}
 	
 	public void showGallery(MyPagerAdapter pagerAdapter) {
@@ -188,7 +205,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 			if (mMenuLayout.isPopMenuShow()) {
 				mMenuLayout.dismissPopMenu();
 			} else {
-				mMenuLayout.showPopMenu(mMenu, new Point(this.getMeasuredWidth() , mPathSelector.getMeasuredHeight()));
+				mMenuLayout.showPopMenu(mModel.supportSort() ? mFullMenu : mMenuWithoutSort, new Point(this.getMeasuredWidth() , mPathSelector.getMeasuredHeight()));
 			}
 		}
 	}

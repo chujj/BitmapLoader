@@ -82,8 +82,7 @@ public class FolderData implements IData {
 
 	@Override
 	public boolean supportSort(int sortby) {
-		// ZHUJJ Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
