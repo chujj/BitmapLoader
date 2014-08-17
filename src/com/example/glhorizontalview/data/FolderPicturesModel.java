@@ -1,11 +1,9 @@
 package com.example.glhorizontalview.data;
 
-import java.io.File;
 import java.util.Stack;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.os.Environment;
 
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.glhorizontalview.GLResourceModel;

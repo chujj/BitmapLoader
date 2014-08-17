@@ -6,15 +6,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
-import com.example.bitmaploader.R;
 import com.example.glhorizontalview.controll.MyPagerAdapter;
 
 public class FolderData implements IData {
@@ -24,20 +21,13 @@ public class FolderData implements IData {
 	}
 
 	private Item[] mKeys;
-	
-	
 	private Rect mRect;
-	private Paint mBgPaint;
 	private FolderPicturesModel mFather;
 	
 	public FolderData(FolderPicturesModel father, String abspath) {
 		mRect = new Rect();
 		mFather = father;
 
-		mBgPaint = new Paint();
-		mBgPaint.setColor(0xffc3c3c3);
-//		mBgPaint.setColor(0xff000000);
-		
 		mPath = abspath;
 		
 		File dir = new File(mPath);
@@ -136,7 +126,7 @@ public class FolderData implements IData {
 		boolean validate = false;
 
 		mRect.set(0, 0, require_width, require_height);
-		mC.drawRect(mRect, mBgPaint);
+		mC.drawRect(mRect, HomeData.sBgPaint);
 
 		if (mKeys[aIdx].isFolder) {
 			HomeData.drawFolderToCanvas(mC, require_width, require_height, mKeys[aIdx].fName, mRect);

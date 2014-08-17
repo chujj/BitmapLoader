@@ -1,13 +1,11 @@
 package com.example.glhorizontalview.controll;
 
-import java.util.List;
-
-import com.ds.bitmaputils.AtomBitmap;
-
 import ru.truba.touchgallery.GalleryWidget.BasePagerAdapter;
 import ru.truba.touchgallery.GalleryWidget.GalleryViewPager;
 import android.content.Context;
 import android.view.ViewGroup;
+
+import com.ds.bitmaputils.AtomBitmap;
 
 public class MyPagerAdapter extends BasePagerAdapter {
 

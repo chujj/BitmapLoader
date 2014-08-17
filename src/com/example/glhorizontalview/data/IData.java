@@ -1,6 +1,5 @@
 package com.example.glhorizontalview.data;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 public interface IData {

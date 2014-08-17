@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.example.bitmaploader.R;
 import com.example.glhorizontalview.controll.PathContainerView;
 
-import dalvik.system.PathClassLoader;
 import ds.android.ui.core.DsPopMenu;
 import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 
@@ -42,7 +41,7 @@ public class HomeData  implements IData {
 	private static Bitmap sFolderBitmap;
 	private Rect mRect;
 	private static Paint sTextPaint;
-	private static Paint sBgPaint;
+	protected static Paint sBgPaint;
 	
 	
 	public static HomeData build(FolderPicturesModel father) {

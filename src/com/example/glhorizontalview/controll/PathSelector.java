@@ -3,21 +3,19 @@ package com.example.glhorizontalview.controll;
 import java.io.File;
 import java.util.ArrayList;
 
-import com.ds.ui.DsBitmapUtil;
-import com.ds.ui.DsCanvasUtil;
-import com.example.bitmaploader.R;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Environment;
-import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import com.ds.ui.DsBitmapUtil;
+import com.ds.ui.DsCanvasUtil;
+import com.example.bitmaploader.R;
 
 public class PathSelector extends ViewGroup implements OnClickListener {
 	private String initPath = "/";

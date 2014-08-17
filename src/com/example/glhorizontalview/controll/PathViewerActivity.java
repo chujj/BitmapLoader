@@ -1,20 +1,15 @@
 package com.example.glhorizontalview.controll;
 
-import java.io.IOException;
-
-import com.ds.bitmaputils.BitmapHelper;
-import com.example.httepsernvertest.MyServer;
-import com.example.httepsernvertest.MyServer.Responce;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.widget.Toast;
+
+import com.ds.bitmaputils.BitmapHelper;
 
 public class PathViewerActivity extends Activity {
 
 	private PathContainerView mContentView;
-	private MyServer mServer;
+//	private MyServer mServer;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -28,13 +23,13 @@ public class PathViewerActivity extends Activity {
 //		}
 	}
 	
-	private Responce res = new Responce() {
-
-		@Override
-		public String getString() {
-			return BitmapHelper.getInstance(PathViewerActivity.this).dumpAllAtomBitmaps();
-		}
-	};
+//	private Responce res = new Responce() {
+//
+//		@Override
+//		public String getString() {
+//			return BitmapHelper.getInstance(PathViewerActivity.this).dumpAllAtomBitmaps();
+//		}
+//	};
 
 	@Override
 	protected void onResume() {

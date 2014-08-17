@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 
 import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
-import com.ds.bitmaputils.BitmapTask;
 import com.example.bitmaploader.R;
 
 public class MixedTouchImageView extends RelativeLayout {
@@ -26,7 +25,7 @@ public class MixedTouchImageView extends RelativeLayout {
 
 		protected Context mContext;
 		
-		private int mGrounpOffset;
+//		private int mGrounpOffset;
 
 		public MixedTouchImageView(Context ctx)
 		{
