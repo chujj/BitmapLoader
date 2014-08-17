@@ -807,8 +807,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		}
 		
 		private final void calcOffsetModeCurve(float offset_x, float f) {
-			degree = f;
 			offsetX = offset_x + x; // x changed
+			degree = f + offsetX * 45 / (Distance)   * (offsetX > 0 ? -1 : -1); // add spin feeling
 			offsetZ = (float) (-K * Math.pow(offsetX, 2)); // z changed;
 			boolean old_stat = validate;
 			validate = (-offsetZ > Max_Depth) ? false : true;
