@@ -87,10 +87,11 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mSwitchBtn.setOnClickListener(this);
 		
 		mMenuLayout = new DsPopMenuLayout(context);
-//		mMenuLayout.setBackgroundColor(0xffaa0000);
+
 		this.addView(mMenuLayout);
 
 		mGalleryViewer = new GalleryViewPager(context);
+		mGalleryViewer.setBackgroundColor(0xff000000);
 		this.addView(mGalleryViewer);
 		mGalleryViewer.setVisibility(View.INVISIBLE);
 		
