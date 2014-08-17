@@ -209,8 +209,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		}
 	}
 	
-	public void showMenu(DsPopMenu menu) {
-		mMenuLayout.showPopMenu(menu);
+	public void showMenu(DsPopMenu menu, float x, float y) {
+		mMenuLayout.showPopMenu(menu, new Point((int)x,(int) y));
 	}
 	
 	public void dismissMenu() {

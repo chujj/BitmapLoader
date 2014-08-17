@@ -89,9 +89,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				}
 
 				@Override
-				public void longClick(int hit) {
-					// ZHUJJ Auto-generated method stub
-					
+				public void longClick(float x , float y , int hit) {
+
 				}
 			};
 		}
@@ -608,7 +607,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		}
 
 		@Override
-		public void onLongPress(float x, float y) {
+		public void onLongPress(float x, float y, float origin_x, float origin_y) {
 			Message m = Message.obtain(null, MSG_HIT_TEST);
 			Bundle b = new Bundle();
 			b.putFloat("viewport_offset_x_percent", x);
@@ -625,7 +624,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			int hit = m.getData().getInt("hit", -1);
 			DsLog.e(" onLongPress at x y: " + x + " " + y + " hit: " + hit);
 			if (hit != -1) {
-				mModel.longClick(hit);
+				mModel.longClick(origin_x , origin_y , hit);
 			} else {
 				
 			}

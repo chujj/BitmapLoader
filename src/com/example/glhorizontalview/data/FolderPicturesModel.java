@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Point;
 
 import com.ds.bitmaputils.BitmapHelper;
 import com.example.bitmaploader.R;
@@ -104,8 +105,8 @@ public class FolderPicturesModel implements GLResourceModel {
 	}
 	
 	@Override
-	public void longClick(int hit) {
-		mIDataStack.peek().longClick(hit);
+	public void longClick(float x , float y , int hit) {
+		mIDataStack.peek().longClick(x, y, hit);
 	}
 	
 	private MyRenderer mRender;
@@ -175,11 +176,11 @@ public class FolderPicturesModel implements GLResourceModel {
 	}
 
 	public void showMenuForFolder(FolderData folderData, String absPath,
-			String fName, boolean isFolder) {
+			String fName, boolean isFolder, float x, float y) {
 		DsPopMenu menu = new DsPopMenu(getContext());
 		menu.addPopMenuItem(new PathContainerView.MenuItem(getContext(), mContext.getString(R.string.menu_add_fav), 1));
 		menu.setPopMenuClickListener(new FolderMenuListener(absPath, fName, isFolder));
-		mPathClickListener.showMenu(menu);
+		mPathClickListener.showMenu(menu, x, y);
 	}
 	
 	private class FolderMenuListener implements DsPopMenuClickListener {
@@ -214,8 +215,8 @@ public class FolderPicturesModel implements GLResourceModel {
 		
 	}
 	
-	public void showMenuForHome(DsPopMenu menu) {
-		mPathClickListener.showMenu(menu);
+	public void showMenuForHome(DsPopMenu menu, float x, float y) {
+		mPathClickListener.showMenu(menu, x, y);
 	}
 
 
