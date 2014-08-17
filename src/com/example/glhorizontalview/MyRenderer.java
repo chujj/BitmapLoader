@@ -491,7 +491,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	////////////////////////////////animation part ////////////////////////////////
 	private final static int View_part = 1;
 	
-	private int Curve_Tile_Size = 300; // ZHUJJ-TODO use different tile_size under differnt reder_mode, accord the screen size
+	private int Curve_Tile_Size = 256; // ZHUJJ-TODO use different tile_size under differnt reder_mode, accord the screen size
 	private int Plane_Tile_Size = 100;
 	
 	private final static float PLAN_HEIGHT_MAXIMIN = 1.0f;

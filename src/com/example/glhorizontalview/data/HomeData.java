@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Environment;
 import android.widget.Toast;
 
@@ -26,6 +27,9 @@ import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 
 public class HomeData  implements IData {
 	private final static String serilized_file_name = "home_ticket";
+	private final float TEXT_AREA_HEIGHT_PERCENT_OF_FOLDERBITMAP = 0.125f; // crop height from folder.png
+	
+	private static final boolean debug_background = false;
 	
 	public final static int TYPE_PATH_DEFAULT = 0;
 	public final static int TYPE_PATH_FAV = 1;
@@ -37,7 +41,8 @@ public class HomeData  implements IData {
 
 	private Bitmap mFolderBitmap;
 	private Rect mRect;
-	private Paint mPaint, mBgPaint;
+	private Paint mTextPaint, mBgPaint;
+	
 	
 	public static HomeData build(FolderPicturesModel father) {
 		return new HomeData(father);
@@ -51,11 +56,17 @@ public class HomeData  implements IData {
 
 		mFolderBitmap = BitmapFactory.decodeResource(father.getContext().getResources(), R.drawable.folder);
 
-		mPaint = new Paint();
-		mPaint.setTextSize(30);
+		mTextPaint = new Paint();
+		mTextPaint.setAntiAlias(true);
+		mTextPaint.setColor(0xffc3c3c3);
+		mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
 		mBgPaint = new Paint();
-		mBgPaint.setColor(0xffc3c3c3);
+		if (debug_background) {
+			mBgPaint.setColor(0xffc3c3c3);
+		} else {
+			mBgPaint.setColor(0xff000000);
+		}
 		
 		loadFromFile();
 	}
@@ -80,6 +91,8 @@ public class HomeData  implements IData {
 					HomeItem it = new HomeItem();
 					it.mType = Integer.parseInt(defines[0]);
 					it.mDefine = defines[1].trim();
+					if (defines.length > 2 && !defines[2].trim().equals("null")) 
+						it.mShortName = defines[2].trim();
 					mItems.add(it);
 					line = in.readLine();
 				}
@@ -102,6 +115,7 @@ public class HomeData  implements IData {
 		HomeItem it = new HomeItem();
 		it.mType = TYPE_PATH_DEFAULT;
 		it.mDefine = getInitPath();
+		it.mShortName = new File(it.mDefine).getName();
 		
 		mItems.add(it);
 	}
@@ -131,7 +145,8 @@ public class HomeData  implements IData {
 	public int getCount() {
 		return mItems.size();
 	}
-
+	
+	
 	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
@@ -143,7 +158,17 @@ public class HomeData  implements IData {
 			mC.drawRect(mRect, mBgPaint);
 			
 			mC.drawBitmap(mFolderBitmap, null, mRect, null);
-			mC.drawText(mItems.get(aIdx).mDefine, 0, require_height / 2 + 40, mPaint);
+			
+			String descript = it.mShortName == null ? it.mDefine : it.mShortName;
+			float text_size = TEXT_AREA_HEIGHT_PERCENT_OF_FOLDERBITMAP * require_height / 2;
+			int max_count = (int) ((require_width  / text_size)  - 1);
+			if (descript.length() > max_count) {
+				descript = "..." + descript.substring(descript.length() - max_count + 3);
+			} else {
+				
+			}
+			mTextPaint.setTextSize(text_size);
+			mC.drawText(descript, (require_width - mTextPaint.measureText(descript) ) / 2, require_height - text_size, mTextPaint);
 		} else {
 			mC.drawColor(0xff00aaaa);
 		}
@@ -205,6 +230,8 @@ public class HomeData  implements IData {
 				sb.append(it.mType);
 				sb.append(type_sperater);
 				sb.append(it.mDefine);
+				sb.append(type_sperater);
+				sb.append(it.mShortName);
 				sb.append("\n");
 				byte[] content = sb.toString().getBytes();
 				fo.write(content, 0, content.length);
@@ -221,6 +248,7 @@ public class HomeData  implements IData {
 	private class HomeItem {
 		private int mType;
 		private String mDefine;
+		private String mShortName;
 	}
 
 	public void tryAddFav(String mAbsPath, String mFName, boolean mIsFolder) {
@@ -233,12 +261,13 @@ public class HomeData  implements IData {
 		}
 		
 		if (exist) { // show toast
-			Toast.makeText(mFather.getContext(), "mFName already exist in Fav", Toast.LENGTH_LONG).show();
+			Toast.makeText(mFather.getContext(), mFName + " already exist in Fav", Toast.LENGTH_LONG).show();
 		} else {
 			// add to fav
 			HomeItem newFav = new HomeItem();
 			newFav.mType = TYPE_PATH_FAV;
 			newFav.mDefine = mAbsPath;
+			newFav.mShortName = mFName;
 			mItems.add(newFav);
 			// reload model, or mark reload delay
 			mFather.homedataReloaded();
