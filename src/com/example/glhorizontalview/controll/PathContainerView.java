@@ -46,6 +46,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	public PathContainerView(Context context) {
 		super(context);
 
+		MENU_TEXT_SIZE_WITHOUT_DENSITY = (int) (MENU_TEXT_SIZE_WITHOUT_DENSITY * context.getResources().getDisplayMetrics().density);
+		
 		mGLSurfaceView = new MyGLSurfaceView(context);
 		this.setBackgroundColor(0xff000000);
 
@@ -78,12 +80,10 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		
 		mHomeBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_homepage));
 //		this.addView(mHomeBtn);
-		mHomeBtn.setBackgroundColor(0xff000000);
 		mHomeBtn.setOnClickListener(this);
 		
 		mSwitchBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_menu));
 		this.addView(mSwitchBtn);
-		mSwitchBtn.setBackgroundColor(0xff000000);
 		mSwitchBtn.setOnClickListener(this);
 		
 		mMenuLayout = new DsPopMenuLayout(context);
@@ -91,7 +91,6 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		this.addView(mMenuLayout);
 
 		mGalleryViewer = new GalleryViewPager(context);
-		mGalleryViewer.setBackgroundColor(0xff000000);
 		this.addView(mGalleryViewer);
 		mGalleryViewer.setVisibility(View.INVISIBLE);
 		
@@ -101,20 +100,20 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private void buildMenu(Context context) {
 		mFullMenu = new DsPopMenu(context);
 		mFullMenu.setMaxColumn(1);
-		mFullMenu.addPopMenuItem(new MenuDivider(context, " Layout", 0)); // ZHUJJ-FIXME update the UI
-		mFullMenu.addPopMenuItem(new MenuItem(context, " Grid", 1));
-		mFullMenu.addPopMenuItem(new MenuItem(context, " Slide", 2));
-		mFullMenu.addPopMenuItem(new MenuDivider(context, " Sort", 0));
-		mFullMenu.addPopMenuItem(new MenuItem(context, " Time", 3));
-		mFullMenu.addPopMenuItem(new MenuItem(context, " Size", 4));
-		mFullMenu.addPopMenuItem(new MenuItem(context, " Name", 5));
+		mFullMenu.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_layout_title), 0)); // ZHUJJ-FIXME update the UI
+		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_1), 1));
+		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_2), 2));
+		mFullMenu.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_sort_title), 0));
+		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_sort_time), 3));
+		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_sort_size), 4));
+		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_sort_name), 5));
 		
 		
 		mMenuWithoutSort = new DsPopMenu(context);
 		mMenuWithoutSort.setMaxColumn(1);
-		mMenuWithoutSort.addPopMenuItem(new MenuDivider(context, " Layout", 0));
-		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, " Grid", 1));
-		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, " Slide", 2));
+		mMenuWithoutSort.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_layout_title), 0));
+		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_1), 1));
+		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_2), 2));
 
 		MenuListener listener = new MenuListener();
 		
@@ -218,6 +217,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mMenuLayout.dismissPopMenu();
 	}
 	
+	private static int MENU_TEXT_SIZE_WITHOUT_DENSITY = 20;
+	
 	private class MenuDivider extends DsPopMenuItem {
 		private String mString;
 		private Paint mPaint;
@@ -226,7 +227,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 			mString = msg;
 			mPaint = new Paint();
 			mPaint.setColor(0xffffffff);
-			mPaint.setTextSize(24);
+			mPaint.setTextSize(MENU_TEXT_SIZE_WITHOUT_DENSITY);
 			mPaint.setAntiAlias(true);
 			this.setMargin(0);
 			this.setId(id);
@@ -235,14 +236,14 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 
 		@Override
 		protected void onDraw(Canvas canvas) {
-			canvas.drawText(mString, 0, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
+			canvas.drawText(mString, (this.getMeasuredWidth() - mPaint.measureText(mString)) / 2, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
 		}
 
 		@Override
 		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
 			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-			this.setMeasuredDimension(100, 40);
+			this.setMeasuredDimension(MENU_TEXT_SIZE_WITHOUT_DENSITY * 5, MENU_TEXT_SIZE_WITHOUT_DENSITY * 2);
 		}
 
 
@@ -257,7 +258,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 			mString = msg;
 			mPaint = new Paint();
 			mPaint.setColor(0xff000000);
-			mPaint.setTextSize(24);
+			mPaint.setTextSize(MENU_TEXT_SIZE_WITHOUT_DENSITY);
 			mPaint.setAntiAlias(true);
 			this.setMargin(0);
 			this.setId(id);
@@ -267,14 +268,14 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		@Override
 		protected void onDraw(Canvas canvas) {
 			super.onDraw(canvas);
-			canvas.drawText(mString, 24, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
+			canvas.drawText(mString,  (this.getMeasuredWidth() - mPaint.measureText(mString)) / 2, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
 		}
 
 
 		@Override
 		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-			this.setMeasuredDimension(100, 40);
+			this.setMeasuredDimension(MENU_TEXT_SIZE_WITHOUT_DENSITY * 5, MENU_TEXT_SIZE_WITHOUT_DENSITY * 2);
 		}
 	}
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 
 import com.ds.bitmaputils.BitmapHelper;
+import com.example.bitmaploader.R;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.controll.PathContainerView;
@@ -176,7 +177,7 @@ public class FolderPicturesModel implements GLResourceModel {
 	public void showMenuForFolder(FolderData folderData, String absPath,
 			String fName, boolean isFolder) {
 		DsPopMenu menu = new DsPopMenu(getContext());
-		menu.addPopMenuItem(new PathContainerView.MenuItem(getContext(), "fav", 1));
+		menu.addPopMenuItem(new PathContainerView.MenuItem(getContext(), mContext.getString(R.string.menu_add_fav), 1));
 		menu.setPopMenuClickListener(new FolderMenuListener(absPath, fName, isFolder));
 		mPathClickListener.showMenu(menu);
 	}

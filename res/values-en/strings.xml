@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BitmapLoader</string>
+    <string name="bitmap_picker">BitmapLoader Filter</string>
+
+    <string name="menu_layout_title"> Layout</string>
+    <string name="menu_layout_1"> Grid</string>
+    <string name="menu_layout_2"> Slide</string>
+    <string name="menu_sort_title"> Sort</string>
+    <string name="menu_sort_time"> Time</string>
+    <string name="menu_sort_size"> Size</string>
+    <string name="menu_sort_name"> Name</string>
+    
+    <string name="menu_add_fav">Mark</string>
+    <string name="menu_del_fav">Unmark</string>
+</resources>

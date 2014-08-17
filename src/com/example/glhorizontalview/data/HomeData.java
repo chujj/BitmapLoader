@@ -200,7 +200,7 @@ public class HomeData  implements IData {
 	@Override
 	public void longClick(int hit) {
 		DsPopMenu menu = new DsPopMenu(mFather.getContext());
-		menu.addPopMenuItem(new PathContainerView.MenuItem(mFather.getContext(), "del", 1));
+		menu.addPopMenuItem(new PathContainerView.MenuItem(mFather.getContext(), mFather.getContext().getString(R.string.menu_del_fav), 1));
 		menu.setPopMenuClickListener(new DelMenuListener(hit));
 			
 		
