@@ -356,8 +356,22 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	
 	private MyGLHandler mGLHandler;
 
+	private void checkInitedOrRelease() {
+		if (mGLHandler != null) {
+			mGLHandler = null;
+			GLES20.glDeleteProgram(mProgramHandle);
+			mProgramHandle = -1;
+			items = null;
+			if (mTileTextureHandle != -1) {
+				TextureHelper.deleteTexture(mActivityContext, mTileTextureHandle);
+				mTileTextureHandle = -1;
+			}
+		}
+	}
 	@Override
 	public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
+		DsLog.e("lifet onSurfaceCreated");
+		checkInitedOrRelease();
 		mGLHandler = new MyGLHandler();
 		if (Looper.myLooper() == Looper.getMainLooper())
 			;
@@ -390,6 +404,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private float PLANE_VISIABLE_NEAR_X_START, PLANE_VISIABLE_NEAR_X_END;
 	@Override
 	public void onSurfaceChanged(GL10 glUnused, int width, int height) {
+		DsLog.e("lifet onSurfaceChanged " + width + " h:" + height);
 		GLES20.glViewport(0, 0, width, height);
 
 		final float ratio = (float) width / height;
@@ -483,8 +498,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			mGLSurfaceView.requestRender();
 		}
 //		testSubTex();
-//		int error = glUnused.glGetError();
-//		DsLog.e("GL Error: " + error);
+		int error = glUnused.glGetError();
+		if (error != 0)
+			DsLog.e("GL Error: " + Integer.toHexString(error));
 	}
 
 	////////////////////////////////animation part ////////////////////////////////

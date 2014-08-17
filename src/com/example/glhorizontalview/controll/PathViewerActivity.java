@@ -41,6 +41,7 @@ public class PathViewerActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		mContentView.onPause();
+		this.finish();
 	}
 
 //	@Override
