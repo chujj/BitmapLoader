@@ -178,6 +178,18 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				}
 			}
 		}
+		
+		/** make sure x is still same toward of next spin animation
+		 * @param x
+		 * @return
+		 */
+		private boolean timeToTriggerSpinAnimation(float x) {
+			return false;
+		}
+		
+		private void startSpinAnimation(float x) {
+			
+		}
 
 		public boolean handleMessageAndNeedRefresh(Message msg) {
 			boolean refresh = true;
@@ -200,8 +212,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				float vy = msg.getData().getFloat("y");
 				long durning =  (long) ( Math.abs(vx) * AUTO_ANIMATION_TIME_PER_PIXEL);
 //				DsLog.e("eventHub onFling: vx: " + vx + " durning: " + durning);
-				mScroller.fling(mCurrOffset, 0, vx, 0, calced_min_offset - Distance, calced_max_offset + Distance, 0, 0, durning, rollback_routinue_msg);
-				inAutoAnimation = true;
+				if (timeToTriggerSpinAnimation(vx)) {
+					this.startSpinAnimation(vx);
+					mScroller.forceFinished(true);
+					inAutoAnimation = true;
+				} else {
+					mScroller.fling(mCurrOffset, 0, vx, 0, calced_min_offset - Distance, calced_max_offset + Distance, 0, 0, durning, rollback_routinue_msg);
+					inAutoAnimation = true;
+				}
 				break;
 			case MSG_FINISH:
 				if (inAutoAnimation) return refresh;
