@@ -55,7 +55,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		
 		sAgent.sync();
 
-		MENU_TEXT_SIZE_WITHOUT_DENSITY = (int) (MENU_TEXT_SIZE_WITHOUT_DENSITY * context.getResources().getDisplayMetrics().density);
+		MENU_TEXT_SIZE_WITHOUT_DENSITY = (int) (20 * context.getResources().getDisplayMetrics().density);
 		
 		mGLSurfaceView = new MyGLSurfaceView(context);
 		this.setBackgroundColor(0xff000000);
@@ -237,40 +237,19 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	
 	private static int MENU_TEXT_SIZE_WITHOUT_DENSITY = 20;
 	
-	private class MenuDivider extends DsPopMenuItem {
-		private String mString;
-		private Paint mPaint;
+	private class MenuDivider extends MenuItem {
+
 		public MenuDivider(Context aContext, String msg, int id) {
-			super(aContext);
+			super(aContext, msg, id);
 			mString = msg;
-			mPaint = new Paint();
 			mPaint.setColor(0xffffffff);
-			mPaint.setTextSize(MENU_TEXT_SIZE_WITHOUT_DENSITY);
-			mPaint.setAntiAlias(true);
-			this.setMargin(0);
-			this.setId(id);
 			this.setBackgroundColor(0xff43ace8);
 		}
-
-		@Override
-		protected void onDraw(Canvas canvas) {
-			canvas.drawText(mString, (this.getMeasuredWidth() - mPaint.measureText(mString)) / 2, DsCanvasUtil.calcYWhenTextAlignCenter(this.getMeasuredHeight(), mPaint),mPaint);
-		}
-
-		@Override
-		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-			this.setMeasuredDimension(MENU_TEXT_SIZE_WITHOUT_DENSITY * 5, MENU_TEXT_SIZE_WITHOUT_DENSITY * 2);
-		}
-
-
 	}
 
 	public static class MenuItem extends DsPopMenuItem {
-
-		private String mString;
-		private Paint mPaint;
+		protected String mString;
+		protected Paint mPaint;
 		public MenuItem(Context aContext, String msg, int id) {
 			super(aContext);
 			mString = msg;
