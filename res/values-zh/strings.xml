@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">BitmapLoader</string>
+    <string name="app_name">简立看图3D</string>
     <string name="bitmap_picker">BitmapLoader Filter</string>
 
     <string name="menu_layout_title"> 对齐到</string>
@@ -15,4 +15,5 @@
     <string name="menu_add_fav">标记常用</string>
     <string name="menu_del_fav">取消标记</string>
     <string name="menu_share">分享</string>
+    <string name="menu_feedback">反馈</string>
 </resources>

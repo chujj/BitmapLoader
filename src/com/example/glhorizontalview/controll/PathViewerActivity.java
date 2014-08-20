@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.ds.bitmaputils.BitmapHelper;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.update.UmengUpdateAgent;
 
 public class PathViewerActivity extends Activity {
 
@@ -13,7 +15,8 @@ public class PathViewerActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		UmengUpdateAgent.update(this.getApplicationContext());
+		
 		setContentView(mContentView = new PathContainerView(this));
 //		try {
 //			mServer = new MyServer(res);
@@ -34,14 +37,16 @@ public class PathViewerActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		MobclickAgent.onResume(this);
 		mContentView.onResume();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		MobclickAgent.onPause(this);
 		mContentView.onPause();
-		this.finish();
+//		this.finish(); // cause feedback activity of umeng, I disable the finish() here. It will lead oom problem in opengles2
 	}
 
 //	@Override

@@ -24,6 +24,7 @@ import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.controll.PathSelector.PathListener;
 import com.example.glhorizontalview.data.FolderPicturesModel;
 import com.example.glhorizontalview.data.IData;
+import com.umeng.fb.FeedbackAgent;
 
 import ds.android.ui.core.BitmapButton;
 import ds.android.ui.core.DsPopMenu;
@@ -43,9 +44,16 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private DsPopMenu mFullMenu, mMenuWithoutSort;
 	
 	private GalleryViewPager mGalleryViewer;
-
+	private static FeedbackAgent sAgent;
+	
 	public PathContainerView(Context context) {
 		super(context);
+		
+		if (sAgent == null) {
+			sAgent = new FeedbackAgent(context); 
+		}
+		
+		sAgent.sync();
 
 		MENU_TEXT_SIZE_WITHOUT_DENSITY = (int) (MENU_TEXT_SIZE_WITHOUT_DENSITY * context.getResources().getDisplayMetrics().density);
 		
@@ -113,6 +121,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_sort_time), 3));
 		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_sort_size), 4));
 		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_sort_name), 5));
+		mFullMenu.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_feedback), 6));
 		
 		
 		mMenuWithoutSort = new DsPopMenu(context);
@@ -120,6 +129,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mMenuWithoutSort.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_layout_title), 0));
 		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_1), 1));
 		mMenuWithoutSort.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_2), 2));
+		mMenuWithoutSort.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_feedback), 6));
 
 		MenuListener listener = new MenuListener();
 		
@@ -141,6 +151,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 				mModel.sort(IData.SORT_SIZE);
 			} else if (aPopMenuItemId == 5) { // s_name
 				mModel.sort(IData.SORT_NAME);
+			} else if (aPopMenuItemId == 6) { // feedback
+				sAgent.startFeedbackActivity();
 			}
 
 			mMenuLayout.dismissPopMenu();

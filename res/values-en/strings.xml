@@ -15,4 +15,5 @@
     <string name="menu_add_fav">Mark</string>
     <string name="menu_del_fav">Unmark</string>
     <string name="menu_share">Share</string>
+    <string name="menu_feedback">More?</string>
 </resources>
