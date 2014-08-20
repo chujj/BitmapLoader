@@ -55,13 +55,18 @@ public class BitmapHelper {
 		return getBitmap(path, LEVEL.THUMBNAIL);
 	}
 	
-	public AtomBitmap getBitmap(String path, LEVEL level) {
+	public Cbitmap getCbitmap(String path) {
 		Cbitmap c = mCbitmapMap.get(path);
 		if (c == null) {
 			c = new Cbitmap(this, path);
 			mCbitmapMap.put(path, c);
-		}
-		
+		}	
+		return c;
+	}
+	
+	public AtomBitmap getBitmap(String path, LEVEL level) {
+		Cbitmap c = getCbitmap(path);
+
 		return c.accessBitmap(level);
 		
 	}

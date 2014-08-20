@@ -15,8 +15,9 @@ import android.widget.ImageView.ScaleType;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
+import com.ds.bitmaputils.BitmapHelper;
+import com.ds.bitmaputils.Cbitmap;
 import com.example.bitmaploader.R;
 
 public class MixedTouchImageView extends RelativeLayout {
@@ -61,11 +62,19 @@ public class MixedTouchImageView extends RelativeLayout {
 			new ImageLoadTask().execute(imageUrl);
 		}
 
-		public void setAbp(AtomBitmap abp) {
-			Bitmap bm = abp.getBitmap(mBitmapGot);
+		public void setAbp(Cbitmap abp) {
+			// fetch thumnail;
+			Bitmap bm = null;
+			bm = abp.accessBitmap(BitmapHelper.LEVEL.THUMBNAIL).getBitmap();
 			if (bm != null) {
 				mBitmapGot.onBitmapGot(bm);
 			}
+			
+			bm = abp.accessBitmap(BitmapHelper.LEVEL.ORIGIN).getBitmap(mBitmapGot);
+			if (bm != null) {
+				mBitmapGot.onBitmapGot(bm);
+			}
+
 		}
 		
 		public void setPosition(int position) {

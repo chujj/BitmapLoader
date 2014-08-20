@@ -5,12 +5,12 @@ import ru.truba.touchgallery.GalleryWidget.GalleryViewPager;
 import android.content.Context;
 import android.view.ViewGroup;
 
-import com.ds.bitmaputils.AtomBitmap;
+import com.ds.bitmaputils.Cbitmap;
 
 public class MyPagerAdapter extends BasePagerAdapter {
 
-	private AtomBitmap mAbp;
-	public MyPagerAdapter(Context context, AtomBitmap abp) {
+	private Cbitmap mAbp;
+	public MyPagerAdapter(Context context, Cbitmap abp) {
 		super(context, null);
 		mAbp = abp;
 	}

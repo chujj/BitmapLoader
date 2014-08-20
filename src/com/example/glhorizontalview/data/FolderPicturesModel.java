@@ -6,7 +6,6 @@ import java.util.Stack;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.net.Uri;
 
 import com.ds.bitmaputils.BitmapHelper;

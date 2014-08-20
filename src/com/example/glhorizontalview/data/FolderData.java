@@ -164,8 +164,8 @@ public class FolderData implements IData {
 			mFather.clickAtPathInside(FolderData.this, hit, mKeys[hit].absPath);
 		} else {
 			mFather.mPathClickListener.showGallery(new MyPagerAdapter(mFather
-					.getContext(), BitmapHelper.getInstance( // ZHUJJ 1 change from AtomBitmap to CBitmap which could get the high-qulity bitmap resource
-					mFather.getContext()).getBitmap(mKeys[hit].absPath)));
+					.getContext(), BitmapHelper.getInstance(
+					mFather.getContext()).getCbitmap(mKeys[hit].absPath)));
 		}
 	}
 	
