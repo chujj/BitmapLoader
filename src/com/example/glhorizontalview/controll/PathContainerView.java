@@ -5,6 +5,7 @@ import ru.truba.touchgallery.GalleryWidget.GalleryViewPager;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -73,6 +74,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mPathSelector = new PathSelector(context);
 		mPathSelector.setListener(this);
 		mHorizontalView = new HorizontalScrollView(context);
+		mHorizontalView.setHorizontalScrollBarEnabled(false);
+		mPathSelector.setParentHorizontalView(mHorizontalView);
 		this.addView(mGLSurfaceView);
 		mHorizontalView.addView(mPathSelector);
 		this.addView(mHorizontalView);
@@ -82,9 +85,11 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 //		this.addView(mHomeBtn);
 		mHomeBtn.setOnClickListener(this);
 		
-		mSwitchBtn = new BitmapButton(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_menu));
+		Bitmap menu_bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.toolbar_menu);
+		mSwitchBtn = new BitmapButton(context, menu_bitmap);
 		this.addView(mSwitchBtn);
 		mSwitchBtn.setOnClickListener(this);
+		mPathSelector.setMinWidth(context.getResources().getDisplayMetrics().widthPixels  - menu_bitmap.getWidth());
 		
 		mMenuLayout = new DsPopMenuLayout(context);
 
@@ -156,8 +161,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		int h = mPathSelector.getMeasuredHeight();
 		
 		int TOOL_BAR_WIDTH = mSwitchBtn.getMeasuredWidth(); 
-		mHorizontalView.layout(0, 0, width - TOOL_BAR_WIDTH - TOOL_BAR_WIDTH, h);
-		mHomeBtn.layout(width - TOOL_BAR_WIDTH - TOOL_BAR_WIDTH, 0	, width - TOOL_BAR_WIDTH, h);
+		mHorizontalView.layout(0, 0, width - TOOL_BAR_WIDTH , h);
+//		mHomeBtn.layout(width - TOOL_BAR_WIDTH - TOOL_BAR_WIDTH, 0	, width - TOOL_BAR_WIDTH, h);
 		mSwitchBtn.layout(width - TOOL_BAR_WIDTH, 0	, width, h);
 		mGLSurfaceView.layout(0, h, width, height);
 		mMenuLayout.layout(0, 0, width, height);

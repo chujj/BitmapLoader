@@ -12,22 +12,27 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 
 import com.ds.ui.DsBitmapUtil;
 import com.ds.ui.DsCanvasUtil;
 import com.example.bitmaploader.R;
 
+import ds.android.ui.core.YiButton;
+
 public class PathSelector extends ViewGroup implements OnClickListener {
 	private String initPath = "/";
 	
 	private String pathString;
-	private NinePatchDrawable m9Bg; 
+	private NinePatchDrawable m9Bg, m9_Focus_Bg, m9_Pressed; 
 
 	public PathSelector(Context context) {
 		super(context);
 		initPath = Environment.getExternalStorageDirectory().getAbsolutePath();
 		this.setCurrPath(initPath);
 		m9Bg = DsBitmapUtil.getNinePatchDrawable(context, R.drawable.debug_button_focused);
+		m9_Focus_Bg = DsBitmapUtil.getNinePatchDrawable(context, R.drawable.common_btn_press);
+		m9_Pressed = DsBitmapUtil.getNinePatchDrawable(context, R.drawable.debug_button_pressed);
 	}
 	
 	public void setCurrPath(String path) {
@@ -59,8 +64,12 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 		
 		String path = pathString;
 		File pathF = new File(path);
+		boolean lastOne = true;
 		while (pathF != null) {
-			MyTextView tv = new MyTextView(getContext(), pathF.getName(), pathF.getAbsolutePath());
+			MyTextView tv = new MyTextView(getContext(), lastOne, pathF.getName(), pathF.getAbsolutePath());
+			if (lastOne) {
+				lastOne = false;
+			}
 			mLists.add(0, tv);
 			tv.setOnClickListener(this);
 			this.addView(tv);
@@ -68,6 +77,7 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 		}
 		
 		this.postInvalidate();
+
 	}
 
 
@@ -91,22 +101,33 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 			width += mLists.get(i).getMeasuredWidth();
 		}
 		height = mLists.get(0).getMeasuredHeight();
-		width = Math.max(width, getContext().getResources().getDisplayMetrics().widthPixels);
+		width = Math.max(width, mMinWidth);
 		this.setMeasuredDimension(width, height);
+		mParentHorizontalView.post(scrollToRightest);
 	}
+	
+	private Runnable scrollToRightest = new Runnable() {
+		
+		@Override
+		public void run() {
+			mParentHorizontalView.scrollTo(PathSelector.this.getMeasuredWidth(), 0);
+		}
+	};
 
 	private final float TextSize = 32f;
 	private final float TEXT_BORDER_PADDING = 15f;
 	
-	private class MyTextView extends View {
+	private class MyTextView extends YiButton {
 
 		private String mAbsPath;
 		private String mName;
 		private Paint mPaint;
 		private float width, height, text_x, text_y;
+		private boolean mFocusOne;
 		
-		public MyTextView(Context context, String name, String absPath) {
+		public MyTextView(Context context,boolean focusOne, String name, String absPath) {
 			super(context);
+			mFocusOne = focusOne;
 			if (TextUtils.isEmpty(name) && !TextUtils.isEmpty(absPath)) { // may be root "/"
 				name = "/";
 			} else {
@@ -131,9 +152,14 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 
 		@Override
 		protected void onDraw(Canvas canvas) {
-			m9Bg.setBounds(0, 0, this.getMeasuredWidth(), this.getMeasuredHeight());
-			m9Bg.draw(canvas);
+			NinePatchDrawable drawable = mFocusOne ? m9_Focus_Bg : m9Bg;
+			drawable.setBounds(0, 0, this.getMeasuredWidth(), this.getMeasuredHeight());
+			drawable.draw(canvas);
 			canvas.drawText(mName, text_x, text_y, mPaint);
+			if (mIsPress) {
+				m9_Pressed.setBounds(0, 0, this.getMeasuredWidth(), this.getMeasuredHeight());
+				m9_Pressed.draw(canvas);
+			}
 		}
 
 	}
@@ -147,6 +173,15 @@ public class PathSelector extends ViewGroup implements OnClickListener {
 		if (mListener != null) {
 			mListener.onPathChange(pathString);
 		}
+	}
+	private HorizontalScrollView mParentHorizontalView;
+	public void setParentHorizontalView(HorizontalScrollView mHorizontalView) {
+		mParentHorizontalView = mHorizontalView;
+	}
+
+	private int mMinWidth;
+	public void setMinWidth(int i) {
+		mMinWidth = i;
 	}
 	
 	
