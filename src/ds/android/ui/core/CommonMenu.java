@@ -2,7 +2,7 @@ package ds.android.ui.core;
 
 import java.util.ArrayList;
 
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 
 
 import android.content.Context;

@@ -30,7 +30,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 
 
 

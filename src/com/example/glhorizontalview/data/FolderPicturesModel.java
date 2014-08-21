@@ -9,7 +9,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 
 import com.ds.bitmaputils.BitmapHelper;
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.controll.PathContainerView;

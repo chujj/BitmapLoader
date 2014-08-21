@@ -18,7 +18,7 @@ import android.widget.RelativeLayout;
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
 import com.ds.bitmaputils.Cbitmap;
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 
 public class MixedTouchImageView extends RelativeLayout {
 		protected ProgressBar mProgressBar;

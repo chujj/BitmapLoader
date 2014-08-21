@@ -24,7 +24,7 @@ import android.os.Message;
 
 import com.ds.io.DsLog;
 import com.ds.views.MyScroller;
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 import com.learnopengles.android.common.RawResourceReader;
 import com.learnopengles.android.common.ShaderHelper;
 import com.learnopengles.android.common.TextureHelper;

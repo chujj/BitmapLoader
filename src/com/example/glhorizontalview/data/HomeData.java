@@ -18,7 +18,7 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.widget.Toast;
 
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 import com.example.glhorizontalview.controll.PathContainerView;
 
 import ds.android.ui.core.DsPopMenu;

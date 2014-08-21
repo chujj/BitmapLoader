@@ -16,7 +16,7 @@ import android.widget.HorizontalScrollView;
 
 import com.ds.ui.DsBitmapUtil;
 import com.ds.ui.DsCanvasUtil;
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 
 import ds.android.ui.core.YiButton;
 

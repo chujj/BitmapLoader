@@ -18,7 +18,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.Toast;
 
 import com.ds.ui.DsCanvasUtil;
-import com.example.bitmaploader.R;
+import ssc.software.picviewer.R;
 import com.example.glhorizontalview.MyGLSurfaceView;
 import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.controll.PathSelector.PathListener;
