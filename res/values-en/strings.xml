@@ -3,6 +3,8 @@
 
     <string name="app_name">BitmapLoader</string>
     <string name="bitmap_picker">BitmapLoader Filter</string>
+	
+	<string name="root_dir">Root Folder</string>
 
     <string name="menu_layout_title"> Layout</string>
     <string name="menu_layout_1"> Grid</string>

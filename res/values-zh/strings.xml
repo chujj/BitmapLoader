@@ -3,7 +3,9 @@
 
     <string name="app_name">简立看图3D</string>
     <string name="bitmap_picker">BitmapLoader Filter</string>
-
+	
+	<string name="root_dir">所有目录</string>
+	
     <string name="menu_layout_title"> 对齐到</string>
     <string name="menu_layout_1"> 方块</string>
     <string name="menu_layout_2"> 滑块</string>

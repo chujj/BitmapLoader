@@ -118,10 +118,53 @@ public class HomeData  implements IData {
 	}
 	
 	private void buildDefault() {
-		HomeItem it = new HomeItem();
+		File rootsd = Environment.getExternalStorageDirectory();
+		HomeItem it = null;
+		
+		if (rootsd.exists()) {
+			// DCIM
+			File dcim_dir = new File(rootsd.getAbsolutePath() , Environment.DIRECTORY_DCIM);
+			if (dcim_dir.exists()) { 
+				it = new HomeItem();
+				it.mType = TYPE_PATH_DEFAULT;
+				it.mDefine = dcim_dir.getAbsolutePath();
+				it.mShortName = dcim_dir.getName();
+				mItems.add(it);
+
+				// Camera
+				File camera_dir = new File(dcim_dir.getAbsolutePath(), "Camera");
+				if (camera_dir.exists()) {
+					it = new HomeItem();
+					it.mType = TYPE_PATH_DEFAULT;
+					it.mDefine = camera_dir.getAbsolutePath();
+					it.mShortName = camera_dir.getName();
+					mItems.add(it);
+				}
+			} // end DCIM
+			
+			// Picture
+			File picture_dir = new File(rootsd.getAbsoluteFile(), Environment.DIRECTORY_PICTURES);
+			if (picture_dir.exists()) {
+				it = new HomeItem();
+				it.mType = TYPE_PATH_DEFAULT;
+				it.mDefine = picture_dir.getAbsolutePath();
+				it.mShortName = picture_dir.getName();
+				mItems.add(it);
+			}
+			
+			// Sdcard
+			it = new HomeItem();
+			it.mType = TYPE_PATH_DEFAULT;
+			it.mDefine = rootsd.getAbsolutePath();
+			it.mShortName = rootsd.getName();
+			mItems.add(it);
+		}
+		
+		// Root
+		it = new HomeItem();
 		it.mType = TYPE_PATH_DEFAULT;
-		it.mDefine = getInitPath();
-		it.mShortName = new File(it.mDefine).getName();
+		it.mDefine = "/";
+		it.mShortName = mFather.getContext().getString(R.string.root_dir);
 		
 		mItems.add(it);
 	}
@@ -199,12 +242,13 @@ public class HomeData  implements IData {
 
 	@Override
 	public void longClick(float x, float y, int hit) {
-		DsPopMenu menu = new DsPopMenu(mFather.getContext());
-		menu.addPopMenuItem(new PathContainerView.MenuItem(mFather.getContext(), mFather.getContext().getString(R.string.menu_del_fav), 1));
-		menu.setPopMenuClickListener(new DelMenuListener(hit));
-			
-		
-		mFather.showMenuForHome(menu, x, y);
+		if (mItems.get(hit).mType != TYPE_PATH_DEFAULT) {
+			DsPopMenu menu = new DsPopMenu(mFather.getContext());
+			menu.addPopMenuItem(new PathContainerView.MenuItem(mFather.getContext(), mFather.getContext().getString(R.string.menu_del_fav), 1));
+			menu.setPopMenuClickListener(new DelMenuListener(hit));
+
+			mFather.showMenuForHome(menu, x, y);
+		}
 	}
 	
 	
