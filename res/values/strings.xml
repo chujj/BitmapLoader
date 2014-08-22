@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">简立看图3D</string>
+    <string name="bitmap_picker">BitmapLoader Filter</string>
+	
+	<string name="root_dir">所有目录</string>
+	
+    <string name="menu_layout_title"> 对齐到</string>
+    <string name="menu_layout_1"> 方块</string>
+    <string name="menu_layout_2"> 滑块</string>
+    <string name="menu_sort_title"> 排序用</string>
+    <string name="menu_sort_time"> 时间</string>
+    <string name="menu_sort_size"> 大小</string>
+    <string name="menu_sort_name"> 文件名</string>
+    
+    <string name="menu_add_fav">标记常用</string>
+    <string name="menu_del_fav">取消标记</string>
+    <string name="menu_share">分享</string>
+    <string name="menu_feedback">反馈</string>
+</resources>
