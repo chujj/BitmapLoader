@@ -410,10 +410,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				fragmentShaderHandle, new String[] { "a_Position",
 						"a_TexCoordinate" });
 
-		initDimensionLimit();
-		
-		updateItems(0, 0);
-		
 	}
 
 	private float PLANE_VISIABLE_NEAR_X_START, PLANE_VISIABLE_NEAR_X_END;
@@ -434,11 +430,51 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		Matrix.frustumM(mProjectionMatrix, 0, left, right,
 				-PLAN_HEIGHT_MAXIMIN, PLAN_HEIGHT_MAXIMIN, NEAR, FAR);
 		
+		calcTileSizeForBothMode(width, height);
+		initDimensionLimit();
 		updateItems(0, 0);
+	}
+	
+	// setup the tile cache's position all in one texture
+	private void calcTileSizeForBothMode(int width, int height) {
+		int[] t_max_size = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, t_max_size, 0);
+		t_max_size[0] = t_max_size[0] / 2; // half size of the maximn, 8192 in virtualbox always crashed
+
+		{// curve-mode: 1. calc count ; 2. calc size
+			int min_count = (ONE_SIZE_COUNT * 2) + 1 + 1; // +1 for logo
+			int max_count = (t_max_size[0] / SUGGEST_MAX_TILE_SIZE);
+			max_count = max_count * max_count;
+			if (max_count >= min_count) { // use as much tile as possible
+				Curve_Tile_Count = max_count;
+				Curve_Tile_Size = SUGGEST_MAX_TILE_SIZE;
+			} else { // scale in the size to fit min_count, for better pic qulite
+				Curve_Tile_Count = min_count;
+				// we put all tile as squarly as possible
+				Curve_Tile_Size =  t_max_size[0] / ( (int) (Math.floor(Math.sqrt(min_count))) + 1);
+			}
+		}		
+
+		{// plane: 1.calc count; 2. calc size
+			int min_count = (int) (((PLANE_VISIABLE_NEAR_X_END - PLANE_VISIABLE_NEAR_X_START) / Distance) + 1);
+			min_count = min_count * PLANE_ROW_COUNT;
+			min_count += 1; // +1 for logo
+			int max_count = (t_max_size[0] / SUGGEST_MAX_TILE_SIZE);
+			max_count = max_count * max_count;
+			if (max_count >= min_count) { // use as much tile as possible
+				Plane_Tile_Count = max_count;
+				Plane_Tile_Size = SUGGEST_MAX_TILE_SIZE;
+			} else { // scale in the size to fit min_count, for better pic qulite
+				Plane_Tile_Count = min_count;
+				Plane_Tile_Size =  t_max_size[0] / ( (int) (Math.floor(Math.sqrt(min_count))) + 1);
+			}
+		}
+
 	}
 
 	@Override
 	public void onDrawFrame(GL10 glUnused) {
+//		DsLog.e("lifet onDrawFrame");
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 		GLES20.glUseProgram(mProgramHandle);
@@ -521,8 +557,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	////////////////////////////////animation part ////////////////////////////////
 	private final static int View_part = 1;
 	
+	private final static int SUGGEST_MAX_TILE_SIZE = 256;
+	
 	private int Curve_Tile_Size = 256; // ZHUJJ-TODO use different tile_size under differnt reder_mode, accord the screen size
+	private int Curve_Tile_Count = -1;
 	private int Plane_Tile_Size = 100;
+	private int Plane_Tile_Count = -1;
+	
+	private int mCurr_Tile_Size;
+	private int mCurr_Tile_Count;
 	
 	private final static float PLAN_HEIGHT_MAXIMIN = 1.0f;
 	private final static float PLAN_HALF_WIDTH_FIXED = 1.0f; // y = k*x^2
@@ -675,9 +718,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	}
 
 	private void initDimensionLimit() {
-//		mCurrMode = MODE_PLANE;
-//		mCurrMode = MODE_CURVE;
-		
 		mScroller = new MyScroller(mActivityContext);
 		mCurrOffset = 0;
 
@@ -686,9 +726,18 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		p.setColor(0xff00ff00);
 		
 		int size = mModel.getCount();
+		if (mCurrMode == MODE_CURVE) {
+			mCurr_Tile_Size = Curve_Tile_Size;
+			mCurr_Tile_Count = Curve_Tile_Count;
+		} else {
+			mCurr_Tile_Size = Plane_Tile_Size;
+			mCurr_Tile_Count = Plane_Tile_Count;			
+		}
+		
+		final int tile_size = mCurr_Tile_Size; // ZHUJJ NO NEED allocate again when we in same session, if we always use the half size, or mode not changed 
 		items = new Item[size];
 		Bitmap.Config cf = Bitmap.Config.RGB_565;
-		Bitmap bitmap = Bitmap.createBitmap(Curve_Tile_Size, Curve_Tile_Size, cf);
+		Bitmap bitmap = Bitmap.createBitmap(tile_size, tile_size, cf);
 		Canvas c = new Canvas(bitmap);
 		for (int i = 0; i < size ;i++) {
 			items[i] = new Item(bitmap, c, p, i * Distance, i, mCurrMode);
@@ -701,24 +750,16 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			calced_max_offset = 0;
 			calced_min_offset =  -( items.length / PLANE_ROW_COUNT ) * Distance;
 		}
-		
-		// get the max texture size
-		int[] t_max_size = new int[1];
-		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, t_max_size, 0);
 
 		// calc the tile count maybe used in render routine
-		int count = (ONE_SIZE_COUNT * 2) + 1 + 1;
-		if (mCurrMode == MODE_PLANE) {
-			count = 20;
-		}
-		count = 20; // ZHUJJ auto calc tile, adjust the tile size
-		count ++; // for logo
-		
-		
-		// setup the tile cache's position all in one texture
-		int it = (int) Math.round(Math.sqrt(count)); // we put all tile as squarly as possible
-		if ((it * Curve_Tile_Size) > t_max_size[0]) {
-			throw new RuntimeException("multi textures NOT Supported!: square count: " + it + " tile_size: " + Curve_Tile_Size + " bigger than limit: " + t_max_size[0]);
+		final int count = mCurr_Tile_Count;
+
+		// check max texture size
+		int[] t_max_size = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, t_max_size, 0);
+		int it = (int) (Math.floor(Math.sqrt(count))); 
+		if ((it * tile_size) > t_max_size[0]) {
+			throw new RuntimeException("multi textures NOT Supported!: square count: " + it + " tile_size: " + tile_size + " bigger than limit: " + t_max_size[0]);
 		}
 
 		mTilePoll = new Tile[count];
@@ -726,7 +767,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			mTilePoll[i] = new Tile(i, count, it);
 		}
 
-		mTileBitmap = Bitmap.createBitmap(Curve_Tile_Size * it, Curve_Tile_Size * it, cf);
+		mTileBitmap = Bitmap.createBitmap(tile_size * it, tile_size * it, cf);
 		if (mTileTextureHandle != -1) {
 			TextureHelper.deleteTexture(mActivityContext, mTileTextureHandle);
 			mTileTextureHandle = -1;
@@ -738,12 +779,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mTilePoll[logoTileIdx].dataLoaded = true;
 		// draw logo, and update into texture
 		c.drawColor(0xff000000);
-		c.drawBitmap(mLogo, (Curve_Tile_Size - mLogo.getWidth()) / 2, (Curve_Tile_Size - mLogo.getHeight()) / 2, null);
+		c.drawBitmap(mLogo, (tile_size - mLogo.getWidth()) / 2, (tile_size - mLogo.getHeight()) / 2, null);
 //		mLogo.recycle();
 //		mLogo = null;
 		GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
-				Curve_Tile_Size * mTilePoll[logoTileIdx].column_idx, 
-				Curve_Tile_Size * mTilePoll[logoTileIdx].row_idx,
+				tile_size * mTilePoll[logoTileIdx].column_idx, 
+				tile_size * mTilePoll[logoTileIdx].row_idx,
 				bitmap);
 	}
 
@@ -888,11 +929,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 					mC.drawText(Integer.toString(mIdx), 0, 50, mP);
 					// zhujj: here, we should always make set the dataLoaded flag to save time. But I print the time cost is very small, and the 
 					// algorithem of change the flag is complex, so I just ignore here.
-					mTilePoll[mTileIdx].dataLoaded = mModel.updateToCanvas(mIdx, mC, Curve_Tile_Size, Curve_Tile_Size);
+					mTilePoll[mTileIdx].dataLoaded = mModel.updateToCanvas(mIdx, mC, mCurr_Tile_Size, mCurr_Tile_Size);
 					// we do not need to bind, which already bind before this called
 					GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 
-							Curve_Tile_Size * mTilePoll[mTileIdx].column_idx, 
-							Curve_Tile_Size * mTilePoll[mTileIdx].row_idx,
+							mCurr_Tile_Size * mTilePoll[mTileIdx].column_idx, 
+							mCurr_Tile_Size * mTilePoll[mTileIdx].row_idx,
 							mBitmap);
 					DsLog.e("update pixel of id: " + mIdx  + " into tile: " + mTileIdx);
 				}

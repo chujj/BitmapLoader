@@ -184,12 +184,11 @@ public class HomeData  implements IData {
 	
 	@Override
 	public boolean supportSort(int sortby) {
-		return false;
+		return false; // ZHUJJ-TODO make this flag work
 	}
 
 	@Override
 	public void sort(int flag) {
-		// ZHUJJ-TODO Auto-generated method stub
 	}
 
 	@Override
