@@ -114,7 +114,7 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private void buildMenu(Context context) {
 		mFullMenu = new DsPopMenu(context);
 		mFullMenu.setMaxColumn(1);
-		mFullMenu.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_layout_title), 0)); // ZHUJJ-FIXME update the UI
+		mFullMenu.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_layout_title), 0));
 		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_1), 1));
 		mFullMenu.addPopMenuItem(new MenuItem(context, context.getString(R.string.menu_layout_2), 2));
 		mFullMenu.addPopMenuItem(new MenuDivider(context, context.getString(R.string.menu_sort_title), 0));

@@ -84,7 +84,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 		return isRecycled;
 	}
 	
-	private static Object UniqueKey(String str) { // ZHUJJ: use same key, if size are same
+	private static Object UniqueKey(String str) { // ZHUJJ-TODO: use same key, if size are same
 		return Integer.valueOf(str.hashCode());
 	}
 

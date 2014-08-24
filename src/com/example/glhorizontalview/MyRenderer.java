@@ -696,7 +696,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		if (mCurrMode == MODE_PLANE) {
 			count = 20;
 		}
-		count = 20; // ZHUJJ for test make all tile count to 20;
+		count = 20; // ZHUJJ auto calc tile, adjust the tile size
 		count ++; // for logo
 		
 		
@@ -719,7 +719,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mTileTextureHandle = TextureHelper.loadTexture(mActivityContext, mTileBitmap);
 		mTileBitmap.recycle();
 
-		mTilePoll[logoTileIdx].markInUse(logoTileIdx); // ZHUJJ NOTE, here is some trick. Cause inUsed flag marked, the idx will not calced in reuse
+		mTilePoll[logoTileIdx].markInUse(logoTileIdx); //NOTE, here is some trick. Cause inUsed flag marked, the idx will not calced in reuse
 		mTilePoll[logoTileIdx].dataLoaded = true;
 		// draw logo, and update into texture
 		c.drawColor(0xff000000);
