@@ -94,6 +94,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				public void longClick(float x , float y , int hit) {
 
 				}
+
+				@Override
+				public void lastFrame(float offset_progress) {
+
+				}
 			};
 		}
 		mModel.currRenderView(this);
@@ -153,6 +158,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private static final int MSG_REFRESH_IDX = 0x0005;
 	private static final int MSG_EXTERNAL_RUNNABLE = 0x0006;
 	private static final int MSG_SWITCH_RENDER_MODE = 0x0007;
+	private static final int MSG_JUMP_PERCENT = 0x0008;
+	
 	
 	private ArrayList<Message> mMessagesList = new ArrayList<Message>();
 	
@@ -289,6 +296,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				// realloc texture handel
 				// redraw
 				break;
+			case MSG_JUMP_PERCENT:
+			{
+				if (inAutoAnimation) return refresh;
+				float progress = 1.0f * msg.arg1 / msg.arg2;
+				float dstoffset = calced_max_offset - progress * (calced_max_offset - calced_min_offset);
+
+				updateItems(dstoffset - mCurrOffset, 0);
+			}
+			break;
 			default:
 				break;
 			}
@@ -546,6 +562,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
 		if (inAutoAnimation) {
 			inAutoAnimation = continueAnimation();
+			if (!inAutoAnimation) { // last frame drawing
+				if (mModel != null) {
+					mModel.lastFrame((calced_max_offset - mCurrOffset) / (calced_max_offset - calced_min_offset));
+				}
+			}
 			mGLSurfaceView.requestRender();
 		}
 //		testSubTex();
@@ -986,6 +1007,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			}
 		}
 		sendMesg(Message.obtain(null, MSG_SWITCH_RENDER_MODE, mode, -1));
+	}
+	
+	public void jumpToPercent(int progress) {
+		sendMesg(Message.obtain(null, MSG_JUMP_PERCENT, progress, 100));
+	}
+	
+	public void jumpFinished() {
+		sendMesg(Message.obtain(null, MSG_FINISH));
 	}
 
 }

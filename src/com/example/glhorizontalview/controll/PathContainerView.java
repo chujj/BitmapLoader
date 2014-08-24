@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.ds.ui.DsCanvasUtil;
@@ -39,6 +40,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 	private FolderPicturesModel mModel;
 	private MyRenderer mRender;
 	private View mSwitchBtn, mHomeBtn;
+	
+	private MySeekBark mSeekbar;
 	
 	private DsPopMenuLayout mMenuLayout;
 	private DsPopMenu mFullMenu, mMenuWithoutSort;
@@ -109,6 +112,27 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mGalleryViewer.setVisibility(View.INVISIBLE);
 		
 		buildMenu(context);
+		
+		mSeekbar = new MySeekBark(context, new SeekBar.OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				mRender.jumpFinished();
+				mSeekbar.stopToSeek();
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				mSeekbar.startToSeek();
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				mRender.jumpToPercent(progress);
+			}
+		});
+		this.addView(mSeekbar);
 	}
 	
 	private void buildMenu(Context context) {
@@ -179,6 +203,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		mGLSurfaceView.layout(0, h, width, height);
 		mMenuLayout.layout(0, 0, width, height);
 		mGalleryViewer.layout(0, 0, width, height);
+		
+		mSeekbar.layout(0, height - mSeekbar.getMeasuredHeight(), width, height);
 	}
 
 	@Override
@@ -301,5 +327,9 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		
 	}
 
-	
+	public void onItemNDraw(float offset_progress) {
+		mSeekbar.setCurrProgress(offset_progress);
+		
+	}
+
 }

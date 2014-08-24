@@ -15,4 +15,6 @@ public interface GLResourceModel {
 	public void currRenderView(MyRenderer render);
 
 	public void longClick(float x , float y , int hit);
+	
+	public void lastFrame(float offset_progress);
 }

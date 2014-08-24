@@ -232,5 +232,10 @@ public class FolderPicturesModel implements GLResourceModel {
 		mPathClickListener.showMenu(menu, x, y);
 	}
 
+	@Override
+	public void lastFrame(float offset_progress) {
+		mPathClickListener.onItemNDraw(offset_progress);
+	}
+
 
 }
