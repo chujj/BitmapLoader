@@ -202,12 +202,12 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 
 	@Override
 	public void onPathChange(String abspath) {
-		mModel.loadPathContent(abspath, true);
+		mModel.loadPathContent(abspath);
 	}
 
 	public void clickAtPathFromView(String absPath) {
 		mPathSelector.setCurrPath(absPath);
-		mModel.loadPathContent(absPath, true);
+		mModel.loadPathContent(absPath);
 	}
 	
 	public void setPathOnly(String absPath) {

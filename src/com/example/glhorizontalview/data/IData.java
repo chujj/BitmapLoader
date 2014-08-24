@@ -2,6 +2,9 @@ package com.example.glhorizontalview.data;
 
 import android.graphics.Canvas;
 
+import com.example.glhorizontalview.ModelChangeCallback;
+import com.example.glhorizontalview.ModelChangeCallback.ModelState;
+
 public interface IData {
 	public static final int SORT_REVERSE = 1 << 4;
 	public static final int SORT_NAME = 1;
@@ -25,5 +28,9 @@ public interface IData {
 	public void clickAt(int hit);
 
 	public void longClick(float x , float y, int hit);
+
+	public void backToModel(ModelChangeCallback popStack);
+
+	public void goingToLeaveModel(ModelState stat);
 
 }

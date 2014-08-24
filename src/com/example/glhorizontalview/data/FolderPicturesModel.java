@@ -11,6 +11,7 @@ import android.net.Uri;
 import com.ds.bitmaputils.BitmapHelper;
 import ssc.software.picviewer.R;
 import com.example.glhorizontalview.GLResourceModel;
+import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.controll.PathContainerView;
 
@@ -46,19 +47,48 @@ public class FolderPicturesModel implements GLResourceModel {
 		return mIDataStack.peek().updateToCanvas(aIdx, mC, require_width, require_height);
 	}
 	
-	private class LoadPathRunnable implements Runnable {
+	private class LoadPathRunnable extends ModelChangeCallback {
 		private String mPath;
 		public LoadPathRunnable(String path) {
 			mPath = path;
 		}
-		
+
 		@Override
-		public void run() {
+		public void onModelChanged(ModelState stat) {
+			mIDataStack.peek().goingToLeaveModel(stat);
 			mIDataStack.push(new FolderData(FolderPicturesModel.this, mPath));
 			tellFatherTestTopOnUi();
 		}
 
 	}
+	
+	private class SortRunnable  extends ModelChangeCallback {
+		private int mSortFlag;
+		public SortRunnable(int sortflag) {
+			mSortFlag = sortflag;
+		}
+
+		@Override
+		public void onModelChanged(ModelState stat) {
+			mIDataStack.peek().sort(mSortFlag);
+		}
+
+	}
+	
+	private class PopStack extends ModelChangeCallback {
+
+		@Override
+		public void onModelChanged(ModelState stat) {
+			if (!mIDataStack.empty()) {
+				IData poped = mIDataStack.pop();
+				poped.toString();
+				mIDataStack.peek().backToModel(this);
+				tellFatherTestTopOnUi();
+			}
+
+		}
+		
+	}	
 	
 	private void tellFatherTestTopOnUi() {
 		mPathClickListener.post(new Runnable() {
@@ -70,29 +100,12 @@ public class FolderPicturesModel implements GLResourceModel {
 		});
 	}
 
-	public void loadPathContent(String path, boolean reload) {
+	public void loadPathContent(String path) {
 		LoadPathRunnable run = new LoadPathRunnable(path);
-		if (reload) {
-			mRender.modelChanged(run);
-		} else {
-			run.run();
-		}
-
-	}
-
-	private class SortRunnable implements Runnable {
-		private int mSortFlag;
-		public SortRunnable(int sortflag) {
-			mSortFlag = sortflag;
-		}
-
-		@Override
-		public void run() {
-			mIDataStack.peek().sort(mSortFlag);
-		}
 		
+		mRender.modelChanged(run);
 	}
-	
+
 	public boolean supportSort() {
 		return mIDataStack.peek().supportSort(-1);
 	}
@@ -133,20 +146,7 @@ public class FolderPicturesModel implements GLResourceModel {
 		
 		mPathClickListener.clickAtPathFromView(nextAbsPath);
 	}
-	
-	private class PopStack implements Runnable {
 
-		@Override
-		public void run() {
-			if (!mIDataStack.empty()) {
-				IData poped = mIDataStack.pop();
-				poped.toString();
-				tellFatherTestTopOnUi();
-			}
-		}
-		
-	}
-	
 	public String getPath() {
 		if (mIDataStack.peek() instanceof FolderData) {
 			return ((FolderData)mIDataStack.peek()).getmPath();

@@ -24,6 +24,8 @@ import android.os.Message;
 
 import com.ds.io.DsLog;
 import com.ds.views.MyScroller;
+import com.example.glhorizontalview.ModelChangeCallback.ModelState;
+
 import ssc.software.picviewer.R;
 import com.learnopengles.android.common.RawResourceReader;
 import com.learnopengles.android.common.ShaderHelper;
@@ -236,28 +238,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				float viewport_offset_x_percent = msg.getData().getFloat("viewport_offset_x_percent");
 				float viewport_offset_y_percent = msg.getData().getFloat("viewport_offset_y_percent");
 
-				int hit = -1;
-				if (mCurrMode == MODE_CURVE) {
-					if ( (Math.abs(viewport_offset_y_percent - 0.5f) / 0.5)< TOP_PERCENT && 
-							(Math.abs(viewport_offset_x_percent - 0.5f) / 0.5)< LEFT_PERCENT) {
-						hit = (int) (-mCurrOffset / Distance);
-					}
-				} else {
-					float dx = (PLANE_VISIABLE_NEAR_X_END - PLANE_VISIABLE_NEAR_X_START) * viewport_offset_x_percent + PLANE_VISIABLE_NEAR_X_START;
-					int idx = -1;
-					for (int i = 0; i < items.length; i+= PLANE_ROW_COUNT) {
-						if( (dx > items[i].offsetX - PLAN_HALF_WIDTH_FIXED) && (dx < items[i].offsetX + PLAN_HALF_WIDTH_FIXED)) {
-							idx = i;
-							break;
-						}
-					}
-					if (idx != -1) {
-						int _offset_y = (int) ((1 - viewport_offset_y_percent )/ (1.0f / PLANE_ROW_COUNT));
-						hit = idx + _offset_y;
-					} else {
-						hit = -1;
-					}
-				}
+				int hit = testHit(viewport_offset_x_percent, viewport_offset_y_percent);
 				if (inAutoAnimation) hit = -1;
 				Bundle b = msg.getData();
 				b.putInt("hit", hit);
@@ -269,10 +250,18 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			case MSG_MODEL_RELOAD:
 //				DsLog.e("eventHub modelReload");
 				mMessagesList.clear();
-				if (msg.obj != null)
-					((Runnable)msg.obj).run();
+				float next_offset_x = 0;;
+				if (msg.obj != null) {
+					ModelChangeCallback callback = ((ModelChangeCallback)msg.obj); 
+					callback.onModelChanged(new ModelState(testHit(0.5f, 0.5f), mCurrOffset, mCurrMode));
+					if (callback.mStat != null) {
+						mCurrMode = callback.mStat.lastRenderMode;
+						next_offset_x = callback.mStat.lastOffset;
+						callback.mStat = null;
+					}
+				}
 				initDimensionLimit();
-				updateItems(0, 0);
+				updateItems(next_offset_x, 0);
 				break;
 			case MSG_REFRESH_IDX:
 //				DsLog.e("eventHub refreshIdx");
@@ -305,6 +294,32 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			}
 			return refresh;
 		}
+	}
+	
+	private int testHit(float nearPerX, float nearPerY) {
+		int hit = -1;
+		if (mCurrMode == MODE_CURVE) {
+			if ( (Math.abs(nearPerY - 0.5f) / 0.5)< TOP_PERCENT && 
+					(Math.abs(nearPerX - 0.5f) / 0.5)< LEFT_PERCENT) {
+				hit = (int) (-mCurrOffset / Distance);
+			}
+		} else {
+			float dx = (PLANE_VISIABLE_NEAR_X_END - PLANE_VISIABLE_NEAR_X_START) * nearPerX + PLANE_VISIABLE_NEAR_X_START;
+			int idx = -1;
+			for (int i = 0; i < items.length; i+= PLANE_ROW_COUNT) {
+				if( (dx > items[i].offsetX - PLAN_HALF_WIDTH_FIXED) && (dx < items[i].offsetX + PLAN_HALF_WIDTH_FIXED)) {
+					idx = i;
+					break;
+				}
+			}
+			if (idx != -1) {
+				int _offset_y = (int) ((1 - nearPerY )/ (1.0f / PLANE_ROW_COUNT));
+				hit = idx + _offset_y;
+			} else {
+				hit = -1;
+			}
+		}
+		return hit;
 	}
 	private Runnable rollback_routinue_msg = new Runnable() {
 
@@ -913,10 +928,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		}
 	}
 
-	public void modelChanged(Runnable run) {
-		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD, run));
+	public void modelChanged(ModelChangeCallback callback) {
+		sendMesg(Message.obtain(null, MSG_MODEL_RELOAD, callback));
 	}
-	
+
 	public void refreshIdx(int idxToRefresh) {
 		sendMesg(Message.obtain(null, MSG_REFRESH_IDX, idxToRefresh, -1));
 	}

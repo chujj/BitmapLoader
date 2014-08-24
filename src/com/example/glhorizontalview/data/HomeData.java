@@ -19,6 +19,9 @@ import android.os.Environment;
 import android.widget.Toast;
 
 import ssc.software.picviewer.R;
+
+import com.example.glhorizontalview.ModelChangeCallback;
+import com.example.glhorizontalview.ModelChangeCallback.ModelState;
 import com.example.glhorizontalview.controll.PathContainerView;
 
 import ds.android.ui.core.DsPopMenu;
@@ -327,6 +330,20 @@ public class HomeData  implements IData {
 			
 		}
 		
+	}
+
+	private ModelState mLeaveStat;
+	@Override
+	public void goingToLeaveModel(ModelState stat) {
+		mLeaveStat = stat;
+	}
+
+	@Override
+	public void backToModel(ModelChangeCallback popStack) {
+		if (mLeaveStat != null) {
+			popStack.setState(mLeaveStat);
+			mLeaveStat = null;
+		}
 	}
 
 

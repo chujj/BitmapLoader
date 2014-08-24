@@ -12,6 +12,8 @@ import android.graphics.Rect;
 import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
+import com.example.glhorizontalview.ModelChangeCallback;
+import com.example.glhorizontalview.ModelChangeCallback.ModelState;
 import com.example.glhorizontalview.controll.MyPagerAdapter;
 
 public class FolderData implements IData {
@@ -174,6 +176,20 @@ public class FolderData implements IData {
 		Item it = mKeys[hit];
 		
 		mFather.showMenuForFolder(this, it.absPath, it.fName, it.isFolder, x, y);
+	}
+
+	private ModelState mLeaveStat;
+	@Override
+	public void goingToLeaveModel(ModelState stat) {
+		mLeaveStat = stat;
+	}
+
+	@Override
+	public void backToModel(ModelChangeCallback popStack) {
+		if (mLeaveStat != null) {
+			popStack.setState(mLeaveStat);
+			mLeaveStat = null;
+		}
 	}
 
 }
