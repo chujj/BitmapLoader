@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.ds.bitmaputils.BitmapHelper;
+import com.ds.jni.JniImpl;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 
@@ -15,6 +16,7 @@ public class PathViewerActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		JniImpl.NativeOnCreate(this);
 		UmengUpdateAgent.update(this.getApplicationContext());
 		
 		setContentView(mContentView = new PathContainerView(this));

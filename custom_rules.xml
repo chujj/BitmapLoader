@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="custom_rules" default="-pre-build">
+  <target name="-pre-build">
+
+    <echo level="info"> Copy reslibs</echo>
+    <copy file="reslibs/armeabi/libdsjni.so" 
+	  tofile="libs/armeabi/libdsjni.so" overwrite="true" failonerror="true" />
+    <copy file="reslibs/armeabi-v7a/libdsjni.so" 
+	  tofile="libs/armeabi-v7a/libdsjni.so" overwrite="true" failonerror="true" />
+    <copy file="reslibs/mips/libdsjni.so" 
+	  tofile="libs/mips/libdsjni.so" overwrite="true" failonerror="true" />
+    <copy file="reslibs/x86/libdsjni.so" 
+	  tofile="libs/x86/libdsjni.so" overwrite="true" failonerror="true" />
+  </target>
+</project>
