@@ -30,6 +30,7 @@ import ds.android.ui.core.DsPopMenu.DsPopMenuClickListener;
 public class HomeData  implements IData {
 	private final static String serilized_file_name = "home_ticket";
 	private final static float TEXT_AREA_HEIGHT_PERCENT_OF_FOLDERBITMAP = 0.125f; // crop height from folder.png
+	private final static String BOARD_MARK = "boards";
 	
 	private static final boolean debug_background = false;
 	
@@ -124,6 +125,14 @@ public class HomeData  implements IData {
 		File rootsd = Environment.getExternalStorageDirectory();
 		HomeItem it = null;
 		
+		{// default, boards model
+			it = new HomeItem();
+			it.mShortName = BOARD_MARK;
+			it.mType = TYPE_URI;
+			it.mDefine = BOARD_MARK;
+			mItems.add(it);
+		}
+
 		if (rootsd.exists()) {
 			// DCIM
 			File dcim_dir = new File(rootsd.getAbsolutePath() , Environment.DIRECTORY_DCIM);
@@ -237,6 +246,11 @@ public class HomeData  implements IData {
 		HomeItem it = mItems.get(hit);
 		if (it.mType == TYPE_PATH_DEFAULT || it.mType == TYPE_PATH_FAV) {
 			mFather.clickAtPathInside(this, hit, it.mDefine);
+		} else if (it.mType == TYPE_URI){
+			if (it.mDefine.startsWith(BOARD_MARK)) {
+				// start boards model
+				mFather.clickAtBoards();
+			}
 		} else {
 			; // ZHUJJ-TODO, add more actions
 		}

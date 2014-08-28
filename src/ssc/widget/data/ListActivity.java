@@ -31,7 +31,7 @@ public class ListActivity extends Activity {
 		if (supportsEs2) {
 			mGLSurfaceView.setEGLContextClientVersion(2);
 			mGLSurfaceView.setRenderer(new MyRenderer(this, mGLSurfaceView, 
-					new BoardsModel(this)
+					new BoardsModel(this, null)
 					));
 		} else {
 			return;

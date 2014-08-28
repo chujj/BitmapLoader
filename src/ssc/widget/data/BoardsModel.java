@@ -5,13 +5,16 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.Looper;
 
 import com.ds.bitmaputils.BitmapNetGetter;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
+import com.example.glhorizontalview.ModelChangeCallback.ModelState;
 import com.example.glhorizontalview.MyRenderer;
+import com.example.glhorizontalview.data.IData;
 
-public class BoardsModel implements GLResourceModel {
+public class BoardsModel implements GLResourceModel, IData {
 
 	private Context mContext;
 	private MyRenderer mMyRenderer;
@@ -19,12 +22,13 @@ public class BoardsModel implements GLResourceModel {
 	
 	public HBoard[] mBoardsRef;
 	
-	public BoardsModel(Context context) {
+	public BoardsModel(Context context, MyRenderer render) {
 		mContext = context;
 		mRect = new Rect();
+		mMyRenderer = render;
 
-		new Handler().postDelayed(new Runnable() {
-			
+		Runnable action = new Runnable() {
+
 			@Override
 			public void run() {
 				mMyRenderer.modelChanged(new ModelChangeCallback() {
@@ -34,7 +38,13 @@ public class BoardsModel implements GLResourceModel {
 					}
 				});
 			}
-		}, 500);
+		};
+		
+		if (Looper.getMainLooper() == Looper.myLooper()) {
+			new Handler().postDelayed(action, 500);
+		} else {
+			action.run();
+		}
 	}
 	
 	private void getBoards() {
@@ -93,6 +103,31 @@ public class BoardsModel implements GLResourceModel {
 	@Override
 	public void lastFrame(float offset_progress) {
 
+	}
+
+	//////////////////////////////// IData Interface ////////////////////////////////
+	@Override
+	public boolean supportSort(int sortby) {
+		// ZHUJJ Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void sort(int flag) {
+		// ZHUJJ Auto-generated method stub
+		
+	}
+
+	@Override
+	public void backToModel(ModelChangeCallback popStack) {
+		// ZHUJJ Auto-generated method stub
+		
+	}
+
+	@Override
+	public void goingToLeaveModel(ModelState stat) {
+		// ZHUJJ Auto-generated method stub
+		
 	}
 
 }

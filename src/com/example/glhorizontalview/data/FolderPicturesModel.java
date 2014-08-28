@@ -10,6 +10,8 @@ import android.net.Uri;
 
 import com.ds.bitmaputils.BitmapHelper;
 import ssc.software.picviewer.R;
+import ssc.widget.data.BoardsModel;
+
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.MyRenderer;
@@ -145,6 +147,21 @@ public class FolderPicturesModel implements GLResourceModel {
 		if (folderData == null || mIDataStack.peek() != folderData) return;
 		
 		mPathClickListener.clickAtPathFromView(nextAbsPath);
+	}
+	
+	
+	private class LoadBoardsRunnable extends ModelChangeCallback {
+		@Override
+		public void onModelChanged(ModelState stat) {
+			mIDataStack.peek().goingToLeaveModel(stat);
+			mIDataStack.push(new BoardsModel(mContext, mRender));
+			tellFatherTestTopOnUi();
+		}
+	}
+
+	public void clickAtBoards() {
+		LoadBoardsRunnable run = new LoadBoardsRunnable();
+		mRender.modelChanged(run);
 	}
 
 	public String getPath() {
