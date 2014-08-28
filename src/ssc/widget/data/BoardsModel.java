@@ -1,10 +1,12 @@
 package ssc.widget.data;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Handler;
 
+import com.ds.bitmaputils.BitmapNetGetter;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.MyRenderer;
@@ -53,8 +55,23 @@ public class BoardsModel implements GLResourceModel {
 	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
+		if (aIdx > mBoardsRef.length) return false;
+		
 		mRect.set(0, 0, require_width, require_height);
 		mC.drawColor(0xff880000);
+
+		if (mBoardsRef[aIdx]._cover_image == null) {
+			
+		} else {
+			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoardsRef[aIdx]._cover_image, null);
+			if (bitmap != null) {
+				mRect.set(0, 0, require_width, require_height);
+				mC.drawBitmap(bitmap, null, mRect, null);
+			} else {
+				return false;
+			}
+		}
+		
 		return true;
 	}
 

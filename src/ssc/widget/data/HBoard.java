@@ -17,7 +17,7 @@ public class HBoard {
 
 	private JSONObject mJsonObject;
 	private Cover mCover;
-	private ImageFile mImage;
+	public ImageFile _cover_image;
 	private HPin[] mPins;
 	
 	public HBoard(JSONObject jsonObject) throws JSONException {
@@ -53,7 +53,7 @@ public class HBoard {
 		public final static String KEY_RAW_TEXT = "raw_text";
 		public Cover (JSONObject jsonObject) throws JSONException {
 			if (jsonObject.has(KEY_FILE)) {
-				mImage = new ImageFile(jsonObject.getJSONObject(KEY_FILE));
+				_cover_image = new ImageFile(jsonObject.getJSONObject(KEY_FILE));
 			}
 		}
 	}
@@ -69,11 +69,11 @@ public class HBoard {
 		sb.append(_descript);
 		sb.append(" | ");
 		sb.append(_pin_count);
-		if (mImage != null) {
+		if (_cover_image != null) {
 			sb.append(" | ");
-			sb.append(mImage._key);
+			sb.append(_cover_image._key);
 			sb.append(" | ");
-			sb.append(mImage._width + "," + mImage._height);
+			sb.append(_cover_image._width + "," + _cover_image._height);
 		}
 		return sb.toString();
 	}

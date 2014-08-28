@@ -7,6 +7,7 @@ import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 
+import com.ds.bitmaputils.BitmapHelper;
 import com.example.glhorizontalview.MyGLSurfaceView;
 import com.example.glhorizontalview.MyRenderer;
 
@@ -19,7 +20,7 @@ public class ListActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-
+		BitmapHelper.getInstance(this);
 		mGLSurfaceView = new MyGLSurfaceView(this);
 
 		// Check if the system supports OpenGL ES 2.0.

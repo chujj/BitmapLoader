@@ -2,8 +2,11 @@ package ssc.widget.data;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import com.jakewharton.disklrucache.DiskLruCache;
 
 import android.content.Context;
 
@@ -24,9 +27,26 @@ public class UserDataManager {
 	}
 
 	private UserDataGroup mDataController;
+	protected DiskLruCache mCache;
 
 	private UserDataManager(Context context) {
+		prepareCache(context);
 		loadData(context, true);
+	}
+	
+	private void prepareCache(Context context) {
+		DiskLruCache cache = null;
+		try {
+			cache = DiskLruCache.open(context.getCacheDir(), 1, 1, 1024 * 1024 * 20);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if (cache  == null) {
+			throw new RuntimeException("cache init error");
+		}
+		
+		mCache  = cache;
 	}
 	
 	private void loadData(Context context, boolean queryNet) {
