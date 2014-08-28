@@ -1,3 +1,7 @@
+[submodule "DiskLruCache"]
+	   path = subprjs/DiskLruCache
+	   url = https://github.com/JakeWharton/DiskLruCache.git
+
 [submodule "nanohttpd"]
 	   path = subprjs/nanohttpd
 	   url = https://github.com/NanoHttpd/nanohttpd.git

@@ -30,4 +30,41 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/com/jakewharton</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>src/com/jakewharton/disklrucache</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>src/com/jakewharton/disklrucache/DiskLruCache.java</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/subprjs/DiskLruCache/src/main/java/com/jakewharton/disklrucache/DiskLruCache.java</locationURI>
+		</link>
+		<link>
+			<name>src/com/jakewharton/disklrucache/DiskLruCacheTest.java</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/subprjs/DiskLruCache/src/test/java/com/jakewharton/disklrucache/DiskLruCacheTest.java</locationURI>
+		</link>
+		<link>
+			<name>src/com/jakewharton/disklrucache/StrictLineReader.java</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/subprjs/DiskLruCache/src/main/java/com/jakewharton/disklrucache/StrictLineReader.java</locationURI>
+		</link>
+		<link>
+			<name>src/com/jakewharton/disklrucache/StrictLineReaderTest.java</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/subprjs/DiskLruCache/src/test/java/com/jakewharton/disklrucache/StrictLineReaderTest.java</locationURI>
+		</link>
+		<link>
+			<name>src/com/jakewharton/disklrucache/Util.java</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/subprjs/DiskLruCache/src/main/java/com/jakewharton/disklrucache/Util.java</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
