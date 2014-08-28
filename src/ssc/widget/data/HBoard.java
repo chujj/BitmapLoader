@@ -18,7 +18,7 @@ public class HBoard {
 	private JSONObject mJsonObject;
 	private Cover mCover;
 	private ImageFile mImage;
-	private Pin[] mPins;
+	private HPin[] mPins;
 	
 	public HBoard(JSONObject jsonObject) throws JSONException {
 		mJsonObject = jsonObject;
@@ -38,9 +38,9 @@ public class HBoard {
 
 	private void loadPins(JSONObject jsonObject) throws JSONException {
 		JSONArray pins = jsonObject.getJSONArray(KEY_PINS);
-		mPins = new Pin[pins.length()];
+		mPins = new HPin[pins.length()];
 		for (int i = 0; i < mPins.length; i++) {
-			mPins[i] = new Pin(pins.getJSONObject(i));
+			mPins[i] = new HPin(pins.getJSONObject(i));
 		}
 	}
 

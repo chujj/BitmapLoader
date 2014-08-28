@@ -1,10 +1,5 @@
 package ssc.widget.data;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -16,10 +11,11 @@ import com.example.glhorizontalview.MyRenderer;
 
 public class BoardsModel implements GLResourceModel {
 
-
 	private Context mContext;
 	private MyRenderer mMyRenderer;
 	private Rect mRect;
+	
+	public HBoard[] mBoardsRef;
 	
 	public BoardsModel(Context context) {
 		mContext = context;
@@ -41,12 +37,17 @@ public class BoardsModel implements GLResourceModel {
 	
 	private void getBoards() {
 		UserDataManager.init(mContext);
+		mBoardsRef = UserDataManager.getInstance().getBoards();
 	}
 
 
 	@Override
 	public int getCount() {
-		return 0;
+		if (mBoardsRef == null) {
+			return 0;
+		} else {
+			return mBoardsRef.length;
+		}
 	}
 
 	@Override

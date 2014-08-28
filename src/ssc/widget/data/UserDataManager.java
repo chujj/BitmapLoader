@@ -22,21 +22,23 @@ public class UserDataManager {
 	public static UserDataManager getInstance() {
 		return sInstance;
 	}
-	
-	
-	private UserDataManager(Context context) {
-		UserDataGroup localcache_result = loadLocalUserBoardsCache(context); // boards
 
-		UserDataGroup net_result = queryNetUserBoards(context);
-		if (net_result.newerThan(localcache_result)) {
-			localcache_result.mergeNetData(net_result);
-			mDataController = localcache_result;
-			writeToLocalCache(context, localcache_result);
-		} else {
-			mDataController = localcache_result; // notheng
-		}
+	private UserDataGroup mDataController;
+
+	private UserDataManager(Context context) {
+		loadData(context, true);
 	}
 	
+	private void loadData(Context context, boolean queryNet) {
+		mDataController = loadLocalUserBoardsCache(context);
+		
+		UserDataGroup net_result = queryNetUserBoards(context);
+		
+		mDataController = UserDataGroup.mergeNetData(net_result, mDataController);
+		if (mDataController.isSthMerged) {
+			writeToLocalCache(context, mDataController);
+		}
+	}
 
 	private UserDataGroup queryNetUserBoards(Context listActivity) {
 		String data = queryNet(boardsUrl);
@@ -94,5 +96,9 @@ public class UserDataManager {
 		}
 
 		return retval;
+	}
+
+	public HBoard[] getBoards() {
+		return mDataController.mHBoard;
 	}	
 }
