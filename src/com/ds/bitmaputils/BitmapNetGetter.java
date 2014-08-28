@@ -132,7 +132,11 @@ public class BitmapNetGetter {
 				Bitmap bitmap = null;
 				
 				// read local
-				bitmap = getBitmapFromFile(task);
+				if (task.useLocalStreamCache()) {
+					bitmap = task.decodeFromLocalStream();
+				} else {
+					bitmap = getBitmapFromFile(task);
+				}
 				
 				// LOG_OUT file or net
 //				if (bitmap != null) {
@@ -145,8 +149,12 @@ public class BitmapNetGetter {
 					//remote
 					bitmap = getBitmapFromNet(task.getNetUrl());
 					if (bitmap != null) {
-						String path2File = saveBitmapToFile(task, bitmap);
-						task.saveFileSystemPath(path2File);
+						if (task.saveBitmapByTaskself()) {
+							task.saveBitmap(bitmap);
+						} else {
+							String path2File = saveBitmapToFile(task, bitmap);
+							task.saveFileSystemPath(path2File);
+						}
 					}
 				}
 				getInstance().mBitmapCache.put(task.getTaskKey(), bitmap);

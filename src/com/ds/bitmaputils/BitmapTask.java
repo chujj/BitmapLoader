@@ -1,5 +1,7 @@
 package com.ds.bitmaputils;
 
+import android.graphics.Bitmap;
+
 public interface BitmapTask {
 	/**
 	 * The uniq key, which should always same the different sessions. An
@@ -16,6 +18,14 @@ public interface BitmapTask {
 	 */
 	public String getNetUrl();
 
+	/** if true, will read from task's stream, instead of local file.
+	 * @return
+	 */
+	public boolean useLocalStreamCache();
+	/** decodeAsTask's stream
+	 * @return
+	 */
+	public Bitmap decodeFromLocalStream();
 	/**
 	 * the abs path, tell by last call of @saveFileSystemPath, or null
 	 * 
@@ -30,6 +40,14 @@ public interface BitmapTask {
 	 */
 	public void saveNetUrl(String aUrl);
 
+	/** If let task self handle cache?
+	 * @return
+	 */
+	public boolean saveBitmapByTaskself();
+	/** called if task decide handle save cache self
+	 * @param bitmap
+	 */
+	public void saveBitmap(Bitmap bitmap);
 	/**
 	 * call then cached in local fs, the fs path given
 	 * 
@@ -39,4 +57,8 @@ public interface BitmapTask {
 	
 	public int getBitmapMaxWidth();
 	public int getBitmapMaxHeight();
+
+
+	
+
 }

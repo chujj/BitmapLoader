@@ -157,4 +157,26 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 		lastAccessTime = 0;
 		accessCount = 0;
 	}
+
+	@Override
+	public boolean useLocalStreamCache() {
+		// should not support here
+		return false;
+	}
+
+	@Override
+	public Bitmap decodeFromLocalStream() {
+		int a = 1 / 0;
+		return null;
+	}
+
+	@Override
+	public boolean saveBitmapByTaskself() {
+		return false;// should not support here
+	}
+
+	@Override
+	public void saveBitmap(Bitmap bitmap) {
+		int a = 1 / 0;
+	}
 }
