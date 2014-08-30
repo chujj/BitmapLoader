@@ -7,7 +7,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.ds.io.DsLog;
 
 public class UserDataGroup {
 
@@ -104,6 +108,40 @@ public class UserDataGroup {
 			e.printStackTrace();
 		}
 
+	}
+	
+//	final static String boadrs_ping_url = "http://api.huaban.com/boards/17227439/pins?limit=6&wfl=1";
+//	http://api.huaban.com/boards/17227439/pins?wfl=1
+	private static String buildQueryPinsUrl(long boardId) {
+		String retval = "http://api.huaban.com/boards/";
+		retval += boardId;
+		retval += "/pins?wfl=1";
+		return retval;
+	}
+	
+	public void queryAllPinsInBoards() {
+		for (int i = 0; i < mHBoard.length; i++) {
+			HBoard board = mHBoard[i];
+			if (board._pin_count == 0 || (board.mPins.length >= board._pin_count)) {
+				continue;
+			}
+			
+			HPin[] pins = null;
+			String data = UserDataManager.queryNet(buildQueryPinsUrl(board._id));
+			JSONObject pinsobj = null;
+			try {
+				pinsobj = new JSONObject(data);
+				pins = HBoard.loadPins(pinsobj);
+				if (pins == null || pins.length != board._pin_count) {
+					DsLog.e("query pins failed! for board: " + board._id + " get count: " + (pins == null ? "null" : pins.length) + " hope: " + board._pin_count);
+					continue;
+				}
+
+				board.switchPinsData(pinsobj, pins);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

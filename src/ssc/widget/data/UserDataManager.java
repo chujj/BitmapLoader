@@ -13,7 +13,7 @@ import android.content.Context;
 public class UserDataManager {
 	final static int userID = 13189445;
 	final static String boardsUrl = "http://api.huaban.com/users/" + userID + "/boards";
-	
+
 	private static UserDataManager sInstance;
 
 	public synchronized static void init(Context context) {
@@ -56,6 +56,7 @@ public class UserDataManager {
 		
 		mDataController = UserDataGroup.mergeNetData(net_result, mDataController);
 		if (mDataController.isSthMerged) {
+			mDataController.queryAllPinsInBoards();
 			writeToLocalCache(context, mDataController);
 		}
 	}
@@ -91,7 +92,7 @@ public class UserDataManager {
 
 	}
 
-	private static String queryNet(String aUrl) {
+	public static String queryNet(String aUrl) {
 		ByteArrayOutputStream mBuffer = new ByteArrayOutputStream();
 		int BUFFER_LENGTH = 500;
 		byte[] buffer = new byte[BUFFER_LENGTH];

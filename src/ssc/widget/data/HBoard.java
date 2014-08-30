@@ -33,15 +33,23 @@ public class HBoard {
 		_pin_count = jsonObject.getInt(KEY_PIN_COUNT);
 		_update_timestamp = jsonObject.getLong(KEY_UPDATE_TIME);
 		
-		loadPins(jsonObject);
+		mPins = loadPins(jsonObject);
 	}
 
-	private void loadPins(JSONObject jsonObject) throws JSONException {
+	public static HPin[] loadPins(JSONObject jsonObject) throws JSONException {
+		HPin[] array;
 		JSONArray pins = jsonObject.getJSONArray(KEY_PINS);
-		mPins = new HPin[pins.length()];
-		for (int i = 0; i < mPins.length; i++) {
-			mPins[i] = new HPin(pins.getJSONObject(i));
+		array = new HPin[pins.length()];
+		for (int i = 0; i < array.length; i++) {
+			array[i] = new HPin(pins.getJSONObject(i));
 		}
+		return array;
+	}
+	
+	public void switchPinsData(JSONObject pinsobj, HPin[] pins) throws JSONException {
+		mJsonObject.remove(KEY_PINS);
+		mJsonObject.put(KEY_PINS, pinsobj.getJSONArray(KEY_PINS));
+		mPins = pins;
 	}
 
 	public Cover getCover() {
@@ -95,4 +103,5 @@ public class HBoard {
 		String beforeurl = QUERY_URL + _id + "/pins?limit=20&wfl=1&min=" + beforeWhichPin;
 		// ZHUJJ implement
 	}
+
 }
