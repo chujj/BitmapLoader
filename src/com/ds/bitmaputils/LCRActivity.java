@@ -131,19 +131,19 @@ public class LCRActivity extends Activity {
 		
 		@Override
 		public String getFileSystemPath() {
-			// ZHUJJ Auto-generated method stub
+			
 			return null;
 		}
 		
 		@Override
 		public int getBitmapMaxWidth() {
-			// ZHUJJ Auto-generated method stub
+			
 			return 0;
 		}
 		
 		@Override
 		public int getBitmapMaxHeight() {
-			// ZHUJJ Auto-generated method stub
+			
 			return 0;
 		}
 

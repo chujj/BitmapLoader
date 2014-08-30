@@ -4,11 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import com.ds.bitmaputils.BitmapHelper;
 import com.ds.bitmaputils.BitmapNetGetter;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.ModelChangeCallback.ModelState;
 import com.example.glhorizontalview.MyRenderer;
+import com.example.glhorizontalview.controll.MyPagerAdapter;
 import com.example.glhorizontalview.data.FolderPicturesModel;
 import com.example.glhorizontalview.data.IData;
 
@@ -30,7 +32,7 @@ public class PinsModel implements GLResourceModel, IData {
 
 	@Override
 	public int getCount() {
-		return mBoard._pin_count;
+		return mBoard.mPins.length;
 	}
 
 	@Override
@@ -42,13 +44,14 @@ public class PinsModel implements GLResourceModel, IData {
 		mC.drawColor(0xff880000);
 
 		if (mBoard.mPins[aIdx]._img == null) {
-			
+			return false;
 		} else {
 			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoard.mPins[aIdx]._img, null);
 			if (bitmap != null) {
 				mRect.set(0, 0, require_width, require_height);
 				mC.drawBitmap(bitmap, null, mRect, null);
 			} else {
+				mMyRenderer.refreshIdx(aIdx); // ZHUJJ cause last call of BitmapGetTask doesn't have call back. So we force refresh here
 				return false;
 			}
 		}
@@ -58,8 +61,15 @@ public class PinsModel implements GLResourceModel, IData {
 
 	@Override
 	public void clickAt(int hit) {
-		// ZHUJJ Auto-generated method stub
-		
+		if (mBoard.mPins[hit]._img != null) {
+//			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoard.mPins[hit]._img, null);
+//			if (bitmap != null) {
+//				
+//				mFather.mPathClickListener.showGallery(new MyPagerAdapter(mFather
+//						.getContext(), bitmap));
+//			} 
+		}
+
 	}
 
 	@Override
@@ -69,37 +79,37 @@ public class PinsModel implements GLResourceModel, IData {
 
 	@Override
 	public void longClick(float x, float y, int hit) {
-		// ZHUJJ Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void lastFrame(float offset_progress) {
-		// ZHUJJ Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public boolean supportSort(int sortby) {
-		// ZHUJJ Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public void sort(int flag) {
-		// ZHUJJ Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void backToModel(ModelChangeCallback popStack) {
-		// ZHUJJ Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void goingToLeaveModel(ModelState stat) {
-		// ZHUJJ Auto-generated method stub
+		
 
 	}
 }

@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapNetGetter;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
@@ -74,13 +75,14 @@ public class BoardsModel implements GLResourceModel, IData {
 		mC.drawColor(0xff880000);
 
 		if (mBoardsRef[aIdx]._cover_image == null) {
-			
+			return false;
 		} else {
 			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoardsRef[aIdx]._cover_image, null);
 			if (bitmap != null) {
 				mRect.set(0, 0, require_width, require_height);
 				mC.drawBitmap(bitmap, null, mRect, null);
 			} else {
+				mMyRenderer.refreshIdx(aIdx); // ZHUJJ cause last call of BitmapGetTask doesn't have call back. So we force refresh here
 				return false;
 			}
 		}
@@ -111,14 +113,11 @@ public class BoardsModel implements GLResourceModel, IData {
 	//////////////////////////////// IData Interface ////////////////////////////////
 	@Override
 	public boolean supportSort(int sortby) {
-		// ZHUJJ Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void sort(int flag) {
-		// ZHUJJ Auto-generated method stub
-		
 	}
 
 	private ModelState mLeaveStat;
