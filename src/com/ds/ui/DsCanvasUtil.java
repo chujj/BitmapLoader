@@ -1,8 +1,11 @@
 package com.ds.ui;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 /** 提供绘图相关的公共方法 */
@@ -372,5 +375,22 @@ public final class DsCanvasUtil {
 		path.lineTo(aX + aWidth, aY + aHeight);
 
 		return path;
+	}
+	
+	public static void drawToCenterOfCanvas(Canvas canvas, Bitmap bp, int max_width, int max_height, Rect cacheRect) {
+		final int b_w = bp.getWidth();
+		final int b_h = bp.getHeight();
+		if (b_w <= max_width && b_h <= max_height) { // center aligned
+			canvas.drawBitmap(bp, (max_width - b_w) / 2, (max_height - b_h) /2, null);
+		} else { // scaled fix given rect size
+			final float s_w = 1.0f * max_width / b_w;
+			final float s_h = 1.0f * max_height / b_h;
+			final float f_s = Math.min(s_w, s_h);
+			final int f_w = (int) (b_w * f_s);
+			final int f_h = (int) (b_h * f_s);
+			cacheRect.set(0, 0, f_w, f_h);
+			cacheRect.offset( (max_width - f_w) / 2, (max_height - f_h) / 2);
+			canvas.drawBitmap(bp, null, cacheRect, null);
+		}
 	}
 }

@@ -9,6 +9,7 @@ import android.os.Looper;
 
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapNetGetter;
+import com.ds.ui.DsCanvasUtil;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.ModelChangeCallback.ModelState;
@@ -79,8 +80,7 @@ public class BoardsModel implements GLResourceModel, IData {
 		} else {
 			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoardsRef[aIdx]._cover_image, null);
 			if (bitmap != null) {
-				mRect.set(0, 0, require_width, require_height);
-				mC.drawBitmap(bitmap, null, mRect, null);
+				DsCanvasUtil.drawToCenterOfCanvas(mC, bitmap, require_width, require_height, mRect);
 			} else {
 				mMyRenderer.refreshIdx(aIdx); // ZHUJJ cause last call of BitmapGetTask doesn't have call back. So we force refresh here
 				return false;

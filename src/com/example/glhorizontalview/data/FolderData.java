@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
+import com.ds.ui.DsCanvasUtil;
 import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.ModelChangeCallback.ModelState;
 import com.example.glhorizontalview.controll.MyPagerAdapter;
@@ -137,24 +138,12 @@ public class FolderData implements IData {
 					mKeys[aIdx].absPath);
 			Bitmap bp = abp.getBitmap(mKeys[aIdx]);
 			if (bp != null) {
-				final int b_w = bp.getWidth();
-				final int b_h = bp.getHeight();
-				if (b_w <= require_width && b_h <= require_height) { // center aligned
-					mC.drawBitmap(bp, (require_width - b_w) / 2, (require_height - b_h) /2, null);
-				} else { // scaled fix given rect size
-					final float s_w = 1.0f * require_width / b_w;
-					final float s_h = 1.0f * require_height / b_h;
-					final float f_s = Math.min(s_w, s_h);
-					final int f_w = (int) (b_w * f_s);
-					final int f_h = (int) (b_h * f_s);
-					mRect.set(0, 0, f_w, f_h);
-					mRect.offset( (require_width - f_w) / 2, (require_height - f_h) / 2);
-					mC.drawBitmap(bp, null, mRect, null);
-				}
+				DsCanvasUtil.drawToCenterOfCanvas(mC, bp, require_width, require_height, mRect);
 				validate = true;
 			} else {
 				validate = false;
 			}
+			
 		}
 
 		return validate;
