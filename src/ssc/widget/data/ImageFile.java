@@ -57,7 +57,7 @@ public class ImageFile implements BitmapTask {
 
 	@Override
 	public String getNetUrl() {
-		return remote_query_url + _key;
+		return remote_query_url;
 	}
 
 	@Override

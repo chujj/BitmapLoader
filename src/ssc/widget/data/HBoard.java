@@ -18,7 +18,7 @@ public class HBoard {
 	private JSONObject mJsonObject;
 	private Cover mCover;
 	public ImageFile _cover_image;
-	private HPin[] mPins;
+	public HPin[] mPins;
 	
 	public HBoard(JSONObject jsonObject) throws JSONException {
 		mJsonObject = jsonObject;

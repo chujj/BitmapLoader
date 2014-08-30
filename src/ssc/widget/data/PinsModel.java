@@ -1,11 +1,8 @@
 package ssc.widget.data;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.ds.bitmaputils.BitmapNetGetter;
 import com.example.glhorizontalview.GLResourceModel;
@@ -15,68 +12,39 @@ import com.example.glhorizontalview.MyRenderer;
 import com.example.glhorizontalview.data.FolderPicturesModel;
 import com.example.glhorizontalview.data.IData;
 
-public class BoardsModel implements GLResourceModel, IData {
+public class PinsModel implements GLResourceModel, IData {
 
-	private Context mContext;
+	private FolderPicturesModel mFather;
 	private MyRenderer mMyRenderer;
 	private Rect mRect;
+	private HBoard mBoard;
 	
-	public HBoard[] mBoardsRef;
-	private FolderPicturesModel mFather;
-	
-	public BoardsModel(FolderPicturesModel father, MyRenderer render) {
-		mFather = father;
+
+	public PinsModel(FolderPicturesModel folderPicturesModel,
+			MyRenderer render, HBoard board) {
+		mFather = folderPicturesModel;
 		mRect = new Rect();
 		mMyRenderer = render;
-		mContext = father.getContext();
-
-		Runnable action = new Runnable() {
-
-			@Override
-			public void run() {
-				mMyRenderer.modelChanged(new ModelChangeCallback() {
-					@Override
-					public void onModelChanged(ModelState stat) {
-						getBoards();
-					}
-				});
-			}
-		};
-		
-		if (Looper.getMainLooper() == Looper.myLooper()) {
-			new Handler().postDelayed(action, 500);
-		} else {
-			action.run();
-		}
+		mBoard = board;
 	}
-	
-	private void getBoards() {
-		UserDataManager.init(mContext);
-		mBoardsRef = UserDataManager.getInstance().getBoards();
-	}
-
 
 	@Override
 	public int getCount() {
-		if (mBoardsRef == null) {
-			return 0;
-		} else {
-			return mBoardsRef.length;
-		}
+		return mBoard._pin_count;
 	}
 
 	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
-		if (aIdx > mBoardsRef.length) return false;
-		
+		if (aIdx > mBoard.mPins.length) return false;
+
 		mRect.set(0, 0, require_width, require_height);
 		mC.drawColor(0xff880000);
 
-		if (mBoardsRef[aIdx]._cover_image == null) {
+		if (mBoard.mPins[aIdx]._img == null) {
 			
 		} else {
-			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoardsRef[aIdx]._cover_image, null);
+			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoard.mPins[aIdx]._img, null);
 			if (bitmap != null) {
 				mRect.set(0, 0, require_width, require_height);
 				mC.drawBitmap(bitmap, null, mRect, null);
@@ -90,7 +58,8 @@ public class BoardsModel implements GLResourceModel, IData {
 
 	@Override
 	public void clickAt(int hit) {
-		mFather.clickAtGivenBoard(mBoardsRef[hit]);
+		// ZHUJJ Auto-generated method stub
+		
 	}
 
 	@Override
@@ -100,15 +69,16 @@ public class BoardsModel implements GLResourceModel, IData {
 
 	@Override
 	public void longClick(float x, float y, int hit) {
-		// ZHUJJ implemnt
+		// ZHUJJ Auto-generated method stub
+		
 	}
 
 	@Override
 	public void lastFrame(float offset_progress) {
-
+		// ZHUJJ Auto-generated method stub
+		
 	}
 
-	//////////////////////////////// IData Interface ////////////////////////////////
 	@Override
 	public boolean supportSort(int sortby) {
 		// ZHUJJ Auto-generated method stub
@@ -118,21 +88,18 @@ public class BoardsModel implements GLResourceModel, IData {
 	@Override
 	public void sort(int flag) {
 		// ZHUJJ Auto-generated method stub
-		
-	}
 
-	private ModelState mLeaveStat;
-	@Override
-	public void goingToLeaveModel(ModelState stat) {
-		mLeaveStat = stat;
 	}
 
 	@Override
 	public void backToModel(ModelChangeCallback popStack) {
-		if (mLeaveStat != null) {
-			popStack.setState(mLeaveStat);
-			mLeaveStat = null;
-		}
+		// ZHUJJ Auto-generated method stub
+
 	}
 
+	@Override
+	public void goingToLeaveModel(ModelState stat) {
+		// ZHUJJ Auto-generated method stub
+
+	}
 }

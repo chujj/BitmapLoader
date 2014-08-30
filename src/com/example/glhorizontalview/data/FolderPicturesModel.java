@@ -11,6 +11,8 @@ import android.net.Uri;
 import com.ds.bitmaputils.BitmapHelper;
 import ssc.software.picviewer.R;
 import ssc.widget.data.BoardsModel;
+import ssc.widget.data.HBoard;
+import ssc.widget.data.PinsModel;
 
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
@@ -132,7 +134,7 @@ public class FolderPicturesModel implements GLResourceModel {
 		mRender = render;
 	}
 
-	protected Context getContext() {
+	public Context getContext() {
 		return mContext;
 	}
 
@@ -154,7 +156,7 @@ public class FolderPicturesModel implements GLResourceModel {
 		@Override
 		public void onModelChanged(ModelState stat) {
 			mIDataStack.peek().goingToLeaveModel(stat);
-			mIDataStack.push(new BoardsModel(mContext, mRender));
+			mIDataStack.push(new BoardsModel(FolderPicturesModel.this, mRender));
 			tellFatherTestTopOnUi();
 		}
 	}
@@ -164,6 +166,26 @@ public class FolderPicturesModel implements GLResourceModel {
 		mRender.modelChanged(run);
 	}
 
+	private class LoadPinRunnable extends ModelChangeCallback {
+		private HBoard mBoard;
+
+		public LoadPinRunnable(HBoard board) {
+			mBoard = board;
+		}
+
+		@Override
+		public void onModelChanged(ModelState stat) {
+			mIDataStack.peek().goingToLeaveModel(stat);
+			mIDataStack.push(new PinsModel(FolderPicturesModel.this, mRender, mBoard));
+			tellFatherTestTopOnUi();
+		}
+	}
+	
+	public void clickAtGivenBoard(HBoard board) {
+		LoadPinRunnable run = new LoadPinRunnable(board);
+		mRender.modelChanged(run);		
+	}
+	
 	public String getPath() {
 		if (mIDataStack.peek() instanceof FolderData) {
 			return ((FolderData)mIDataStack.peek()).getmPath();
