@@ -45,7 +45,12 @@ public class PinsModel implements GLResourceModel, IData {
 	public int getCount() {
 		return mBoard.mPins.length;
 	}
-
+	
+	@Override
+	public void deprecateToDraw(int aIdx) {
+		BitmapHelper.getInstance(mFather.getContext()).cancelTaskByKey(mBoard.mPins[aIdx]._img.remote_query_url, LEVEL.ORIGIN);
+	}
+	
 	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
@@ -146,9 +151,4 @@ public class PinsModel implements GLResourceModel, IData {
 			float calced_min_offset) {
 	}
 
-	@Override
-	public void deprecateToDraw(int aIdx) {
-		// ZHUJJ Auto-generated method stub
-		
-	}
 }
