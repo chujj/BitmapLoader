@@ -17,7 +17,7 @@ public class UserDataManager {
 	private static UserDataManager sInstance;
 
 	public synchronized static void init(Context context) {
-		if (sInstance != null) throw new RuntimeException("multi init");
+//		if (sInstance != null) throw new RuntimeException("multi init");
 		
 		sInstance = new UserDataManager(context);
 	}
