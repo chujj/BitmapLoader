@@ -2,7 +2,9 @@ package ssc.widget.data;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 
 import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapHelper;
@@ -23,7 +25,7 @@ public class PinsModel implements GLResourceModel, IData {
 	private MyRenderer mMyRenderer;
 	private Rect mRect;
 	private HBoard mBoard;
-	
+	private Paint mTextPaint;
 
 	public PinsModel(FolderPicturesModel folderPicturesModel,
 			MyRenderer render, HBoard board) {
@@ -31,6 +33,12 @@ public class PinsModel implements GLResourceModel, IData {
 		mRect = new Rect();
 		mMyRenderer = render;
 		mBoard = board;
+		
+		mTextPaint = new Paint();
+		mTextPaint.setTextSize(15);
+		mTextPaint.setAntiAlias(true);
+		mTextPaint.setColor(0xffc3c3c3);
+		mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 	}
 
 	@Override
@@ -41,13 +49,14 @@ public class PinsModel implements GLResourceModel, IData {
 	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
-		if (aIdx > mBoard.mPins.length) return false;
+		boolean retval = false;
+		if (aIdx > mBoard.mPins.length) return retval;
 
 		mRect.set(0, 0, require_width, require_height);
-		mC.drawColor(0xff880000);
+		mC.drawColor(0xff000000);
 
 		if (mBoard.mPins[aIdx]._img == null) {
-			return false;
+			retval = false;
 		} else {
 			AtomBitmap abitmap = BitmapHelper.getInstance(mFather.getContext()).
 					getBitmap(mBoard.mPins[aIdx]._img.remote_query_url, LEVEL.ORIGIN, true, BoardsModel.sFactory, mBoard.mPins[aIdx]._img);
@@ -55,15 +64,32 @@ public class PinsModel implements GLResourceModel, IData {
 			
 			if (bitmap != null) {
 				DsCanvasUtil.drawToCenterOfCanvas(mC, bitmap, require_width, require_height, mRect);
+				retval = true;
 			} else {
 				mMyRenderer.refreshIdx(aIdx); //cause last call of BitmapGetTask doesn't have call back. So we force refresh here
-				return false;
+				retval = false;
 			}
 		}
+		final String raw_text =  mBoard.mPins[aIdx]._raw_text;
+		drawFolderToCanvas(mC, require_width, require_height, raw_text == null ? "" : raw_text, mRect, mTextPaint);
 		
-		return true;
+		return retval;
 	}
+	
+	public static void drawFolderToCanvas(Canvas mC, int require_width,
+			int require_height, String descript, Rect mBgRect, Paint textPaint) {
 
+		float text_size = 15;
+		int max_count = (int) ((require_width  / text_size)  - 1);
+		if (descript.length() > max_count) {
+			descript = descript.subSequence(0, max_count) + "...";
+		} else {
+
+		}
+		
+		mC.drawText(descript, (require_width - textPaint.measureText(descript) ) / 2, require_height - text_size, textPaint);
+	}
+	
 	@Override
 	public void clickAt(int hit) {
 		if (mBoard.mPins[hit]._img != null) {

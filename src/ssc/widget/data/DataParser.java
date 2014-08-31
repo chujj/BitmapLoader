@@ -58,7 +58,7 @@ public class DataParser {
 			boardArray = new HBoard[boardCount];
 			for (int i = 0; i < boardArray.length; i++) {
 				boardArray[i] = new HBoard(boards.getJSONObject(i));
-				System.out.println(boardArray[i].toString());
+//				System.out.println(boardArray[i].toString());
 			}
 
 			

@@ -205,7 +205,7 @@ public class HomeData  implements IData {
 		return mItems.size();
 	}
 	
-	protected static void drawFolderToCanvas(Canvas mC, int require_width,
+	public static void drawFolderToCanvas(Canvas mC, int require_width,
 			int require_height, String descript, Rect mBgRect) {
 		mC.drawRect(mBgRect, sBgPaint);
 
