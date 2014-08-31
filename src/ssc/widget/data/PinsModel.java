@@ -4,7 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapHelper;
+import com.ds.bitmaputils.BitmapHelper.LEVEL;
 import com.ds.bitmaputils.BitmapNetGetter;
 import com.ds.ui.DsCanvasUtil;
 import com.example.glhorizontalview.GLResourceModel;
@@ -47,11 +49,14 @@ public class PinsModel implements GLResourceModel, IData {
 		if (mBoard.mPins[aIdx]._img == null) {
 			return false;
 		} else {
-			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoard.mPins[aIdx]._img, null);
+			AtomBitmap abitmap = BitmapHelper.getInstance(mFather.getContext()).
+					getBitmap(mBoard.mPins[aIdx]._img.remote_query_url, LEVEL.ORIGIN, true, BoardsModel.sFactory, mBoard.mPins[aIdx]._img);
+			Bitmap bitmap =  abitmap.getBitmap();
+			
 			if (bitmap != null) {
 				DsCanvasUtil.drawToCenterOfCanvas(mC, bitmap, require_width, require_height, mRect);
 			} else {
-				mMyRenderer.refreshIdx(aIdx); // ZHUJJ cause last call of BitmapGetTask doesn't have call back. So we force refresh here
+				mMyRenderer.refreshIdx(aIdx); //cause last call of BitmapGetTask doesn't have call back. So we force refresh here
 				return false;
 			}
 		}

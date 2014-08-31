@@ -11,11 +11,12 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 
+import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapTask;
 import com.jakewharton.disklrucache.DiskLruCache.Editor;
 import com.jakewharton.disklrucache.DiskLruCache.Snapshot;
 
-public class ImageFile implements BitmapTask {
+public class ImageFile extends AtomBitmap { // implements BitmapTask {
 	public final static String KEY_KEY = "key";
 	public final static String KEY_TYPE = "type";
 	public final static String KEY_WIDTH  = "width";
@@ -23,6 +24,7 @@ public class ImageFile implements BitmapTask {
 	
 	
 	public ImageFile(JSONObject jsonobject) throws JSONException {
+		super();
 		_width = jsonobject.getInt(KEY_WIDTH);
 		_height = jsonobject.getInt(KEY_HEIGHT);
 		_key = jsonobject.getString(KEY_KEY);

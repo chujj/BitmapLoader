@@ -20,15 +20,19 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	private LEVEL mLevel;
 	private Object unique_key;
 
-	public AtomBitmap(BitmapHelper aHalper, LEVEL level, String abspath2File, int m_width, int m_height) {
-		mFilePath = abspath2File;
-		max_width = m_width;
-		max_height = m_height;
+	protected AtomBitmap() {
 		isRecycled = false;
 		isDecodeError = false;
 		mRegistedCallback = new ArrayList<BitmapGotCallBack>();
-		aHalper.registeAtomBitmap(this);
+		BitmapHelper.sInstance.registeAtomBitmap(this);
 		size = -1;
+	}
+	
+	public AtomBitmap(BitmapHelper aHalper, LEVEL level, String abspath2File, int m_width, int m_height) {
+		this();
+		mFilePath = abspath2File;
+		max_width = m_width;
+		max_height = m_height;
 		mLevel = level;
 		
 		unique_key = UniqueKey(mFilePath + level.name());
@@ -48,7 +52,7 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	public Bitmap getBitmap(BitmapGotCallBack callback) {
 		if (mBitmap == null || isRecycled) {
 			mBitmap = BitmapNetGetter.tryGetBitmapFromUrlOrCallback(this, mInsideCallback);
-			if (mBitmap == null && !mRegistedCallback.contains(callback)) {
+			if (mBitmap == null && callback != null && !mRegistedCallback.contains(callback)) {
 				mRegistedCallback.add(callback);
 			}
 		}

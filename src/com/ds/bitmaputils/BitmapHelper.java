@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.ds.bitmaputils.Cbitmap.CustomBuildAtomBitmapFactory;
 import com.ds.theard.WorkThread;
 
 import android.content.Context;
@@ -23,7 +24,7 @@ public class BitmapHelper {
 		ORIGIN,
 	}
 	
-	private static BitmapHelper sInstance;
+	protected static BitmapHelper sInstance;
 	public static synchronized BitmapHelper getInstance(Context context) {
 		if (null == sInstance) {
 			sInstance  = new BitmapHelper(context);
@@ -55,24 +56,27 @@ public class BitmapHelper {
 		return getBitmap(path, LEVEL.THUMBNAIL);
 	}
 	
-	public Cbitmap getCbitmap(String path) {
+	
+	public AtomBitmap getBitmap(String path, LEVEL level) {
+		Cbitmap c = getCbitmap(path, false, null, null);
+
+		return c.accessBitmap(level);
+	}
+	
+	public AtomBitmap getBitmap(String path, LEVEL level, boolean custombuild, CustomBuildAtomBitmapFactory factory, Object userData) {
+		Cbitmap c = getCbitmap(path, custombuild, factory, userData);
+
+		return c.accessBitmap(level);
+	}
+
+	private Cbitmap getCbitmap(String path, boolean custombuild, CustomBuildAtomBitmapFactory factory, Object userData) {
 		Cbitmap c = mCbitmapMap.get(path);
 		if (c == null) {
-			c = new Cbitmap(this, path);
+			c = new Cbitmap(this, path, custombuild, factory, userData);
 			mCbitmapMap.put(path, c);
 		}	
 		return c;
 	}
-	
-	public AtomBitmap getBitmap(String path, LEVEL level) {
-		Cbitmap c = getCbitmap(path);
-
-		return c.accessBitmap(level);
-		
-	}
-	
-	
-	
 	public int getSize() {
 		return 0;
 	}

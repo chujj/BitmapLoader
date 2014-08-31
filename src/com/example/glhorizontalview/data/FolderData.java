@@ -154,9 +154,9 @@ public class FolderData implements IData {
 		if (mKeys[hit].isFolder) {
 			mFather.clickAtPathInside(FolderData.this, hit, mKeys[hit].absPath);
 		} else {
-			mFather.mPathClickListener.showGallery(new MyPagerAdapter(mFather
-					.getContext(), BitmapHelper.getInstance(
-					mFather.getContext()).getCbitmap(mKeys[hit].absPath)));
+//			mFather.mPathClickListener.showGallery(new MyPagerAdapter(mFather
+//					.getContext(), BitmapHelper.getInstance(
+//					mFather.getContext()).getCbitmap(mKeys[hit].absPath)));
 		}
 	}
 	

@@ -7,8 +7,12 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
+import com.ds.bitmaputils.BitmapHelper;
+import com.ds.bitmaputils.BitmapHelper.LEVEL;
 import com.ds.bitmaputils.BitmapNetGetter;
+import com.ds.bitmaputils.Cbitmap.CustomBuildAtomBitmapFactory;
 import com.ds.ui.DsCanvasUtil;
 import com.example.glhorizontalview.GLResourceModel;
 import com.example.glhorizontalview.ModelChangeCallback;
@@ -78,17 +82,30 @@ public class BoardsModel implements GLResourceModel, IData {
 		if (mBoardsRef[aIdx]._cover_image == null) {
 			return false;
 		} else {
-			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoardsRef[aIdx]._cover_image, null);
+			AtomBitmap abitmap = BitmapHelper.getInstance(mContext).
+					getBitmap(mBoardsRef[aIdx]._cover_image.remote_query_url, LEVEL.ORIGIN, true, sFactory, mBoardsRef[aIdx]._cover_image);
+			Bitmap bitmap =  abitmap.getBitmap();
 			if (bitmap != null) {
 				DsCanvasUtil.drawToCenterOfCanvas(mC, bitmap, require_width, require_height, mRect);
 			} else {
-				mMyRenderer.refreshIdx(aIdx); // ZHUJJ cause last call of BitmapGetTask doesn't have call back. So we force refresh here
+				mMyRenderer.refreshIdx(aIdx); //cause last call of BitmapGetTask doesn't have call back. So we force refresh here
 				return false;
 			}
 		}
 		
 		return true;
 	}
+	
+	protected static CustomBuildAtomBitmapFactory sFactory = new CustomBuildAtomBitmapFactory() {
+
+		@Override
+		public AtomBitmap buildAtomBitmap(LEVEL level, Object userData) {
+			if (userData != null) {
+				return (ImageFile) userData;
+			}
+			return null;
+		}
+	};
 
 	@Override
 	public void clickAt(int hit) {
