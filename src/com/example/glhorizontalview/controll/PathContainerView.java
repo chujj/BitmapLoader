@@ -106,13 +106,17 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 
 		this.addView(mMenuLayout);
 
+		buildSeekbar(context);
+		
 		mGalleryViewer = new GalleryViewPager(context);
 		mGalleryViewer.setBackgroundColor(0xff000000);
 		this.addView(mGalleryViewer);
 		mGalleryViewer.setVisibility(View.INVISIBLE);
 		
 		buildMenu(context);
-		
+	}
+	
+	private void buildSeekbar(Context context) {
 		mSeekbar = new MySeekBark(context, new SeekBar.OnSeekBarChangeListener() {
 			
 			@Override
