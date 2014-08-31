@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import ssc.software.picviewer.R;
+
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.ds.bitmaputils.Cbitmap.CustomBuildAtomBitmapFactory;
 import com.ds.theard.WorkThread;
@@ -31,6 +35,7 @@ public class BitmapHelper {
 		return sInstance;
 	}
 
+	protected Bitmap mLoadFailed;
 	private BitmapHelper(Context context) {
 		WorkThread.init();
 		if (BitmapNetGetter.sCacheDirPath != null) {
@@ -38,6 +43,7 @@ public class BitmapHelper {
 		}
 		mCbitmapMap = new HashMap<String, Cbitmap>();
 		mAtomBitmaps = new ArrayList<AtomBitmap>();
+		mLoadFailed = BitmapFactory.decodeResource(context.getResources(), R.drawable.load_fail);
 	}
 	
 	private HashMap<String , Cbitmap> mCbitmapMap;

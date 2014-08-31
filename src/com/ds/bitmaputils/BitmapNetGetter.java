@@ -162,6 +162,11 @@ public class BitmapNetGetter {
 						}
 					}
 				}
+				
+				if (bitmap == null) {
+					bitmap = task.getBitmapFailed();
+				}
+				
 				getInstance().mBitmapCache.put(task.getTaskKey(), bitmap);
 				Message.obtain(getInstance().mUIHandler, UIHandler.MSG_FETCH_BITMAP_DONE, task).sendToTarget();
 				break;

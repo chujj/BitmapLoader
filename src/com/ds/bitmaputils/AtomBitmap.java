@@ -188,4 +188,9 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 		int a = 1 / 0;
 	}
 
+	@Override
+	public Bitmap getBitmapFailed() {
+		return BitmapHelper.sInstance.mLoadFailed;
+	}
+
 }

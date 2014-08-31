@@ -58,7 +58,6 @@ public interface BitmapTask {
 	public int getBitmapMaxWidth();
 	public int getBitmapMaxHeight();
 
-
-	
+	public Bitmap getBitmapFailed();
 
 }
