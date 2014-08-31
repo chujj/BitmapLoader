@@ -26,6 +26,8 @@ public class MySeekBark extends SeekBar {
 	private float mCurrOffset, mCurrMinOffset;
 	public void setCurrProgress(float currOffset, float calced_max_offset,
 			float calced_min_offset) {
+		if (blockOutsizeProgress) return;
+		
 		if ((mCurrOffset == currOffset) && (calced_min_offset == mCurrMinOffset)) {
 			return;
 		}
@@ -47,4 +49,7 @@ public class MySeekBark extends SeekBar {
 		blockOutsizeProgress = true;
 	}
 
+	public boolean isSeeking() {
+		return blockOutsizeProgress;
+	}
 }

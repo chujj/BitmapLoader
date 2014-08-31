@@ -133,6 +133,8 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
+				if (!mSeekbar.isSeeking()) // block none activity motion
+					return;
 				mRender.jumpToPercent(progress);
 			}
 		});
