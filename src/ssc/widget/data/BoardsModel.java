@@ -88,7 +88,9 @@ public class BoardsModel implements GLResourceModel, IData {
 		mC.drawColor(0xff000000);
 
 		if (mBoardsRef[aIdx]._cover_image == null) {
-			retval = false;
+			mC.drawColor(0xff3c3c3c);
+			DsCanvasUtil.drawToCenterOfCanvas(mC, BitmapHelper.getInstance(null).mCommonLinearShadowBg, require_width, require_height, mRect);
+			retval = true;
 		} else {
 			AtomBitmap abitmap = BitmapHelper.getInstance(mContext).
 					getBitmap(mBoardsRef[aIdx]._cover_image.remote_query_url, LEVEL.ORIGIN, true, sFactory, mBoardsRef[aIdx]._cover_image);

@@ -36,6 +36,7 @@ public class BitmapHelper {
 	}
 
 	protected Bitmap mLoadFailed;
+	public Bitmap mCommonLinearShadowBg;
 	private BitmapHelper(Context context) {
 		WorkThread.init();
 		if (BitmapNetGetter.sCacheDirPath != null) {
@@ -44,6 +45,7 @@ public class BitmapHelper {
 		mCbitmapMap = new HashMap<String, Cbitmap>();
 		mAtomBitmaps = new ArrayList<AtomBitmap>();
 		mLoadFailed = BitmapFactory.decodeResource(context.getResources(), R.drawable.load_fail);
+		mCommonLinearShadowBg = BitmapFactory.decodeResource(context.getResources(), R.drawable.common_shadow);
 	}
 	
 	private HashMap<String , Cbitmap> mCbitmapMap;
