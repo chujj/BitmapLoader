@@ -780,7 +780,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			calced_min_offset =  -( items.length - 1 ) * Distance;
 		} else {
 			calced_max_offset = 0;
-			calced_min_offset =  -( items.length / PLANE_ROW_COUNT ) * Distance;
+			calced_min_offset =  -( (items.length - 1) / PLANE_ROW_COUNT ) * Distance;
 		}
 
 		// calc the tile count maybe used in render routine
