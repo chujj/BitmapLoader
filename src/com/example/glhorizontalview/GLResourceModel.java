@@ -17,4 +17,7 @@ public interface GLResourceModel {
 	public void longClick(float x , float y , int hit);
 	
 	public void lastFrame(float offset_progress);
+
+	public void drawAtOffset(float mCurrOffset, float calced_max_offset,
+			float calced_min_offset);
 }

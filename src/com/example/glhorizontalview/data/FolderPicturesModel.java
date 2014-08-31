@@ -273,7 +273,13 @@ public class FolderPicturesModel implements GLResourceModel {
 
 	@Override
 	public void lastFrame(float offset_progress) {
-		mPathClickListener.onItemNDraw(offset_progress);
+		
+	}
+
+	@Override
+	public void drawAtOffset(float mCurrOffset, float calced_max_offset,
+			float calced_min_offset) {
+		mPathClickListener.onOffsetDrawed(mCurrOffset, calced_max_offset, calced_min_offset);
 	}
 
 

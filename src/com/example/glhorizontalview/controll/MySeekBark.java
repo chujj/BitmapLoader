@@ -1,5 +1,7 @@
 package com.example.glhorizontalview.controll;
 
+import com.ds.io.DsLog;
+
 import android.content.Context;
 import android.widget.SeekBar;
 
@@ -21,12 +23,22 @@ public class MySeekBark extends SeekBar {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
 
-	public void setCurrProgress(float offset_progress) {
-		if (blockOutsizeProgress) return;
+	private float mCurrOffset, mCurrMinOffset;
+	public void setCurrProgress(float currOffset, float calced_max_offset,
+			float calced_min_offset) {
+		if ((mCurrOffset == currOffset) && (calced_min_offset == mCurrMinOffset)) {
+			return;
+		}
 		
-		setProgress((int)(offset_progress * 100));
-	}
+		float progress = ((-currOffset) / (calced_max_offset - calced_min_offset));
+		progress = Math.min(progress, 1);
+		progress = Math.max(progress, 0);
 
+		mCurrOffset = currOffset;
+		mCurrMinOffset = calced_min_offset;
+		setProgress( (int)(progress * 100));
+	}
+	
 	public void stopToSeek() {
 		blockOutsizeProgress = false;
 	}
@@ -35,5 +47,4 @@ public class MySeekBark extends SeekBar {
 		blockOutsizeProgress = true;
 	}
 
-	
 }

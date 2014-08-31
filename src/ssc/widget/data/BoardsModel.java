@@ -151,4 +151,9 @@ public class BoardsModel implements GLResourceModel, IData {
 		}
 	}
 
+	@Override
+	public void drawAtOffset(float mCurrOffset, float calced_max_offset,
+			float calced_min_offset) {
+	}
+
 }

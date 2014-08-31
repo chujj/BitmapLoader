@@ -331,9 +331,9 @@ public class PathContainerView extends ViewGroup implements PathListener, OnClic
 		
 	}
 
-	public void onItemNDraw(float offset_progress) {
-		mSeekbar.setCurrProgress(offset_progress);
-		
+	public void onOffsetDrawed(float mCurrOffset, float calced_max_offset,
+			float calced_min_offset) {
+		mSeekbar.setCurrProgress(mCurrOffset, calced_max_offset, calced_min_offset);
 	}
 
 }

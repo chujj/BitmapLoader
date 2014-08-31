@@ -99,6 +99,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				public void lastFrame(float offset_progress) {
 
 				}
+
+				@Override
+				public void drawAtOffset(float mCurrOffset,
+						float calced_max_offset, float calced_min_offset) {
+
+				}
 			};
 		}
 		mModel.currRenderView(this);
@@ -569,6 +575,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			}
 			mGLSurfaceView.requestRender();
 		}
+		
+		if (mModel != null) {
+			mModel.drawAtOffset(mCurrOffset, calced_max_offset, calced_min_offset);
+		}
+		
 //		testSubTex();
 		int error = glUnused.glGetError();
 		if (error != 0)
