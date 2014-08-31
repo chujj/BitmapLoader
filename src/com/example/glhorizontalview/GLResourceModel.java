@@ -6,6 +6,8 @@ public interface GLResourceModel {
 	public int getCount();
 
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width, int require_height);
+	
+	public void deprecateToDraw(int aIdx);
 
 	/** called on UI Thread
 	 * @param hit

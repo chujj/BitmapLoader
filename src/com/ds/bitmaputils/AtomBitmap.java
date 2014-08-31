@@ -61,6 +61,10 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 
 	}
 
+	public void tryCancelQueryTask() {
+		BitmapNetGetter.tryCancelTask(this);
+	}
+
 	final private void markRead() {
 		lastAccessTime = System.currentTimeMillis();
 		accessCount ++ ;
@@ -183,4 +187,5 @@ public class AtomBitmap implements BitmapTask , Comparable<AtomBitmap> {
 	public void saveBitmap(Bitmap bitmap) {
 		int a = 1 / 0;
 	}
+
 }

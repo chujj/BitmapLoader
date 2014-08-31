@@ -50,6 +50,11 @@ public class FolderPicturesModel implements GLResourceModel {
 			int require_height) {
 		return mIDataStack.peek().updateToCanvas(aIdx, mC, require_width, require_height);
 	}
+
+	@Override
+	public void deprecateToDraw(int aIdx) {
+		mIDataStack.peek().deprecateToDraw(aIdx);
+	}
 	
 	private class LoadPathRunnable extends ModelChangeCallback {
 		private String mPath;
@@ -281,6 +286,5 @@ public class FolderPicturesModel implements GLResourceModel {
 			float calced_min_offset) {
 		mPathClickListener.onOffsetDrawed(mCurrOffset, calced_max_offset, calced_min_offset);
 	}
-
 
 }

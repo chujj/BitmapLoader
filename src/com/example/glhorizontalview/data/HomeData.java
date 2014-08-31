@@ -223,6 +223,11 @@ public class HomeData  implements IData {
 	}
 	
 	@Override
+	public void deprecateToDraw(int aIdx) {
+
+	}
+		
+	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {
 		boolean validate = false;

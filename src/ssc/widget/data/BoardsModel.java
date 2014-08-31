@@ -156,4 +156,10 @@ public class BoardsModel implements GLResourceModel, IData {
 			float calced_min_offset) {
 	}
 
+	@Override
+	public void deprecateToDraw(int aIdx) {
+		// ZHUJJ Auto-generated method stub
+		
+	}
+
 }

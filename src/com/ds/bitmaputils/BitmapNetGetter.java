@@ -109,6 +109,11 @@ public class BitmapNetGetter {
 		return retval;
 	}
 	
+	public static void tryCancelTask(BitmapTask aTask) {
+		getInstance().mWorkHandler.removeMessages(WorkHandler.MSG_FETCH_BITMAP, aTask);
+		getInstance().mFetchTask.remove(aTask.getTaskKey());
+	}
+	
 	private Bitmap getCachedBitmap(Object aKey) {
 		return mBitmapCache.get(aKey);
 	}
@@ -255,10 +260,8 @@ public class BitmapNetGetter {
 			switch (msg.what) {
 			case MSG_FETCH_BITMAP_DONE:
 				BitmapTask task = (BitmapTask) msg.obj;
-				if (getInstance().mFetchTask.containsKey(task.getTaskKey())) {
-					BitmapGotCallBack run = getInstance().mFetchTask.get(task.getTaskKey());
-					getInstance().mFetchTask.remove(task.getTaskKey());
-					if (run != null)
+				BitmapGotCallBack run = getInstance().mFetchTask.remove(task.getTaskKey());
+				if (run != null) {
 						run.onBitmapGot(getInstance().mBitmapCache.get(task.getTaskKey()));
 				}
 				break;
@@ -294,5 +297,7 @@ public class BitmapNetGetter {
 		}
 		return filePath;
 	}
+
+
 
 }

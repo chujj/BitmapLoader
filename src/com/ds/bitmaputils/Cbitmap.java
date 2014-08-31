@@ -7,7 +7,7 @@ public class Cbitmap {
 	
 	private String key;
 	
-	private AtomBitmap mThumbNailAtomBitmap, mFitScreenAtomBitmap, mOriginAtomBitmap;
+	protected AtomBitmap mThumbNailAtomBitmap, mFitScreenAtomBitmap, mOriginAtomBitmap;
 	private BitmapHelper mHelper;
 	private boolean mIsCustomBuild;
 	private CustomBuildAtomBitmapFactory mABitmapFactory;
@@ -24,6 +24,19 @@ public class Cbitmap {
 		mUserData = userData;
 	}
 
+	
+	protected boolean isExistLevel(LEVEL level) {
+		if (level == LEVEL.THUMBNAIL) {
+			return mThumbNailAtomBitmap != null;
+		} else if (level == LEVEL.ORIGIN) {
+			return mOriginAtomBitmap != null;
+		} else if (level == LEVEL.FITSCREEN) {
+			return mFitScreenAtomBitmap != null;
+		}
+		
+		return false;
+	}
+	
 	public AtomBitmap accessBitmap(LEVEL level) {
 		if (level == LEVEL.THUMBNAIL) {
 			if (mThumbNailAtomBitmap == null) {

@@ -119,4 +119,10 @@ public class PinsModel implements GLResourceModel, IData {
 	public void drawAtOffset(float mCurrOffset, float calced_max_offset,
 			float calced_min_offset) {
 	}
+
+	@Override
+	public void deprecateToDraw(int aIdx) {
+		// ZHUJJ Auto-generated method stub
+		
+	}
 }

@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import com.ds.bitmaputils.AtomBitmap;
 import com.ds.bitmaputils.BitmapGotCallBack;
 import com.ds.bitmaputils.BitmapHelper;
+import com.ds.bitmaputils.BitmapHelper.LEVEL;
 import com.ds.ui.DsCanvasUtil;
 import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.ModelChangeCallback.ModelState;
@@ -122,6 +123,11 @@ public class FolderData implements IData {
 		return mKeys.length;
 	}
 
+	@Override
+	public void deprecateToDraw(int aIdx) {
+		BitmapHelper.getInstance(mFather.getContext()).cancelTaskByKey(mKeys[aIdx].absPath, LEVEL.THUMBNAIL);
+	}
+	
 	@Override
 	public boolean updateToCanvas(int aIdx, Canvas mC, int require_width,
 			int require_height) {

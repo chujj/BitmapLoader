@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import ssc.software.picviewer.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,15 +19,12 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
 import com.ds.io.DsLog;
 import com.ds.views.MyScroller;
 import com.example.glhorizontalview.ModelChangeCallback.ModelState;
-
-import ssc.software.picviewer.R;
 import com.learnopengles.android.common.RawResourceReader;
 import com.learnopengles.android.common.ShaderHelper;
 import com.learnopengles.android.common.TextureHelper;
@@ -103,6 +101,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				@Override
 				public void drawAtOffset(float mCurrOffset,
 						float calced_max_offset, float calced_min_offset) {
+
+				}
+
+				@Override
+				public void deprecateToDraw(int aIdx) {
 
 				}
 			};
@@ -223,7 +226,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				break;
 			case MSG_FLING:
 				float vx = msg.getData().getFloat("x");
-				float vy = msg.getData().getFloat("y");
+//				float vy = msg.getData().getFloat("y");
 				long durning =  (long) ( Math.abs(vx) * AUTO_ANIMATION_TIME_PER_PIXEL);
 //				DsLog.e("eventHub onFling: vx: " + vx + " durning: " + durning);
 				if (timeToTriggerSpinAnimation(vx)) {
@@ -947,6 +950,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		}
 				
 		public void deprecateToDraw() {
+			mModel.deprecateToDraw(mIdx);
 		}
 
 		public void prepareToDraw2() {
@@ -967,7 +971,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 							mCurr_Tile_Size * mTilePoll[mTileIdx].column_idx, 
 							mCurr_Tile_Size * mTilePoll[mTileIdx].row_idx,
 							mBitmap);
-					DsLog.e("update pixel of id: " + mIdx  + " into tile: " + mTileIdx);
+//					DsLog.e("update pixel of id: " + mIdx  + " into tile: " + mTileIdx);
 				}
 			}
 		}

@@ -33,4 +33,6 @@ public interface IData {
 
 	public void goingToLeaveModel(ModelState stat);
 
+	public void deprecateToDraw(int aIdx);
+
 }

@@ -75,6 +75,17 @@ public class BitmapHelper {
 		}	
 		return c;
 	}
+
+	public void cancelTaskByKey(String key, LEVEL level) {
+		Cbitmap c = mCbitmapMap.get(key);
+		if (c == null || !c.isExistLevel(level)) {
+			return;
+		}
+		
+		AtomBitmap finded = c.accessBitmap(level);
+		finded.tryCancelQueryTask();
+	}	
+	
 	public int getSize() {
 		return 0;
 	}
@@ -118,4 +129,5 @@ public class BitmapHelper {
 		}
 		return sb.toString();
 	}
+
 }
