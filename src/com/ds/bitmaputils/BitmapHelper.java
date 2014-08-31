@@ -2,14 +2,12 @@ package com.ds.bitmaputils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+
+import android.content.Context;
 
 import com.ds.bitmaputils.Cbitmap.CustomBuildAtomBitmapFactory;
 import com.ds.theard.WorkThread;
-
-import android.content.Context;
-import android.graphics.Bitmap;
 
 public class BitmapHelper {
 	public static int THUMBNAIL_WIDTH = 300;
@@ -69,7 +67,7 @@ public class BitmapHelper {
 		return c.accessBitmap(level);
 	}
 
-	private Cbitmap getCbitmap(String path, boolean custombuild, CustomBuildAtomBitmapFactory factory, Object userData) {
+	public Cbitmap getCbitmap(String path, boolean custombuild, CustomBuildAtomBitmapFactory factory, Object userData) {
 		Cbitmap c = mCbitmapMap.get(path);
 		if (c == null) {
 			c = new Cbitmap(this, path, custombuild, factory, userData);

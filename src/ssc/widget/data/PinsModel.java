@@ -67,14 +67,11 @@ public class PinsModel implements GLResourceModel, IData {
 	@Override
 	public void clickAt(int hit) {
 		if (mBoard.mPins[hit]._img != null) {
-//			Bitmap bitmap =  BitmapNetGetter.tryGetBitmapFromUrlOrCallback(mBoard.mPins[hit]._img, null);
-//			if (bitmap != null) {
-//				
-//				mFather.mPathClickListener.showGallery(new MyPagerAdapter(mFather
-//						.getContext(), bitmap));
-//			} 
+			mFather.mPathClickListener.showGallery(new MyPagerAdapter(mFather
+					.getContext(), BitmapHelper.getInstance(
+							mFather.getContext()).
+							getCbitmap(mBoard.mPins[hit]._img.remote_query_url, true, BoardsModel.sFactory, mBoard.mPins[hit]._img)));
 		}
-
 	}
 
 	@Override
