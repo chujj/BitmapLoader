@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import ssc.software.picviewer.R;
 
+import com.ds.bitmaputils.BitmapHelper;
+import com.ds.ui.DsCanvasUtil;
 import com.example.glhorizontalview.ModelChangeCallback;
 import com.example.glhorizontalview.ModelChangeCallback.ModelState;
 import com.example.glhorizontalview.controll.PathContainerView;
@@ -238,7 +240,9 @@ public class HomeData  implements IData {
 			String descript = it.mShortName == null ? it.mDefine : it.mShortName;
 			drawFolderToCanvas(mC, require_width, require_height, descript, mRect);
 		} else {
-			mC.drawColor(0xff00aaaa);
+			mC.drawColor(0xff000000);
+			DsCanvasUtil.drawToCenterOfCanvas(mC, BitmapHelper.getInstance(mFather.getContext()).mMorePic, 
+					require_width, require_height, mRect);
 		}
 
 		validate = true;
