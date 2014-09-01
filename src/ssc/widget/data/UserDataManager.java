@@ -55,7 +55,7 @@ public class UserDataManager {
 		UserDataGroup net_result = queryNetUserBoards(context);
 		
 		mDataController = UserDataGroup.mergeNetData(net_result, mDataController);
-		if (mDataController.isSthMerged) {
+		if (mDataController!= null && mDataController.mEntry != null && mDataController.isSthMerged) {
 			mDataController.queryAllPinsInBoards();
 			writeToLocalCache(context, mDataController);
 		}
@@ -120,6 +120,6 @@ public class UserDataManager {
 	}
 
 	public HBoard[] getBoards() {
-		return mDataController.mHBoard;
+		return mDataController == null ? null : mDataController.mHBoard;
 	}	
 }
