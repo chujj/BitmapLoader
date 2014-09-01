@@ -63,6 +63,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mModel = aModel;
 		mLogo = BitmapFactory.decodeResource(activityContext.getResources(), R.drawable.tm);
 		mWidth = mHeight = -1;
+		mCurrOffset = 0;
 		if (aModel == null) {
 			mModel = new GLResourceModel() {
 				
@@ -277,7 +278,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 						callback.mStat = null;
 					}
 				}
-				initDimensionLimit();
+				initDimensionLimit(0);
 				updateItems(next_offset_x, 0);
 				break;
 			case MSG_REFRESH_IDX:
@@ -300,7 +301,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				
 				mCurrMode = nextMode;
 				// recalc size
-				initDimensionLimit();
+				initDimensionLimit(0);
 				updateItems(0, 0);
 				// release last texture hander
 				// realloc texture handel
@@ -470,7 +471,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				-PLAN_HEIGHT_MAXIMIN, PLAN_HEIGHT_MAXIMIN, NEAR, FAR);
 		
 		calcTileSizeForBothMode(width, height);
-		initDimensionLimit();
+		initDimensionLimit(mCurrOffset);
 		updateItems(0, 0);
 	}
 	
@@ -769,9 +770,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		DsLog.e("max pixels size: " + maxSize[0] + " max_pixel_unit: " + maxNum[0]);
 	}
 
-	private void initDimensionLimit() {
+	private void initDimensionLimit(float initOffset) {
 		mScroller = new MyScroller(mActivityContext);
-		mCurrOffset = 0;
+		mCurrOffset = initOffset;
 
 		Paint p = new Paint();
 		p.setTextSize(50);
@@ -820,10 +821,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		}
 
 		mTileBitmap = Bitmap.createBitmap(tile_size * it, tile_size * it, cf);
-		if (mTileTextureHandle != -1) {
-			TextureHelper.deleteTexture(mActivityContext, mTileTextureHandle);
-			mTileTextureHandle = -1;
-		}
 		mTileTextureHandle = TextureHelper.loadTexture(mActivityContext, mTileBitmap);
 		mTileBitmap.recycle();
 
