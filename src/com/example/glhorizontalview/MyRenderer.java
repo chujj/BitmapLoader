@@ -517,7 +517,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 //		DsLog.e("lifet onDrawFrame");
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-		GLES20.glUseProgram(mProgramHandle);
+		GLES20.glUseProgram(mProgramHandle); // ZHUJJ-TODO after resume here may 505 OOM happend
+		testGLError("onDrawFrame start to Draw after use Program");
 
 		mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgramHandle,
 				"u_MVPMatrix");
@@ -531,7 +532,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTileTextureHandle);
 		GLES20.glUniform1i(mTextureUniformHandle, 0);
-		
+
 		for (int i = 0; i < items.length; i++) {
 			if ( !(items[i].validate)) {
 				items[i].deprecateToDraw();
@@ -565,7 +566,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 			
 			GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
-			
+
 			// draw logo
 			mBackPositions.position(0);
 			GLES20.glVertexAttribPointer(mPositionHandle, PositionDataSize,
@@ -582,6 +583,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 
 			GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+
 		}
 		
 		if (inAutoAnimation) {
@@ -598,13 +600,18 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			mModel.drawAtOffset(mCurrOffset, calced_max_offset, calced_min_offset);
 		}
 		
-//		testSubTex();
+		GLES20.glUseProgram(0);
+
 		testGLError("onDrawFrame");
 	}
 	
-	final private void testGLError(String extraMsg) {
+	final private boolean testGLError(String extraMsg) {
 		int error = GLES20.glGetError();
-		if (error != 0) DsLog.e(extraMsg + ":GL Error: " + Integer.toHexString(error));
+		if (error != 0) {
+			DsLog.e(extraMsg + ":GL Error: " + Integer.toHexString(error));
+			return true;
+		} 
+		return false;
 	}
 
 	////////////////////////////////animation part ////////////////////////////////

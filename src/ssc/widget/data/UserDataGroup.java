@@ -30,7 +30,7 @@ public class UserDataGroup {
 	 * @param dst
 	 * @return
 	 */
-	public static UserDataGroup mergeNetData(UserDataGroup src, UserDataGroup dst) { // ZHUJJ implement
+	public static UserDataGroup mergeNetData(UserDataGroup src, UserDataGroup dst) {
 		if (dst == null) {
 			dst = src;
 			dst.isSthMerged = true;
@@ -94,7 +94,7 @@ public class UserDataGroup {
 		}
 	}
 
-	public void writeToFile(File cache) { // ZHUJJ implement
+	public void writeToFile(File cache) {
 		FileOutputStream fos;
 		try {
 			fos = new FileOutputStream(cache);

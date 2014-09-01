@@ -133,7 +133,7 @@ public class BoardsModel implements GLResourceModel, IData {
 
 	@Override
 	public void longClick(float x, float y, int hit) {
-		// ZHUJJ implemnt
+		
 	}
 
 	@Override
