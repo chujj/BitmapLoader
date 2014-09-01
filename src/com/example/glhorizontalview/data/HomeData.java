@@ -243,6 +243,8 @@ public class HomeData  implements IData {
 			mC.drawColor(0xff000000);
 			DsCanvasUtil.drawToCenterOfCanvas(mC, BitmapHelper.getInstance(mFather.getContext()).mMorePic, 
 					require_width, require_height, mRect);
+			sTextPaint.setTextSize(25);
+			mC.drawText(it.mShortName, (require_width - sTextPaint.measureText(it.mShortName)) / 2, require_height - 15, sTextPaint);
 		}
 
 		validate = true;
