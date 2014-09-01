@@ -62,6 +62,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mGLSurfaceView = sv;
 		mModel = aModel;
 		mLogo = BitmapFactory.decodeResource(activityContext.getResources(), R.drawable.tm);
+		mWidth = mHeight = -1;
 		if (aModel == null) {
 			mModel = new GLResourceModel() {
 				
@@ -395,23 +396,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	private MyGLHandler mGLHandler;
-
-	private void checkInitedOrRelease() {
-		if (mGLHandler != null) {
-			mGLHandler = null;
-			GLES20.glDeleteProgram(mProgramHandle);
-			mProgramHandle = -1;
-			items = null;
-			if (mTileTextureHandle != -1) {
-				TextureHelper.deleteTexture(mActivityContext, mTileTextureHandle);
-				mTileTextureHandle = -1;
-			}
-		}
-	}
+	private int mWidth, mHeight;
+	
+	
 	@Override
 	public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
 		DsLog.e("lifet onSurfaceCreated");
-		checkInitedOrRelease();
+
 		mGLHandler = new MyGLHandler();
 		if (Looper.myLooper() == Looper.getMainLooper())
 			;
@@ -434,22 +425,45 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mProgramHandle = ShaderHelper.createAndLinkProgram(vertexShaderHandle,
 				fragmentShaderHandle, new String[] { "a_Position",
 						"a_TexCoordinate" });
-
+		
+		if (mWidth == -1) {
+			// nothing
+		} else {
+			setupWithLastDimensition(mWidth, mHeight);
+		}
+		
+		testGLError("onSurfaceCreated");
 	}
 
 	private float PLANE_VISIABLE_NEAR_X_START, PLANE_VISIABLE_NEAR_X_END;
 	@Override
 	public void onSurfaceChanged(GL10 glUnused, int width, int height) {
 		DsLog.e("lifet onSurfaceChanged " + width + " h:" + height);
+		
+		if (dimensitionChanged(width, height)) {
+			setupWithLastDimensition(width, height);
+			mWidth = width;
+			mHeight = height;
+		}
+		
+		testGLError("onSurfaceChanged");
+	}
+	
+	private boolean dimensitionChanged(int width, int height) {
+		if (mWidth != width || mHeight != height) return true;
+		return false;
+	}
+	
+	private void setupWithLastDimensition(int width, int height) {
 		GLES20.glViewport(0, 0, width, height);
-
+		
 		final float ratio = (float) width / height;
 		final float left = -ratio;
 		final float right = ratio;
 		
 		PLANE_VISIABLE_NEAR_X_START = - (ratio / NEAR * ( -PLAN_TRASLATE_Z + PLANE_OFFSET_Z));
 		PLANE_VISIABLE_NEAR_X_END = -PLANE_VISIABLE_NEAR_X_START;
-
+		
 		LEFT_PERCENT = (NEAR * (PLAN_HALF_WIDTH_FIXED / (-PLAN_TRASLATE_Z))) / ratio;
 		RIGHT_PERCENT = LEFT_PERCENT;
 		Matrix.frustumM(mProjectionMatrix, 0, left, right,
@@ -584,9 +598,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		}
 		
 //		testSubTex();
-		int error = glUnused.glGetError();
-		if (error != 0)
-			DsLog.e("GL Error: " + Integer.toHexString(error));
+		testGLError("onDrawFrame");
+	}
+	
+	final private void testGLError(String extraMsg) {
+		int error = GLES20.glGetError();
+		if (error != 0) DsLog.e(extraMsg + ":GL Error: " + Integer.toHexString(error));
 	}
 
 	////////////////////////////////animation part ////////////////////////////////
