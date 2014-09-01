@@ -129,7 +129,7 @@ public class HomeData  implements IData {
 		
 		{// default, boards model
 			it = new HomeItem();
-			it.mShortName = BOARD_MARK;
+			it.mShortName = mFather.getContext().getString(R.string.discovery);
 			it.mType = TYPE_URI;
 			it.mDefine = BOARD_MARK;
 			mItems.add(it);
