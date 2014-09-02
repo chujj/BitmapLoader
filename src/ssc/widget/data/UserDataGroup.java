@@ -18,11 +18,13 @@ public class UserDataGroup {
 	HBoard[] mHBoard;
 	JSONObject mEntry;
 	boolean isSthMerged;
+	String command_description;
 	
-	public UserDataGroup(HBoard[] boardArray, JSONObject entry) {
+	public UserDataGroup(HBoard[] boardArray, JSONObject entry, String command_des) {
 		mHBoard = boardArray;
 		mEntry = entry;
 		isSthMerged = false;
+		command_description = command_des;
 	}
 
 	/** merge src into dst. If successed set dst's merge_flag

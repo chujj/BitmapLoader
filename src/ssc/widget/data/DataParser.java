@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,28 +46,33 @@ public class DataParser {
 	}
 	
 	public UserDataGroup parser(String aData) {
-		HBoard[] boardArray = null;
+		HBoard[] boardArray = new HBoard[0];
 		JSONObject entry = null;
+		String commond_description = null;
 		try {
 			entry = new JSONObject(aData);
 			Object boards_object = entry.get(BOARD_ENTRY_KEY);
 			if (boards_object == null || !(boards_object instanceof JSONArray)) {
-				return new UserDataGroup(boardArray, entry);
+				return new UserDataGroup(boardArray, entry, commond_description);
 			}
 			
 			JSONArray boards = (JSONArray) boards_object;
-			int boardCount = boards.length();
-			boardArray = new HBoard[boardCount];
-			for (int i = 0; i < boardArray.length; i++) {
-				boardArray[i] = new HBoard(boards.getJSONObject(i));
-//				System.out.println(boardArray[i].toString());
+			ArrayList<HBoard> lists = new ArrayList<HBoard>();
+			for (int i = 0; i < boards.length(); i++) {
+				JSONObject boardObj = boards.getJSONObject(i);
+				HBoard board = new HBoard(boardObj);
+				if (board._title.equalsIgnoreCase("commands")) {
+					commond_description = board._descript;
+				} else {
+					lists.add(board);
+				}
 			}
 
-			
+			boardArray = lists.toArray(boardArray);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new UserDataGroup(boardArray, entry);
+		return new UserDataGroup(boardArray, entry, commond_description);
 	}
 }
