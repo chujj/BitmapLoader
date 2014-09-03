@@ -3,6 +3,7 @@ package com.example.glhorizontalview.controll;
 import com.ds.io.DsLog;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.widget.SeekBar;
 
 public class MySeekBark extends SeekBar {
@@ -14,6 +15,12 @@ public class MySeekBark extends SeekBar {
 		this.setMax(101);
 		Max_SIZE = (int) (100 * context.getResources().getDisplayMetrics().density);
 		this.setOnSeekBarChangeListener(listener);
+		ColorDrawable bg = new ColorDrawable(0xff00000);
+		ColorDrawable cd = new ColorDrawable(0xff888888);
+//		this.setBackgroundDrawable(bg);
+//		this.setThumb(cd);
+		this.setIndeterminateDrawable(bg);
+		this.setProgressDrawable(cd);
 	}
 
 	@Override

@@ -126,14 +126,6 @@ public class HomeData  implements IData {
 	private void buildDefault() {
 		File rootsd = Environment.getExternalStorageDirectory();
 		HomeItem it = null;
-		
-		{// default, boards model
-			it = new HomeItem();
-			it.mShortName = mFather.getContext().getString(R.string.discovery);
-			it.mType = TYPE_URI;
-			it.mDefine = BOARD_MARK;
-			mItems.add(it);
-		}
 
 		if (rootsd.exists()) {
 			// DCIM
@@ -181,6 +173,14 @@ public class HomeData  implements IData {
 		it.mShortName = mFather.getContext().getString(R.string.root_dir);
 		
 		mItems.add(it);
+		
+		{// default, boards model
+			it = new HomeItem();
+			it.mShortName = mFather.getContext().getString(R.string.discovery);
+			it.mType = TYPE_URI;
+			it.mDefine = BOARD_MARK;
+			mItems.add(it);
+		}
 	}
 	
 	private String getInitPath() {
